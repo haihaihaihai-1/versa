@@ -385,4 +385,45 @@ export interface AppState {
   addresses: UserAddress[]
   visitedModules: { news: number; debate: number; shop: number }
   joinedAt: string
+  shortVideos: ShortVideo[]
+  shortVideoComments: ShortVideoComment[]
+  followingCreators: string[]
+}
+
+export type ShortVideoCategory = 'food' | 'fashion' | 'tech' | 'beauty' | 'home' | 'travel' | 'fitness' | 'lifestyle'
+
+export interface ShortVideo {
+  id: string
+  creatorId: string
+  creatorName: string
+  creatorAvatar: string
+  creatorLevel: number
+  cover: string
+  coverGradient: string
+  title: string
+  description: string
+  tags: string[]
+  category: ShortVideoCategory
+  productIds: string[]
+  duration: number
+  likes: number
+  comments: number
+  shares: number
+  favorites: number
+  views: number
+  music: string
+  isVideo: boolean
+  location?: string
+  createdAt: string
+}
+
+export interface ShortVideoComment {
+  id: string
+  videoId: string
+  userId: string
+  userName: string
+  userAvatar: string
+  content: string
+  likes: number
+  createdAt: string
 }

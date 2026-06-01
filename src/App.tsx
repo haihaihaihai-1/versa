@@ -16,6 +16,9 @@ import { BrandStreetPage } from './pages/BrandStreetPage'
 import { CouponsPage } from './pages/CouponsPage'
 import { LiveShoppingPage } from './pages/LiveShoppingPage'
 import { ComparePage } from './pages/ComparePage'
+import ShortVideoPage from './pages/ShortVideoPage'
+import ShortVideoDetailPage from './pages/ShortVideoDetailPage'
+import ShortVideoCreatorPage from './pages/ShortVideoCreatorPage'
 import { DebateHomePage } from './pages/DebateHomePage'
 import { DebateDetailV2 } from './pages/DebateDetailV2'
 import { RoundTablePage } from './pages/RoundTablePage'
@@ -81,6 +84,9 @@ export const router = createBrowserRouter(
         { path: 'shop/compare', element: <ComparePage /> },
         { path: 'shop/live', element: <LiveShoppingPage /> },
         { path: 'shop/live/:id', element: <LiveShoppingPage /> },
+        { path: 'shop/shorts', element: <ShortVideoPage /> },
+        { path: 'shop/shorts/:id', element: <ShortVideoDetailPage /> },
+        { path: 'shop/shorts/creator/:creatorId', element: <ShortVideoCreatorPage /> },
         { path: 'shop/:id', element: <ProductDetailV2 /> },
         { path: 'shop-legacy', element: <ShopListPage /> },
         { path: 'shop-legacy/:id', element: <ProductDetailPage /> },

@@ -7,7 +7,7 @@ import { BrandZone } from '../components/shop/BrandZone'
 import { ProductCardV2 } from '../components/shop/ProductCardV2'
 import { Tabs } from '../components/ui/Tabs'
 import { SearchBar, useDebounce } from '../components/ui/Search'
-import { Sparkles, Crown, TrendingUp, ShoppingBag, Newspaper, Scale, ArrowUpRight, Star, Ticket, Video, Award, GitCompareArrows, Bell } from 'lucide-react'
+import { Sparkles, Crown, TrendingUp, ShoppingBag, Newspaper, Scale, ArrowUpRight, Star, Ticket, Video, Award, GitCompareArrows, Bell, PlayCircle } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { versa } from '../store/versa'
 import { useVersa } from '../store/versa'
@@ -34,6 +34,7 @@ export function ShopHomePage() {
   const [section, setSection] = useState('recommended')
   const [sort, setSort] = useState('recommended')
   const debounced = useDebounce(query, 200)
+  const { shortVideos } = useVersa()
 
   useEffect(() => { versa.visitModule('shop') }, [])
 
@@ -93,12 +94,12 @@ export function ShopHomePage() {
       <div className="grid grid-cols-4 sm:grid-cols-8 gap-2 sm:gap-3">
         {[
           { icon: Ticket, label: '领券中心', to: '/shop/coupons', gradient: 'from-red-500 to-orange-500' },
+          { icon: PlayCircle, label: '短视频', to: '/shop/shorts', gradient: 'from-rose-500 to-pink-500', badge: 'HOT' },
           { icon: Video, label: '直播', to: '/shop/live', gradient: 'from-pink-500 to-rose-500', badge: 'LIVE' },
           { icon: Crown, label: '品牌街', to: '/shop/brands', gradient: 'from-amber-500 to-orange-500' },
           { icon: GitCompareArrows, label: '商品对比', to: '/shop/compare', gradient: 'from-cyan-500 to-blue-500' },
           { icon: Award, label: '官方旗舰', to: '/shop?section=flagship', gradient: 'from-violet-500 to-purple-500' },
           { icon: TrendingUp, label: '排行榜', to: '/shop?sort=sales', gradient: 'from-emerald-500 to-teal-500' },
-          { icon: Newspaper, label: '新闻同款', to: '/shop?section=news', gradient: 'from-blue-500 to-cyan-500' },
           { icon: Bell, label: '降价提醒', to: '/profile/wishlist', gradient: 'from-debate-500 to-rose-500' },
         ].map((it) => (
           <Link
@@ -241,6 +242,52 @@ export function ShopHomePage() {
             {filtered.map((p) => <ProductCardV2 key={p.id} product={p} />)}
           </div>
         )}
+      </div>
+
+      {/* 短视频种草 */}
+      <div className="rounded-3xl p-6 bg-gradient-to-br from-rose-500/5 via-pink-500/5 to-fuchsia-500/5 border border-ink-200/60 dark:border-ink-800/60 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-rose-500/10 to-transparent rounded-full blur-3xl" />
+        <div className="relative">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-rose-500 to-pink-500 flex items-center justify-center shadow-lg">
+                <PlayCircle className="w-4 h-4 text-white" />
+              </div>
+              <div>
+                <h3 className="font-bold text-base sm:text-lg">短视频种草</h3>
+                <p className="text-[10px] text-ink-500">创作者真实分享</p>
+              </div>
+            </div>
+            <Link to="/shop/shorts" className="text-xs text-rose-500 flex items-center gap-0.5 hover:underline">
+              更多 <ArrowUpRight className="w-3 h-3" />
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {shortVideos.slice(0, 4).map((v) => (
+              <Link
+                key={v.id}
+                to={`/shop/shorts/${v.id}`}
+                className="group block"
+              >
+                <div
+                  className="relative aspect-[9/14] rounded-2xl overflow-hidden"
+                  style={{ background: v.coverGradient }}
+                >
+                  <div className="absolute bottom-0 inset-x-0 p-2.5 bg-gradient-to-t from-black/60 to-transparent">
+                    <p className="text-white text-[11px] font-medium line-clamp-2">{v.title}</p>
+                  </div>
+                  <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded-full bg-black/40 backdrop-blur text-[9px] text-white">
+                    {v.duration}″
+                  </div>
+                </div>
+                <div className="mt-1.5 flex items-center gap-1.5">
+                  <img src={v.creatorAvatar} alt="" className="w-4 h-4 rounded-full bg-ink-100" />
+                  <span className="text-[11px] text-ink-600 truncate">{v.creatorName}</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* 底部 - 品牌聚合 */}

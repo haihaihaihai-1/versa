@@ -1,10 +1,11 @@
 import { useEffect, useState, useCallback, useMemo } from 'react'
-import type { AppState, CartItem, Order, UserProfile, Activity, ModuleKey, AfterSalesRequest, ProductReview, AfterSalesType, UserCoupon, UserInvoice, UserAddress } from '../data/types'
+import type { AppState, CartItem, Order, UserProfile, Activity, ModuleKey, AfterSalesRequest, ProductReview, AfterSalesType, UserCoupon, UserInvoice, UserAddress, ShortVideo, ShortVideoComment } from '../data/types'
+import { seedShortVideos, seedShortVideoComments } from '../data/shortVideos'
 import { seedUser } from '../data/users'
 import { uid } from '../lib/utils'
+const STORAGE_KEY = 'versa:state:v3'
 
-const STORAGE_KEY = 'versa:state:v2'
-const STATE_VERSION = 2
+const STATE_VERSION = 3
 
 const POINTS = {
   READ_ARTICLE: 5,
@@ -48,6 +49,9 @@ function defaultState(): AppState {
     ],
     visitedModules: { news: 0, debate: 0, shop: 0 },
     joinedAt: new Date().toISOString(),
+    shortVideos: seedShortVideos,
+    shortVideoComments: seedShortVideoComments,
+    followingCreators: ['u_creator_lila', 'u_creator_momo'],
   }
 }
 
@@ -452,6 +456,39 @@ export const versa = {
   },
   topUpBalance(amount: number) {
     setState((s) => ({ ...s, user: { ...s.user, balance: s.user.balance + amount } }))
+  },
+
+  // short videos
+  likeShortVideo(id: string) {
+    setState((s) => ({ ...s, shortVideos: s.shortVideos.map((v) => (v.id === id ? { ...v, likes: v.likes + 1 } : v)) }))
+  },
+  viewShortVideo(id: string) {
+    setState((s) => ({ ...s, shortVideos: s.shortVideos.map((v) => (v.id === id ? { ...v, views: v.views + 1 } : v)) }))
+  },
+  addShortVideoComment(videoId: string, content: string) {
+    setState((s) => {
+      const c: ShortVideoComment = {
+        id: uid('svc'),
+        videoId,
+        userId: s.user.id,
+        userName: s.user.displayName,
+        userAvatar: s.user.avatar,
+        content,
+        likes: 0,
+        createdAt: new Date().toISOString(),
+      }
+      return {
+        ...s,
+        shortVideoComments: [c, ...s.shortVideoComments],
+        shortVideos: s.shortVideos.map((v) => (v.id === videoId ? { ...v, comments: v.comments + 1 } : v)),
+      }
+    })
+  },
+  toggleFollowCreator(creatorId: string) {
+    setState((s) => {
+      const has = s.followingCreators.includes(creatorId)
+      return { ...s, followingCreators: has ? s.followingCreators.filter((id) => id !== creatorId) : [...s.followingCreators, creatorId] }
+    })
   },
 
   // reset
