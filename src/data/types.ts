@@ -257,6 +257,9 @@ export interface UserProfile {
   reputation: number
   level: number
   badges: Badge[]
+  points: number
+  balance: number
+  memberLevel: 'normal' | 'silver' | 'gold' | 'diamond'
   stats: {
     articlesRead: number
     debatesJoined: number
@@ -271,6 +274,39 @@ export interface CartItem {
   productId: string
   quantity: number
   addedAt: string
+}
+
+export type UserCoupon = {
+  id: string
+  name: string
+  amount: number
+  threshold: number
+  scope: 'all' | 'category' | 'brand'
+  scopeValue?: string
+  expiresAt: string
+  used?: boolean
+  description?: string
+}
+
+export type UserInvoice = {
+  id: string
+  type: 'personal' | 'company'
+  title: string
+  taxId?: string
+  email?: string
+  isDefault?: boolean
+}
+
+export type UserAddress = {
+  id: string
+  name: string
+  phone: string
+  province: string
+  city: string
+  district: string
+  detail: string
+  tag?: 'home' | 'work' | 'school' | 'other'
+  isDefault?: boolean
 }
 
 export type OrderStatus = 'pending_payment' | 'paid' | 'shipped' | 'delivered' | 'reviewing' | 'cancelled' | 'refunded'
@@ -344,6 +380,9 @@ export interface AppState {
   orders: Order[]
   afterSales: AfterSalesRequest[]
   reviews: ProductReview[]
+  coupons: UserCoupon[]
+  invoices: UserInvoice[]
+  addresses: UserAddress[]
   visitedModules: { news: number; debate: number; shop: number }
   joinedAt: string
 }

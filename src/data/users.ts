@@ -23,6 +23,9 @@ export const seedUser: UserProfile = {
   reputation: 0,
   level: 1,
   badges: [allBadges[0]],
+  points: 1280,
+  balance: 500,
+  memberLevel: 'gold',
   stats: {
     articlesRead: 0,
     debatesJoined: 0,

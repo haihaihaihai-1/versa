@@ -1,10 +1,10 @@
 import { useEffect, useState, useCallback, useMemo } from 'react'
-import type { AppState, CartItem, Order, UserProfile, Activity, ModuleKey, AfterSalesRequest, ProductReview, AfterSalesType } from '../data/types'
+import type { AppState, CartItem, Order, UserProfile, Activity, ModuleKey, AfterSalesRequest, ProductReview, AfterSalesType, UserCoupon, UserInvoice, UserAddress } from '../data/types'
 import { seedUser } from '../data/users'
 import { uid } from '../lib/utils'
 
-const STORAGE_KEY = 'versa:state:v1'
-const STATE_VERSION = 1
+const STORAGE_KEY = 'versa:state:v2'
+const STATE_VERSION = 2
 
 const POINTS = {
   READ_ARTICLE: 5,
@@ -32,6 +32,20 @@ function defaultState(): AppState {
     orders: [],
     afterSales: [],
     reviews: [],
+    coupons: [
+      { id: 'c1', name: '新人专享', amount: 30, threshold: 100, scope: 'all', expiresAt: '2099-12-31', description: '满 100 可用' },
+      { id: 'c2', name: '数码专享', amount: 50, threshold: 500, scope: 'category', scopeValue: 'tech', expiresAt: '2099-12-31', description: '数码类满 500 可用' },
+      { id: 'c3', name: '服饰立减', amount: 20, threshold: 0, scope: 'category', scopeValue: 'fashion', expiresAt: '2099-12-31', description: '服饰类无门槛' },
+      { id: 'c4', name: '京东 PLUS', amount: 100, threshold: 1000, scope: 'all', expiresAt: '2099-12-31', description: '满 1000 可用' },
+      { id: 'c5', name: '生日礼券', amount: 200, threshold: 500, scope: 'all', expiresAt: '2099-12-31', description: '生日月专享' },
+    ],
+    invoices: [
+      { id: 'i1', type: 'personal', title: '许泉兴', email: 'quanxing@versa.com', isDefault: true },
+    ],
+    addresses: [
+      { id: 'a1', name: '许泉兴', phone: '13800008829', province: '上海市', city: '徐汇区', district: '虹漕路', detail: '88 号 15 楼 1502 室', tag: 'home', isDefault: true },
+      { id: 'a2', name: '许泉兴', phone: '13800008829', province: '上海市', city: '浦东新区', district: '世纪大道', detail: '100 号 3 号楼 28 楼', tag: 'work' },
+    ],
     visitedModules: { news: 0, debate: 0, shop: 0 },
     joinedAt: new Date().toISOString(),
   }
@@ -372,6 +386,72 @@ export const versa = {
       return { ...s, reviews: [r, ...s.reviews], orders: updatedOrders }
     })
     return r
+  },
+
+  // addresses
+  addAddress(addr: Omit<UserAddress, 'id'>) {
+    setState((s) => {
+      let list = s.addresses
+      if (addr.isDefault) list = list.map((a) => ({ ...a, isDefault: false }))
+      return { ...s, addresses: [...list, { ...addr, id: uid('addr') }] }
+    })
+  },
+  updateAddress(id: string, patch: Partial<UserAddress>) {
+    setState((s) => {
+      let list = s.addresses.map((a) => (a.id === id ? { ...a, ...patch } : a))
+      if (patch.isDefault) list = list.map((a) => (a.id === id ? a : { ...a, isDefault: false }))
+      return { ...s, addresses: list }
+    })
+  },
+  deleteAddress(id: string) {
+    setState((s) => ({ ...s, addresses: s.addresses.filter((a) => a.id !== id) }))
+  },
+  setDefaultAddress(id: string) {
+    setState((s) => ({
+      ...s,
+      addresses: s.addresses.map((a) => ({ ...a, isDefault: a.id === id })),
+    }))
+  },
+
+  // invoices
+  addInvoice(inv: Omit<UserInvoice, 'id'>) {
+    setState((s) => {
+      let list = s.invoices
+      if (inv.isDefault) list = list.map((i) => ({ ...i, isDefault: false }))
+      return { ...s, invoices: [...list, { ...inv, id: uid('inv') }] }
+    })
+  },
+  updateInvoice(id: string, patch: Partial<UserInvoice>) {
+    setState((s) => {
+      let list = s.invoices.map((i) => (i.id === id ? { ...i, ...patch } : i))
+      if (patch.isDefault) list = list.map((i) => ({ ...i, isDefault: i.id === id }))
+      return { ...s, invoices: list }
+    })
+  },
+  setDefaultInvoice(id: string) {
+    setState((s) => ({
+      ...s,
+      invoices: s.invoices.map((i) => ({ ...i, isDefault: i.id === id })),
+    }))
+  },
+  deleteInvoice(id: string) {
+    setState((s) => ({ ...s, invoices: s.invoices.filter((i) => i.id !== id) }))
+  },
+
+  // coupons - mark used
+  useCoupon(id: string) {
+    setState((s) => ({ ...s, coupons: s.coupons.map((c) => (c.id === id ? { ...c, used: true } : c)) }))
+  },
+
+  // points & balance
+  usePoints(amount: number) {
+    setState((s) => ({ ...s, user: { ...s.user, points: Math.max(0, s.user.points - amount) } }))
+  },
+  useBalance(amount: number) {
+    setState((s) => ({ ...s, user: { ...s.user, balance: Math.max(0, s.user.balance - amount) } }))
+  },
+  topUpBalance(amount: number) {
+    setState((s) => ({ ...s, user: { ...s.user, balance: s.user.balance + amount } }))
   },
 
   // reset
