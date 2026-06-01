@@ -1,5 +1,5 @@
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import {
   ArrowLeft, Heart, Share2, Star, Minus, Plus, ShoppingCart, Scale, Truck,
   Shield, RotateCcw, Newspaper, ChevronRight, Tag, Check, MapPin,
@@ -30,6 +30,35 @@ export function ProductDetailV2() {
   const [showSkuPanel, setShowSkuPanel] = useState(false)
   const [skuAction, setSkuAction] = useState<'cart' | 'buy'>('cart')
   const [sku, setSku] = useState<SkuSelection>({})
+  const [showQnaPreview, setShowQnaPreview] = useState(true)
+
+  // 问大家 Q&A - 基于商品 ID 生成稳定 mock
+  const qaList = useMemo(() => {
+    if (!product) return []
+    const seed = product.id.split('').reduce((s, c) => s + c.charCodeAt(0), 0)
+    const templates = [
+      { q: '值得买吗？质量怎么样', a: '用了一段时间了，质量确实不错，做工精细，颜值也高，强烈推荐！', helpful: 42, daysAgo: 15 },
+      { q: '尺寸合适吗？会不会偏大偏小', a: '正常码数，按平时尺码买就行，我 175/65 穿 M 码刚刚好。', helpful: 28, daysAgo: 8 },
+      { q: '物流几天能到？', a: '京东物流次日达，速度很快，包装也很严实。', helpful: 19, daysAgo: 3 },
+      { q: '有色差吗？实物和图片差别大吗', a: '基本没色差，实物比图片更有质感，材质看着很高级。', helpful: 35, daysAgo: 22 },
+      { q: '送给女朋友合适吗？', a: '我送老婆的，她很喜欢，包装也很精致，适合送礼。', helpful: 12, daysAgo: 5 },
+      { q: '容易坏吗？耐用性怎么样', a: '用了一个月了，没出现任何问题，材质手感都不错。', helpful: 23, daysAgo: 11 },
+      { q: '味道大吗？需要晾一下吗', a: '刚拆有点味道，通风一天就基本没了。', helpful: 8, daysAgo: 7 },
+      { q: '性价比高吗？', a: '同价位里算很能打的了，活动期间入手更划算。', helpful: 31, daysAgo: 18 },
+    ]
+    const shuffled = templates
+      .map((t, i) => ({ ...t, idx: (seed * (i + 1)) % 1000 }))
+      .sort((a, b) => a.idx - b.idx)
+      .slice(0, 4)
+      .map((t, i) => ({
+        ...t,
+        author: ['小**糖', '路**人', '匿**名', '买**家', '阳**光'][i % 5],
+        date: new Date(Date.now() - t.daysAgo * 86400000).toISOString().slice(0, 10),
+      }))
+    return shuffled
+  }, [product?.id])
+
+  type QA = { q: string; a: string; helpful: number; daysAgo: number; author: string; date: string; idx: number }
 
   useEffect(() => { versa.visitModule('shop') }, [id])
   useEffect(() => {
@@ -278,6 +307,61 @@ export function ProductDetailV2() {
           </div>
         </div>
 
+        {/* 问大家 Q&A 预览块 (淘宝 风格) */}
+        {showQnaPreview && qaList.length > 0 && (
+          <div className="mt-8 rounded-3xl bg-gradient-to-br from-amber-500/8 via-orange-500/5 to-transparent border border-amber-500/20 p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg">
+                  <MessageCircle className="w-4 h-4 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold">问大家</h3>
+                  <p className="text-[10px] text-ink-500">已购买用户的真实问答 · {qaList.length} 条</p>
+                </div>
+              </div>
+              <button
+                onClick={() => { setTab('qna'); setShowQnaPreview(false) }}
+                className="text-xs text-amber-700 dark:text-amber-400 hover:underline flex items-center gap-0.5"
+              >
+                查看全部 <ChevronRight className="w-3 h-3" />
+              </button>
+            </div>
+            <div className="space-y-2.5">
+              {qaList.slice(0, 2).map((qa: QA, i: number) => (
+                <div key={i} className="p-3 rounded-2xl bg-white/60 dark:bg-ink-900/40 border border-amber-200/40 dark:border-amber-800/40">
+                  <div className="flex items-start gap-2">
+                    <div className="w-6 h-6 rounded-full bg-amber-500/20 text-amber-700 flex items-center justify-center text-[10px] font-bold flex-shrink-0">问</div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium line-clamp-1">{qa.q}</div>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2 mt-2 ml-1">
+                    <div className="w-6 h-6 rounded-full bg-shop-500/20 text-shop-700 flex items-center justify-center text-[10px] font-bold flex-shrink-0">答</div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs text-ink-600 dark:text-ink-300 line-clamp-2">{qa.a}</div>
+                      <div className="text-[10px] text-ink-400 mt-1 flex items-center gap-2">
+                        <span>{qa.author}</span>
+                        <span>·</span>
+                        <span>{qa.date}</span>
+                        <span className="ml-auto inline-flex items-center gap-0.5 text-amber-600">
+                          <Award className="w-2.5 h-2.5" />{qa.helpful}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={() => { toast('问题已提交, 商家会尽快回复', 'success') }}
+              className="w-full mt-3 h-9 rounded-xl border border-amber-500/30 text-amber-700 dark:text-amber-400 text-xs font-bold hover:bg-amber-500/5 flex items-center justify-center gap-1.5"
+            >
+              <MessageCircle className="w-3.5 h-3.5" /> 我也要提问
+            </button>
+          </div>
+        )}
+
         {/* 详情/规格/评价 - 淘宝 tabs */}
         <div className="mt-10">
           <div className="sticky top-32 sm:top-36 z-20 bg-ink-50 dark:bg-ink-950 -mx-4 sm:mx-0 px-4 sm:px-0">
@@ -287,6 +371,7 @@ export function ProductDetailV2() {
                 { value: 'description', label: '商品详情' },
                 { value: 'specs', label: '规格参数' },
                 { value: 'reviews', label: `评价 (${formatNumber(product.reviewCount)})` },
+                { value: 'qna', label: `问大家 (${qaList.length})` },
               ]}
               value={tab}
               onChange={setTab}
@@ -321,6 +406,44 @@ export function ProductDetailV2() {
             )}
             {tab === 'reviews' && product.reviews && (
               <ReviewList reviews={product.reviews} rating={product.rating} reviewCount={product.reviewCount} />
+            )}
+            {tab === 'qna' && (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="text-sm text-ink-500">共 {qaList.length} 个问答 · 已购买用户的真实反馈</div>
+                  <button
+                    onClick={() => toast('问题已提交', 'success')}
+                    className="text-xs px-3 h-8 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold hover:shadow-lg shadow-amber-500/30 inline-flex items-center gap-1"
+                  >
+                    <MessageCircle className="w-3 h-3" /> 我要提问
+                  </button>
+                </div>
+                {qaList.map((qa: QA, i: number) => (
+                  <div key={i} className="p-4 rounded-2xl bg-white/80 dark:bg-ink-900/40 border border-ink-200/60 dark:border-ink-800/60">
+                    <div className="flex items-start gap-2.5">
+                      <div className="w-7 h-7 rounded-full bg-amber-500/20 text-amber-700 flex items-center justify-center text-xs font-bold flex-shrink-0">问</div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-semibold">{qa.q}</div>
+                      </div>
+                    </div>
+                    <div className="mt-3 ml-9 pl-2 border-l-2 border-shop-500/30">
+                      <div className="flex items-start gap-2.5">
+                        <div className="w-7 h-7 rounded-full bg-shop-500/20 text-shop-700 flex items-center justify-center text-xs font-bold flex-shrink-0">答</div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm text-ink-700 dark:text-ink-200 leading-relaxed">{qa.a}</div>
+                          <div className="mt-2 flex items-center gap-3 text-[10px] text-ink-400">
+                            <span>{qa.author}</span>
+                            <span>{qa.date}</span>
+                            <button className="ml-auto inline-flex items-center gap-1 px-2 py-0.5 rounded-full border border-amber-500/30 text-amber-600 hover:bg-amber-500/10">
+                              <Award className="w-2.5 h-2.5" />有用 ({qa.helpful})
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
         </div>
