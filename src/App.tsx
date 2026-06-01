@@ -25,6 +25,9 @@ import { CheckoutSuccessPage } from './pages/CheckoutSuccessPage'
 import { ProfilePage } from './pages/ProfilePage'
 import { WishlistPage } from './pages/WishlistPage'
 import { OrdersPage } from './pages/OrdersPage'
+import { OrderDetailPage } from './pages/OrderDetailPage'
+import { AfterSalesPage } from './pages/AfterSalesPage'
+import { ReviewPage } from './pages/ReviewPage'
 import { AboutPage } from './pages/AboutPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 
@@ -90,6 +93,9 @@ export const router = createBrowserRouter(
         { path: 'profile/wishlist', element: <WishlistPage /> },
         { path: 'profile/orders', element: <OrdersPage /> },
         { path: 'profile/settings', element: <SettingsPage /> },
+        { path: 'orders/:id', element: <OrderDetailPage /> },
+        { path: 'orders/:orderId/aftersales', element: <AfterSalesPage /> },
+        { path: 'orders/:orderId/review', element: <ReviewPage /> },
         { path: 'settings', element: <SettingsPage /> },
 
         { path: 'p/:id', element: <PostDetailPage /> },

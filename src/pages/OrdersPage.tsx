@@ -4,7 +4,7 @@ import { useVersa } from '../store/versa'
 import { EmptyState } from '../components/ui/EmptyState'
 import {
   Package, ShoppingBag, Check, Truck, Clock, Star, X, RotateCcw, ChevronRight,
-  CreditCard, MapPin, Phone, FileText, MessageCircle,
+  CreditCard, MapPin, Phone, FileText, MessageCircle, Search, Filter, SlidersHorizontal
 } from 'lucide-react'
 import { Button } from '../components/ui/Button'
 import { Badge } from '../components/ui/Badge'
@@ -49,6 +49,8 @@ export function OrdersPage() {
   const { orders } = useVersa()
   const [tab, setTab] = useState('all')
   const [expandedId, setExpandedId] = useState<string | null>(null)
+  const [query, setQuery] = useState('')
+  const [yearFilter, setYearFilter] = useState('all')
 
   const counts = useMemo(() => {
     const map: Record<string, number> = { all: orders.length }
@@ -61,10 +63,26 @@ export function OrdersPage() {
   }, [orders])
 
   const filtered = useMemo(() => {
+    let r = orders
     const t = STATUS_TABS.find((s) => s.value === tab)
-    if (!t || t.value === 'all') return orders
-    return orders.filter((o) => t.statuses.includes(o.status))
-  }, [orders, tab])
+    if (t && t.value !== 'all') r = r.filter((o) => t.statuses.includes(o.status))
+    if (query) {
+      const q = query.toLowerCase()
+      r = r.filter((o) =>
+        o.id.toLowerCase().includes(q) ||
+        o.items.some((i) => i.name.toLowerCase().includes(q))
+      )
+    }
+    if (yearFilter !== 'all') {
+      r = r.filter((o) => o.placedAt.startsWith(yearFilter))
+    }
+    return r
+  }, [orders, tab, query, yearFilter])
+
+  const years = useMemo(() => {
+    const set = new Set(orders.map((o) => o.placedAt.slice(0, 4)))
+    return Array.from(set).sort().reverse()
+  }, [orders])
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -85,7 +103,7 @@ export function OrdersPage() {
       </div>
 
       {/* Status Tabs */}
-      <div className="mb-6 flex gap-2 overflow-x-auto -mx-4 px-4 pb-1">
+      <div className="mb-4 flex gap-2 overflow-x-auto -mx-4 px-4 pb-1">
         {STATUS_TABS.map((t) => (
           <button
             key={t.value}
@@ -107,6 +125,34 @@ export function OrdersPage() {
         ))}
       </div>
 
+      {/* 搜索 + 年份筛选 */}
+      <div className="mb-4 flex flex-wrap gap-2 items-center">
+        <div className="relative flex-1 min-w-[200px]">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-ink-400" />
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="搜索订单号或商品名..."
+            className="w-full h-9 pl-9 pr-3 rounded-xl bg-white/80 dark:bg-ink-900/40 border border-ink-200/60 dark:border-ink-800/60 text-sm outline-none focus:border-shop-500"
+          />
+        </div>
+        {years.length > 1 && (
+          <div className="flex items-center gap-1 bg-ink-100/60 dark:bg-ink-800/60 p-1 rounded-lg">
+            <button
+              onClick={() => setYearFilter('all')}
+              className={cn('px-2.5 h-7 rounded text-xs font-medium', yearFilter === 'all' ? 'bg-white dark:bg-ink-900 shadow-sm' : 'text-ink-500')}
+            >全部</button>
+            {years.map((y) => (
+              <button
+                key={y}
+                onClick={() => setYearFilter(y)}
+                className={cn('px-2.5 h-7 rounded text-xs font-medium', yearFilter === y ? 'bg-white dark:bg-ink-900 shadow-sm' : 'text-ink-500')}
+              >{y}</button>
+            ))}
+          </div>
+        )}
+      </div>
+
       {orders.length === 0 ? (
         <EmptyState
           icon={<Package className="w-7 h-7" />}
@@ -125,14 +171,18 @@ export function OrdersPage() {
             const currentStep = STEP_INDEX[o.status] ?? 0
             const expanded = expandedId === o.id
             return (
-              <div key={o.id} className="rounded-2xl bg-white/80 dark:bg-ink-900/60 border border-ink-200/60 dark:border-ink-800/60 overflow-hidden">
+              <Link
+                key={o.id}
+                to={`/orders/${o.id}`}
+                className="block rounded-2xl bg-white/80 dark:bg-ink-900/60 border border-ink-200/60 dark:border-ink-800/60 overflow-hidden hover:shadow-lg hover:border-shop-500/40 transition-all"
+              >
                 {/* Header */}
                 <div className="px-5 py-3.5 flex items-center justify-between gap-3 flex-wrap bg-gradient-to-r from-shop-500/5 to-transparent">
                   <div className="flex items-center gap-3">
                     <div className="text-xs text-ink-500">订单号</div>
                     <div className="font-mono text-sm font-semibold">{o.id}</div>
                     <button
-                      onClick={() => { navigator.clipboard.writeText(o.id); toast('订单号已复制', 'success') }}
+                      onClick={(e) => { e.preventDefault(); navigator.clipboard.writeText(o.id); toast('订单号已复制', 'success') }}
                       className="text-[10px] text-shop-600 hover:underline"
                     >
                       复制
@@ -210,37 +260,37 @@ export function OrdersPage() {
                   <div className="flex flex-wrap items-center gap-2">
                     {o.status === 'pending_payment' && (
                       <>
-                        <Button size="sm" variant="outline" onClick={() => toast('已取消订单', 'info')}>取消订单</Button>
-                        <Button size="sm" onClick={() => toast('演示模式', 'info')}>立即支付</Button>
+                        <Button size="sm" variant="outline" onClick={(e) => { e.preventDefault(); toast('已取消订单', 'info') }}>取消订单</Button>
+                        <Button size="sm" onClick={(e) => { e.preventDefault(); toast('演示模式', 'info') }}>立即支付</Button>
                       </>
                     )}
                     {o.status === 'shipped' && (
                       <>
-                        <Button size="sm" variant="outline" onClick={() => toast('查看物流', 'info')}>查看物流</Button>
-                        <Button size="sm" onClick={() => toast('已确认收货', 'success')}>确认收货</Button>
+                        <Button size="sm" variant="outline" onClick={(e) => { e.preventDefault(); toast('查看物流', 'info') }}>查看物流</Button>
+                        <Button size="sm" onClick={(e) => { e.preventDefault(); toast('已确认收货', 'success') }}>确认收货</Button>
                       </>
                     )}
                     {o.status === 'delivered' && (
                       <>
-                        <Button size="sm" variant="outline" onClick={() => toast('演示模式', 'info')}>申请售后</Button>
-                        <Button size="sm" onClick={() => toast('演示模式', 'info')} leftIcon={<Star className="w-3.5 h-3.5" />}>立即评价</Button>
+                        <Button size="sm" variant="outline" onClick={(e) => e.preventDefault()}>申请售后</Button>
+                        <Button size="sm" onClick={(e) => e.preventDefault()} leftIcon={<Star className="w-3.5 h-3.5" />}>立即评价</Button>
                       </>
                     )}
                     {o.status === 'reviewing' && (
-                      <Button size="sm" variant="outline" onClick={() => toast('演示模式', 'info')}>再次购买</Button>
+                      <Button size="sm" variant="outline" onClick={(e) => { e.preventDefault(); toast('演示模式', 'info') }}>再次购买</Button>
                     )}
                     <button
-                      onClick={() => setExpandedId(expanded ? null : o.id)}
+                      onClick={(e) => { e.preventDefault(); setExpandedId(expanded ? null : o.id) }}
                       className="text-xs text-ink-500 hover:text-ink-900 dark:hover:text-white inline-flex items-center gap-1"
                     >
-                      订单详情 <ChevronRight className={cn('w-3 h-3 transition-transform', expanded && 'rotate-90')} />
+                      {expanded ? '收起' : '展开'} <ChevronRight className={cn('w-3 h-3 transition-transform', expanded && 'rotate-90')} />
                     </button>
                   </div>
                 </div>
 
                 {/* Expanded: address + timeline */}
                 {expanded && (
-                  <div className="px-5 py-5 border-t border-ink-100 dark:border-ink-800 bg-ink-50/30 dark:bg-ink-900/30 space-y-5">
+                  <div onClick={(e) => e.preventDefault()} className="px-5 py-5 border-t border-ink-100 dark:border-ink-800 bg-ink-50/30 dark:bg-ink-900/30 space-y-5">
                     {/* Address */}
                     <div>
                       <h4 className="text-xs font-bold text-ink-500 mb-2">收货信息</h4>
@@ -283,7 +333,7 @@ export function OrdersPage() {
                     )}
                   </div>
                 )}
-              </div>
+              </Link>
             )
           })}
         </div>

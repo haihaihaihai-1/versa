@@ -282,6 +282,37 @@ export interface OrderTimelineEvent {
   description?: string
 }
 
+export type AfterSalesType = 'refund_only' | 'return_refund' | 'exchange'
+export type AfterSalesStatus = 'pending' | 'approved' | 'rejected' | 'refunded' | 'returned' | 'completed'
+
+export interface AfterSalesRequest {
+  id: string
+  orderId: string
+  productId: string
+  type: AfterSalesType
+  reason: string
+  description?: string
+  images?: string[]
+  refundAmount?: number
+  status: AfterSalesStatus
+  createdAt: string
+  timeline?: { at: string; label: string }[]
+}
+
+export interface ProductReview {
+  id: string
+  orderId: string
+  productId: string
+  rating: number
+  content: string
+  images?: string[]
+  tags?: string[]
+  anonymous?: boolean
+  createdAt: string
+  append?: { at: string; content: string }
+  helpful?: number
+}
+
 export interface Order {
   id: string
   items: { productId: string; name: string; price: number; quantity: number; image: string }[]
@@ -294,6 +325,8 @@ export interface Order {
   paymentMethod?: 'wechat' | 'alipay' | 'huabei' | 'card'
   shippingMethod?: 'standard' | 'express' | 'jd'
   timeline?: OrderTimelineEvent[]
+  afterSales?: AfterSalesRequest[]
+  reviewed?: string[] // productIds that have been reviewed
 }
 
 export interface AppState {
@@ -309,6 +342,8 @@ export interface AppState {
   readArticles: Record<string, number> // id -> readPercent
   reactedArticles: Record<string, 'like' | 'insightful' | 'disagree'>
   orders: Order[]
+  afterSales: AfterSalesRequest[]
+  reviews: ProductReview[]
   visitedModules: { news: number; debate: number; shop: number }
   joinedAt: string
 }

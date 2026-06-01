@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useMemo } from 'react'
-import type { AppState, CartItem, Order, UserProfile, Activity, ModuleKey } from '../data/types'
+import type { AppState, CartItem, Order, UserProfile, Activity, ModuleKey, AfterSalesRequest, ProductReview, AfterSalesType } from '../data/types'
 import { seedUser } from '../data/users'
 import { uid } from '../lib/utils'
 
@@ -30,6 +30,8 @@ function defaultState(): AppState {
     readArticles: {},
     reactedArticles: {},
     orders: [],
+    afterSales: [],
+    reviews: [],
     visitedModules: { news: 0, debate: 0, shop: 0 },
     joinedAt: new Date().toISOString(),
   }
@@ -293,6 +295,83 @@ export const versa = {
       )
     )
     return order
+  },
+
+  // confirm receipt
+  confirmReceipt(orderId: string) {
+    setState((s) => {
+      const order = s.orders.find((o) => o.id === orderId)
+      if (!order) return s
+      const now = new Date().toISOString()
+      const updatedOrders = s.orders.map((o) => {
+        if (o.id !== orderId) return o
+        return {
+          ...o,
+          status: 'delivered' as const,
+          timeline: (o.timeline || []).map((t) => (t.status === 'delivered' ? { ...t, at: now } : t)),
+        }
+      })
+      return { ...s, orders: updatedOrders }
+    })
+  },
+
+  // cancel order
+  cancelOrder(orderId: string) {
+    setState((s) => {
+      const now = new Date().toISOString()
+      return {
+        ...s,
+        orders: s.orders.map((o) => {
+          if (o.id !== orderId) return o
+          return {
+            ...o,
+            status: 'cancelled' as const,
+            timeline: [
+              ...(o.timeline || []),
+              { status: 'cancelled' as const, label: '已取消', at: now, description: '用户主动取消订单' },
+            ],
+          }
+        }),
+      }
+    })
+  },
+
+  // after sales
+  applyAfterSales(req: Omit<AfterSalesRequest, 'id' | 'createdAt' | 'status' | 'timeline'>) {
+    const id = uid('as')
+    const now = new Date().toISOString()
+    const request: AfterSalesRequest = {
+      ...req,
+      id,
+      status: 'pending',
+      createdAt: now,
+      timeline: [
+        { at: now, label: '售后申请已提交' },
+        { at: new Date(Date.now() + 3600_000).toISOString(), label: '商家审核中' },
+        { at: new Date(Date.now() + 86400_000).toISOString(), label: '审核结果通知' },
+      ],
+    }
+    setState((s) => {
+      const updatedOrders = s.orders.map((o) =>
+        o.id === req.orderId ? { ...o, afterSales: [...(o.afterSales || []), request] } : o
+      )
+      return { ...s, afterSales: [request, ...s.afterSales], orders: updatedOrders }
+    })
+    return request
+  },
+
+  // reviews
+  addReview(review: Omit<ProductReview, 'id' | 'createdAt' | 'helpful'>) {
+    const id = uid('rv')
+    const now = new Date().toISOString()
+    const r: ProductReview = { ...review, id, createdAt: now, helpful: 0 }
+    setState((s) => {
+      const updatedOrders = s.orders.map((o) =>
+        o.id === review.orderId ? { ...o, reviewed: [...(o.reviewed || []), review.productId] } : o
+      )
+      return { ...s, reviews: [r, ...s.reviews], orders: updatedOrders }
+    })
+    return r
   },
 
   // reset
