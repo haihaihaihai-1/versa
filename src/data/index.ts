@@ -1,6 +1,6 @@
 export * from './types'
 export { news } from './news'
-export { debates } from './debates'
-export { products } from './products'
+export { debates, commonCitations, moderators, panelists, featuredRoundtable } from './debates'
+export { products, brands } from './products'
 export { authors } from './authors'
 export { allBadges, seedUser, randomName, randomAvatar, moduleMeta } from './users'

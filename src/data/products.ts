@@ -1,5 +1,81 @@
 import type { Product } from './types'
 
+const defaultServices = [
+  { icon: 'truck', name: '次日达', description: '大部分地区次日送达' },
+  { icon: 'shield', name: '正品保证', description: '假一赔十' },
+  { icon: 'rotate', name: '7 天无理由', description: '不影响二次销售' },
+  { icon: 'package', name: '全国联保', description: '门店免费维修' },
+]
+
+const defaultShipping = {
+  fee: 12,
+  freeOver: 99,
+  from: '上海',
+  estimatedDays: 1,
+  express: { fee: 25, days: 1 },
+}
+
+const defaultCoupons = [
+  { id: 'c1', amount: 30, threshold: 200, description: '满 200 减 30', expiresAt: '2026-07-01' },
+  { id: 'c2', amount: 100, threshold: 500, description: '满 500 减 100', expiresAt: '2026-07-01' },
+  { id: 'c3', amount: 200, threshold: 1000, description: '满 1000 减 200', expiresAt: '2026-07-01' },
+]
+
+const baseReviews = (rating: number) => [
+  {
+    id: 'r1',
+    authorName: '购物达人王',
+    authorAvatar: 'https://i.pravatar.cc/100?img=68',
+    rating: 5,
+    content: '实物比图片更好看，做工精细，没有任何瑕疵。快递也很快，第二天就到了，包装很仔细。强烈推荐！',
+    images: [
+      'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&q=80&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400&q=80&auto=format&fit=crop',
+    ],
+    sku: '官方标配',
+    createdAt: '2026-05-20T10:30:00Z',
+    helpful: 234,
+    tags: ['做工好', '包装仔细', '快递快'],
+    reply: { from: '客服小美', content: '感谢您的好评，期待您的下次光临~', createdAt: '2026-05-20T14:00:00Z' },
+  },
+  {
+    id: 'r2',
+    authorName: '理性消费者',
+    authorAvatar: 'https://i.pravatar.cc/100?img=64',
+    rating: rating,
+    content: '整体满意，价格略高但品质对得起这个价位。日常使用足够了，配套的 App 体验也很流畅。',
+    images: ['https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80&auto=format&fit=crop'],
+    sku: '标准版',
+    createdAt: '2026-05-15T08:20:00Z',
+    helpful: 156,
+    tags: ['性价比', '稳定', '够用'],
+  },
+  {
+    id: 'r3',
+    authorName: '不将就先生',
+    authorAvatar: 'https://i.pravatar.cc/100?img=52',
+    content: '观望了很久终于下手，果然没让我失望。',
+    rating: 4,
+    images: [],
+    sku: '官方标配',
+    createdAt: '2026-05-10T19:45:00Z',
+    helpful: 89,
+    tags: ['颜值高'],
+  },
+  {
+    id: 'r4',
+    authorName: '用户 4***2',
+    authorAvatar: 'https://i.pravatar.cc/100?img=37',
+    rating: 5,
+    content: '用了一段时间来回购的，家人也很喜欢。',
+    images: [],
+    sku: '标准版',
+    createdAt: '2026-05-08T15:10:00Z',
+    helpful: 67,
+    tags: ['会回购'],
+  },
+]
+
 export const products: Product[] = [
   {
     id: 'p1',
@@ -12,6 +88,12 @@ export const products: Product[] = [
       'https://images.unsplash.com/photo-1558089687-f282ffcbc126?w=1000&q=80&auto=format&fit=crop',
       'https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?w=1000&q=80&auto=format&fit=crop',
       'https://images.unsplash.com/photo-1592890278981-1c5ed2c1b8e7?w=1000&q=80&auto=format&fit=crop',
+    ],
+    detailImages: [
+      'https://images.unsplash.com/photo-1558089687-f282ffcbc126?w=1200&q=90&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?w=1200&q=90&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1592890278981-1c5ed2c1b8e7?w=1200&q=90&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=90&auto=format&fit=crop',
     ],
     brand: 'Versa',
     category: 'tech',
@@ -31,6 +113,37 @@ export const products: Product[] = [
     linkedDebateIds: ['d1'],
     linkedNewsId: 'n1',
     vendor: 'Versa 官方旗舰店',
+    sales: 8340,
+    services: defaultServices,
+    shipping: defaultShipping,
+    coupons: defaultCoupons,
+    sku: {
+      options: [
+        {
+          name: '颜色',
+          values: [
+            { value: '云白', image: 'https://images.unsplash.com/photo-1558089687-f282ffcbc126?w=200&q=80&auto=format&fit=crop', available: true },
+            { value: '星黛蓝', image: 'https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?w=200&q=80&auto=format&fit=crop', available: true },
+            { value: '碳灰', image: 'https://images.unsplash.com/photo-1592890278981-1c5ed2c1b8e7?w=200&q=80&auto=format&fit=crop', available: false },
+          ],
+        },
+        {
+          name: '版本',
+          values: [
+            { value: '标准版', available: true, priceDelta: 0 },
+            { value: '尊享版', available: true, priceDelta: 400 },
+            { value: '旗舰版', available: true, priceDelta: 800 },
+          ],
+        },
+      ],
+    },
+    flashSale: { endsAt: '2026-06-02T20:00:00Z', sold: 458, total: 500, flashPrice: 1799 },
+    reviews: baseReviews(4.8),
+    isFlagship: true,
+    isExclusive: true,
+    deliveryCity: '上海',
+    brandLogo: 'https://api.dicebear.com/7.x/initials/svg?seed=Versa&backgroundColor=6366f1',
+    brandStory: 'Versa 由 7 位前 Google 工程师在 2021 年创立，专注家庭信息中枢的 AI 化。',
   },
   {
     id: 'p2',
@@ -42,6 +155,10 @@ export const products: Product[] = [
     images: [
       'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=1000&q=80&auto=format&fit=crop',
       'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=1000&q=80&auto=format&fit=crop',
+    ],
+    detailImages: [
+      'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=1200&q=90&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=1200&q=90&auto=format&fit=crop',
     ],
     brand: 'BYD',
     category: 'tech',
@@ -60,6 +177,41 @@ export const products: Product[] = [
     linkedDebateIds: ['d4'],
     linkedNewsId: 'n5',
     vendor: '比亚迪汽车官方',
+    sales: 2340,
+    services: [
+      { icon: 'truck', name: '送车上门', description: '免费送车到家' },
+      { icon: 'shield', name: '三电终身', description: '电池/电控/电机终身保修' },
+      { icon: 'rotate', name: '30 天试驾', description: '不满意可退' },
+    ],
+    shipping: { fee: 0, freeOver: 0, from: '深圳', estimatedDays: 7 },
+    coupons: [
+      { id: 'c1', amount: 5000, threshold: 150000, description: '置换补贴 5000', expiresAt: '2026-12-31' },
+    ],
+    sku: {
+      options: [
+        {
+          name: '配置',
+          values: [
+            { value: '标准续航', available: true, priceDelta: 0 },
+            { value: '长续航', available: true, priceDelta: 20000 },
+            { value: '四驱旗舰', available: true, priceDelta: 40000 },
+          ],
+        },
+        {
+          name: '颜色',
+          values: [
+            { value: '极光蓝', available: true },
+            { value: '时光灰', available: true },
+            { value: '跑酷红', available: true },
+          ],
+        },
+      ],
+    },
+    reviews: baseReviews(4.6),
+    isFlagship: true,
+    deliveryCity: '深圳',
+    brandLogo: 'https://api.dicebear.com/7.x/initials/svg?seed=BYD&backgroundColor=dc2626',
+    brandStory: '比亚迪，1995 年创立于深圳，全球新能源车销量第一。',
   },
   {
     id: 'p3',
@@ -71,6 +223,10 @@ export const products: Product[] = [
     images: [
       'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=1000&q=80&auto=format&fit=crop',
       'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1000&q=80&auto=format&fit=crop',
+    ],
+    detailImages: [
+      'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=1200&q=90&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1200&q=90&auto=format&fit=crop',
     ],
     brand: 'Luckin Coffee',
     category: 'food',
@@ -87,6 +243,31 @@ export const products: Product[] = [
     tags: ['咖啡', '订阅', '办公室'],
     linkedNewsId: 'n2',
     vendor: '瑞幸咖啡官方',
+    sales: 28934,
+    services: [
+      { icon: 'truck', name: '门店自提', description: '全国 8000+ 门店通用' },
+      { icon: 'rotate', name: '未使用随时退', description: '7 天内可退' },
+    ],
+    shipping: { fee: 0, freeOver: 0, from: '北京', estimatedDays: 0 },
+    coupons: [
+      { id: 'c1', amount: 20, threshold: 200, description: '满 200 减 20', expiresAt: '2026-07-01' },
+    ],
+    sku: {
+      options: [
+        {
+          name: '套餐',
+          values: [
+            { value: '28 杯月度', available: true, priceDelta: 0 },
+            { value: '50 杯双月度', available: true, priceDelta: 162 },
+          ],
+        },
+      ],
+    },
+    reviews: baseReviews(4.5),
+    isFlagship: true,
+    deliveryCity: '北京',
+    brandLogo: 'https://api.dicebear.com/7.x/initials/svg?seed=Luckin&backgroundColor=0066cc',
+    brandStory: '瑞幸咖啡，中国最大的连锁咖啡品牌。',
   },
   {
     id: 'p4',
@@ -97,6 +278,10 @@ export const products: Product[] = [
     originalPrice: 1499,
     images: [
       'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1000&q=80&auto=format&fit=crop',
+    ],
+    detailImages: [
+      'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1200&q=90&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=90&auto=format&fit=crop',
     ],
     brand: 'Anthropic',
     category: 'tech',
@@ -115,6 +300,32 @@ export const products: Product[] = [
     linkedNewsId: 'n1',
     isNewsworthy: true,
     vendor: 'Anthropic 官方',
+    sales: 12830,
+    services: [
+      { icon: 'shield', name: '官方授权', description: 'Anthropic 直营' },
+      { icon: 'rotate', name: '30 天退款', description: '不满意全额退' },
+    ],
+    shipping: { fee: 0, freeOver: 0, from: '海外', estimatedDays: 0 },
+    coupons: [
+      { id: 'c1', amount: 100, threshold: 1000, description: '学生认证减 100', expiresAt: '2026-12-31' },
+    ],
+    sku: {
+      options: [
+        {
+          name: '订阅',
+          values: [
+            { value: '个人版 1 年', available: true, priceDelta: 0 },
+            { value: '团队版 5 人', available: true, priceDelta: 4800 },
+          ],
+        },
+      ],
+    },
+    reviews: baseReviews(4.9),
+    isFlagship: true,
+    isExclusive: true,
+    deliveryCity: '海外',
+    brandLogo: 'https://api.dicebear.com/7.x/initials/svg?seed=Anthropic&backgroundColor=cc785c',
+    brandStory: 'Anthropic，由 OpenAI 前员工创立，专注 AI 安全研究。',
   },
   {
     id: 'p5',
@@ -126,6 +337,10 @@ export const products: Product[] = [
     images: [
       'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=1000&q=80&auto=format&fit=crop',
       'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=1000&q=80&auto=format&fit=crop',
+    ],
+    detailImages: [
+      'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=1200&q=90&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=1200&q=90&auto=format&fit=crop',
     ],
     brand: 'MUJI',
     category: 'fashion',
@@ -142,6 +357,35 @@ export const products: Product[] = [
     tags: ['极简', '基础款', '百搭'],
     linkedNewsId: 'n6',
     vendor: '无印良品官方旗舰店',
+    sales: 56234,
+    services: defaultServices,
+    shipping: { fee: 0, freeOver: 99, from: '上海', estimatedDays: 2 },
+    coupons: defaultCoupons,
+    sku: {
+      options: [
+        {
+          name: '尺码',
+          values: [
+            { value: 'S', available: true },
+            { value: 'M', available: true },
+            { value: 'L', available: true },
+            { value: 'XL', available: true },
+          ],
+        },
+        {
+          name: '颜色组合',
+          values: [
+            { value: '经典五色', available: true },
+            { value: '黑白灰三色', available: true },
+          ],
+        },
+      ],
+    },
+    reviews: baseReviews(4.7),
+    isFlagship: true,
+    deliveryCity: '上海',
+    brandLogo: 'https://api.dicebear.com/7.x/initials/svg?seed=MUJI&backgroundColor=000000',
+    brandStory: '无印良品，"这样就好"的极简哲学。',
   },
   {
     id: 'p6',
@@ -151,6 +395,9 @@ export const products: Product[] = [
     price: 68,
     images: [
       'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=1000&q=80&auto=format&fit=crop',
+    ],
+    detailImages: [
+      'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=1200&q=90&auto=format&fit=crop',
     ],
     brand: '建社出版',
     category: 'books',
@@ -168,6 +415,14 @@ export const products: Product[] = [
     linkedNewsId: 'n3',
     isNewsworthy: true,
     vendor: '建社出版官方',
+    sales: 3420,
+    services: defaultServices,
+    shipping: { fee: 6, freeOver: 50, from: '北京', estimatedDays: 2 },
+    coupons: [],
+    reviews: baseReviews(4.8),
+    deliveryCity: '北京',
+    brandLogo: 'https://api.dicebear.com/7.x/initials/svg?seed=%E5%BB%BA%E7%A4%BE&backgroundColor=8b5a2b',
+    brandStory: '建社出版，专注城市与非虚构题材的独立出版社。',
   },
   {
     id: 'p7',
@@ -179,6 +434,10 @@ export const products: Product[] = [
     images: [
       'https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=1000&q=80&auto=format&fit=crop',
       'https://images.unsplash.com/photo-1576618148400-f54bed99fcfd?w=1000&q=80&auto=format&fit=crop',
+    ],
+    detailImages: [
+      'https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=1200&q=90&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1576618148400-f54bed99fcfd?w=1200&q=90&auto=format&fit=crop',
     ],
     brand: 'Versa 礼盒',
     category: 'food',
@@ -196,6 +455,28 @@ export const products: Product[] = [
     linkedNewsId: 'n8',
     linkedDebateIds: ['d7'],
     vendor: 'Versa 礼盒官方',
+    sales: 8920,
+    services: defaultServices,
+    shipping: { fee: 0, freeOver: 0, from: '上海', estimatedDays: 3 },
+    coupons: [
+      { id: 'c1', amount: 50, threshold: 500, description: '满 500 减 50', expiresAt: '2026-09-15' },
+    ],
+    sku: {
+      options: [
+        {
+          name: '口味组合',
+          values: [
+            { value: '经典四味', available: true },
+            { value: '低糖版', available: true },
+          ],
+        },
+      ],
+    },
+    reviews: baseReviews(4.6),
+    isExclusive: true,
+    deliveryCity: '上海',
+    brandLogo: 'https://api.dicebear.com/7.x/initials/svg?seed=VersaGift&backgroundColor=f59e0b',
+    brandStory: 'Versa 礼盒，与新锐设计师合作的限量礼盒品牌。',
   },
   {
     id: 'p8',
@@ -205,6 +486,9 @@ export const products: Product[] = [
     price: 850,
     images: [
       'https://images.unsplash.com/photo-1591291621164-2c6367723315?w=1000&q=80&auto=format&fit=crop',
+    ],
+    detailImages: [
+      'https://images.unsplash.com/photo-1591291621164-2c6367723315?w=1200&q=90&auto=format&fit=crop',
     ],
     brand: 'lululemon',
     category: 'fashion',
@@ -220,6 +504,41 @@ export const products: Product[] = [
     tags: ['瑜伽', '高端', '裸感'],
     linkedNewsId: 'n2',
     vendor: 'lululemon 官方',
+    sales: 89230,
+    services: defaultServices,
+    shipping: { fee: 0, freeOver: 0, from: '上海', estimatedDays: 2 },
+    coupons: defaultCoupons,
+    sku: {
+      options: [
+        {
+          name: '颜色',
+          values: [
+            { value: '曜石黑', available: true, image: 'https://images.unsplash.com/photo-1591291621164-2c6367723315?w=200&q=80&auto=format&fit=crop' },
+            { value: '银河灰', available: true },
+            { value: '烟粉色', available: true },
+            { value: '深紫罗兰', available: true },
+            { value: '海洋蓝', available: true },
+          ],
+        },
+        {
+          name: '尺码',
+          values: [
+            { value: '0', available: true },
+            { value: '2', available: true },
+            { value: '4', available: true },
+            { value: '6', available: true },
+            { value: '8', available: true },
+            { value: '10', available: true },
+            { value: '12', available: true },
+          ],
+        },
+      ],
+    },
+    reviews: baseReviews(4.8),
+    isFlagship: true,
+    deliveryCity: '上海',
+    brandLogo: 'https://api.dicebear.com/7.x/initials/svg?seed=lululemon&backgroundColor=ee0000',
+    brandStory: 'lululemon，1998 年创立于加拿大，从瑜伽服饰起家。',
   },
   {
     id: 'p9',
@@ -230,6 +549,9 @@ export const products: Product[] = [
     originalPrice: 5990,
     images: [
       'https://images.unsplash.com/photo-1558317374-067fb5f30001?w=1000&q=80&auto=format&fit=crop',
+    ],
+    detailImages: [
+      'https://images.unsplash.com/photo-1558317374-067fb5f30001?w=1200&q=90&auto=format&fit=crop',
     ],
     brand: 'Dyson',
     category: 'home',
@@ -244,6 +566,31 @@ export const products: Product[] = [
     },
     tags: ['高端', '家电', '清洁'],
     vendor: '戴森官方旗舰店',
+    sales: 12450,
+    services: [
+      { icon: 'shield', name: '官方保修', description: '2 年整机保修' },
+      { icon: 'truck', name: '次日达', description: '下单 24h 送达' },
+      { icon: 'rotate', name: '30 天退换', description: '不满意可退' },
+    ],
+    shipping: { fee: 0, freeOver: 0, from: '上海', estimatedDays: 1 },
+    coupons: defaultCoupons,
+    sku: {
+      options: [
+        {
+          name: '颜色',
+          values: [
+            { value: '钛白', available: true },
+            { value: '亮金', available: true },
+            { value: '深空灰', available: true },
+          ],
+        },
+      ],
+    },
+    reviews: baseReviews(4.7),
+    isFlagship: true,
+    deliveryCity: '上海',
+    brandLogo: 'https://api.dicebear.com/7.x/initials/svg?seed=Dyson&backgroundColor=7c3aed',
+    brandStory: '戴森，英国高端家电品牌，无线吸尘器的发明者。',
   },
   {
     id: 'p10',
@@ -253,6 +600,9 @@ export const products: Product[] = [
     price: 1899,
     images: [
       'https://images.unsplash.com/photo-1606220588913-b3aacb4d2f46?w=1000&q=80&auto=format&fit=crop',
+    ],
+    detailImages: [
+      'https://images.unsplash.com/photo-1606220588913-b3aacb4d2f46?w=1200&q=90&auto=format&fit=crop',
     ],
     brand: 'Apple',
     category: 'tech',
@@ -267,6 +617,26 @@ export const products: Product[] = [
     },
     tags: ['耳机', '苹果', '降噪'],
     vendor: 'Apple 官方',
+    sales: 156320,
+    services: defaultServices,
+    shipping: { fee: 0, freeOver: 0, from: '上海', estimatedDays: 1 },
+    coupons: defaultCoupons,
+    sku: {
+      options: [
+        {
+          name: '充电方式',
+          values: [
+            { value: 'USB-C', available: true },
+            { value: 'MagSafe', available: true, priceDelta: 100 },
+          ],
+        },
+      ],
+    },
+    reviews: baseReviews(4.7),
+    isFlagship: true,
+    deliveryCity: '上海',
+    brandLogo: 'https://api.dicebear.com/7.x/initials/svg?seed=Apple&backgroundColor=000000',
+    brandStory: 'Apple，1976 年创立于美国，全球最具价值的科技品牌。',
   },
   {
     id: 'p11',
@@ -276,6 +646,9 @@ export const products: Product[] = [
     price: 98,
     images: [
       'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=1000&q=80&auto=format&fit=crop',
+    ],
+    detailImages: [
+      'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=1200&q=90&auto=format&fit=crop',
     ],
     brand: '南海出版公司',
     category: 'books',
@@ -290,6 +663,15 @@ export const products: Product[] = [
     },
     tags: ['文学', '经典', '纪念版'],
     vendor: '南海出版官方',
+    sales: 234120,
+    services: defaultServices,
+    shipping: { fee: 6, freeOver: 50, from: '北京', estimatedDays: 2 },
+    coupons: [],
+    reviews: baseReviews(4.9),
+    isFlagship: true,
+    deliveryCity: '北京',
+    brandLogo: 'https://api.dicebear.com/7.x/initials/svg?seed=%E5%8D%97%E6%B5%B7&backgroundColor=8b5a2b',
+    brandStory: '南海出版公司，1988 年成立于北京。',
   },
   {
     id: 'p12',
@@ -300,6 +682,9 @@ export const products: Product[] = [
     originalPrice: 1990,
     images: [
       'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=1000&q=80&auto=format&fit=crop',
+    ],
+    detailImages: [
+      'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=1200&q=90&auto=format&fit=crop',
     ],
     brand: 'SK-II',
     category: 'beauty',
@@ -314,5 +699,42 @@ export const products: Product[] = [
     },
     tags: ['护肤', '精华水', '经典'],
     vendor: 'SK-II 官方旗舰店',
+    sales: 89420,
+    services: defaultServices,
+    shipping: { fee: 0, freeOver: 0, from: '上海', estimatedDays: 1 },
+    coupons: defaultCoupons,
+    sku: {
+      options: [
+        {
+          name: '容量',
+          values: [
+            { value: '75ml', available: true, priceDelta: -1100 },
+            { value: '160ml', available: true, priceDelta: -540 },
+            { value: '230ml', available: true, priceDelta: 0 },
+            { value: '330ml', available: true, priceDelta: 800 },
+          ],
+        },
+      ],
+    },
+    reviews: baseReviews(4.8),
+    isFlagship: true,
+    deliveryCity: '上海',
+    brandLogo: 'https://api.dicebear.com/7.x/initials/svg?seed=SK-II&backgroundColor=dc2626',
+    brandStory: 'SK-II，日本高端护肤品牌，Pitera 精华的发明者。',
   },
 ]
+
+export const brands = Array.from(new Set(products.map((p) => p.brand)))
+  .map((brandName) => {
+    const ps = products.filter((p) => p.brand === brandName)
+    const sample = ps[0]
+    return {
+      id: brandName.toLowerCase().replace(/\s+/g, '-'),
+      name: brandName,
+      logo: sample.brandLogo || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(brandName)}`,
+      productCount: ps.length,
+      totalSales: ps.reduce((s, p) => s + (p.sales || 0), 0),
+      story: sample.brandStory || `${brandName} 官方旗舰。`,
+    }
+  })
+  .sort((a, b) => b.totalSales - a.totalSales)

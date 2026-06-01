@@ -9,6 +9,12 @@ import { DebatesListPage } from './pages/DebatesListPage'
 import { DebateDetailPage } from './pages/DebateDetailPage'
 import { ShopListPage } from './pages/ShopListPage'
 import { ProductDetailPage } from './pages/ProductDetailPage'
+import { ShopHomePage } from './pages/ShopHomePage'
+import { ProductDetailV2 } from './pages/ProductDetailV2'
+import { BrandPage } from './pages/BrandPage'
+import { DebateHomePage } from './pages/DebateHomePage'
+import { DebateDetailV2 } from './pages/DebateDetailV2'
+import { RoundTablePage } from './pages/RoundTablePage'
 import { CartPage } from './pages/CartPage'
 import { CheckoutPage } from './pages/CheckoutPage'
 import { CheckoutSuccessPage } from './pages/CheckoutSuccessPage'
@@ -56,10 +62,16 @@ export const router = createBrowserRouter(
 
         { path: 'news', element: <NewsListPage /> },
         { path: 'news/:id', element: <NewsDetailPage /> },
-        { path: 'debates', element: <DebatesListPage /> },
-        { path: 'debates/:id', element: <DebateDetailPage /> },
-        { path: 'shop', element: <ShopListPage /> },
-        { path: 'shop/:id', element: <ProductDetailPage /> },
+        { path: 'debates', element: <DebateHomePage /> },
+        { path: 'debates/roundtable/:id', element: <RoundTablePage /> },
+        { path: 'debates/:id', element: <DebateDetailV2 /> },
+        { path: 'debates-legacy', element: <DebatesListPage /> },
+        { path: 'debates-legacy/:id', element: <DebateDetailPage /> },
+        { path: 'shop', element: <ShopHomePage /> },
+        { path: 'shop/brand/:id', element: <BrandPage /> },
+        { path: 'shop/:id', element: <ProductDetailV2 /> },
+        { path: 'shop-legacy', element: <ShopListPage /> },
+        { path: 'shop-legacy/:id', element: <ProductDetailPage /> },
         { path: 'cart', element: <CartPage /> },
         { path: 'checkout', element: <CheckoutPage /> },
         { path: 'checkout/success', element: <CheckoutSuccessPage /> },

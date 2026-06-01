@@ -1,4 +1,47 @@
-import type { Debate } from './types'
+import type { Debate, Citation, Expert } from './types'
+
+const yc1: Citation = { id: 'cit9', source: 'Y Combinator 创业课', quote: '最好的产品是让用户重新认识自己的问题。' }
+const ai1: Citation = { id: 'cit8', source: 'MIT Technology Review', quote: '2026 年 AI 主动反问将成为主流交互范式。' }
+const rich1: Citation = { id: 'cit10', source: '贝塞尔《娱乐至死》', quote: '我们被娱乐得心甘情愿地成为了娱乐的附庸。' }
+const consumer1: Citation = { id: 'cit12', source: '国家统计局 2025', quote: '中国可选消费支出同比下降 4.2%，消费降级趋势明显。' }
+const seti1: Citation = { id: 'cit1', source: 'SETI Institute', url: 'https://www.seti.org', quote: '宇宙中有超过 100 亿颗类地行星，主动向外发射信号是科学的下一步。' }
+const darkforest: Citation = { id: 'cit2', source: '《三体》刘慈欣', quote: '宇宙就是一座黑暗森林，每个文明都是带枪的猎人。' }
+const byd1: Citation = { id: 'cit3', source: '中国汽车工业协会', quote: '2025 年中国新能源车渗透率超过 50%，传统车企面临转型阵痛。' }
+const mmr: Citation = { id: 'cit5', source: '皮尤研究中心', quote: '38% 的美国年轻人考虑过数字游民生活，疫情后这一比例翻倍。' }
+const digital1: Citation = { id: 'cit4', source: 'MBO Partners 2025', quote: '全球数字游民数量已达 4020 万，年增长 12%。' }
+const ritual1: Citation = { id: 'cit11', source: '《小王子》圣埃克苏佩里', quote: '仪式感就是使某一天与其他日子不同，使某一时刻与其他时刻不同。' }
+const opensoft: Citation = { id: 'cit6', source: 'Stanford CRFM', quote: 'DeepSeek V3 在多项基准上已追平 GPT-4o。' }
+const open1: Citation = { id: 'cit7', source: 'Hugging Face 2025 报告', quote: '开源模型下载量同比增加 400%，社区贡献者超百万。' }
+
+export const commonCitations: Record<string, Citation> = {
+  seti1: { id: 'cit1', source: 'SETI Institute', url: 'https://www.seti.org', quote: '宇宙中有超过 100 亿颗类地行星，主动向外发射信号是科学的下一步。' },
+  darkforest: { id: 'cit2', source: '《三体》刘慈欣', quote: '宇宙就是一座黑暗森林，每个文明都是带枪的猎人。' },
+  byd1: { id: 'cit3', source: '中国汽车工业协会', quote: '2025 年中国新能源车渗透率超过 50%，传统车企面临转型阵痛。' },
+  digital1: { id: 'cit4', source: 'MBO Partners 2025', quote: '全球数字游民数量已达 4020 万，年增长 12%。' },
+  mmr: { id: 'cit5', source: '皮尤研究中心', quote: '38% 的美国年轻人考虑过数字游民生活，疫情后这一比例翻倍。' },
+  opensoft: { id: 'cit6', source: 'Stanford CRFM', quote: 'DeepSeek V3 在多项基准上已追平 GPT-4o。' },
+  open1: { id: 'cit7', source: 'Hugging Face 2025 报告', quote: '开源模型下载量同比增加 400%，社区贡献者超百万。' },
+  ai1: { id: 'cit8', source: 'MIT Technology Review', quote: '2026 年 AI 主动反问将成为主流交互范式。' },
+  yc1: { id: 'cit9', source: 'Y Combinator 创业课', quote: '最好的产品是让用户重新认识自己的问题。' },
+  rich1: { id: 'cit10', source: '贝塞尔《娱乐至死》', quote: '我们被娱乐得心甘情愿地成为了娱乐的附庸。' },
+  ritual1: { id: 'cit11', source: '《小王子》圣埃克苏佩里', quote: '仪式感就是使某一天与其他日子不同，使某一时刻与其他时刻不同。' },
+  consumer1: { id: 'cit12', source: '国家统计局 2025', quote: '中国可选消费支出同比下降 4.2%，消费降级趋势明显。' },
+}
+
+export const moderators: Expert[] = [
+  { id: 'mod1', name: '陈嘉映', avatar: 'https://i.pravatar.cc/120?img=60', title: '哲学教授', bio: '前华东师大哲学系教授，专长语言哲学。', stance: 'neutral', credential: '牛津大学博士' },
+  { id: 'mod2', name: '吴伯凡', avatar: 'https://i.pravatar.cc/120?img=51', title: '资深媒体人', bio: '《21 世纪商业评论》专栏主笔。', stance: 'neutral', credential: '30 年商业评论' },
+  { id: 'mod3', name: '李翔', avatar: 'https://i.pravatar.cc/120?img=53', title: '科技博主', bio: '《李翔商业内参》主理人。', stance: 'neutral', credential: '前《时尚先生》主编' },
+]
+
+export const panelists: Expert[] = [
+  { id: 'p_e1', name: '袁越', avatar: 'https://i.pravatar.cc/120?img=12', title: '生物学家', bio: '科普作家，专长生态与生命科学。', stance: 'con', credential: '《土摩托看世界》作者' },
+  { id: 'p_e2', name: '李松蔚', avatar: 'https://i.pravatar.cc/120?img=33', title: '心理学家', bio: '临床心理学家，知乎大 V。', stance: 'pro', credential: '北京大学心理学博士' },
+  { id: 'p_e3', name: '万维钢', avatar: 'https://i.pravatar.cc/120?img=14', title: '物理学家', bio: '《万万没想到》作者。', stance: 'neutral', credential: '前科大物理系教师' },
+  { id: 'p_e4', name: '和菜头', avatar: 'https://i.pravatar.cc/120?img=58', title: '文化评论人', bio: '槽边往事主理人。', stance: 'pro', credential: '资深媒体人' },
+  { id: 'p_e5', name: '连岳', avatar: 'https://i.pravatar.cc/120?img=68', title: '专栏作家', bio: '连岳文章主理人。', stance: 'con', credential: '前《南方周末》记者' },
+  { id: 'p_e6', name: '宁浩', avatar: 'https://i.pravatar.cc/120?img=22', title: '导演', bio: '《疯狂的石头》导演。', stance: 'pro', credential: '电影导演' },
+]
 
 export const debates: Debate[] = [
   {
@@ -16,11 +59,20 @@ export const debates: Debate[] = [
     linkedProductId: 'p1',
     cover: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&q=80&auto=format&fit=crop',
     tags: ['AI', '产品设计', '用户体验'],
+    status: 'live',
+    format: 'roundtable',
+    moderator: moderators[2],
+    panelists: [panelists[1], panelists[3], panelists[5]],
+    proStance: 'AI 反问是体验的进化，体现对用户的尊重',
+    conStance: 'AI 反问是对用户时间的浪费，是权力的越界',
+    difficulty: 'medium',
     arguments: [
       {
-        id: 'a1', side: 'pro', authorId: 'u_01', authorName: '墨白', authorAvatar: 'https://i.pravatar.cc/120?img=68',
-        content: '问得好问题比给差答案更有价值。AI 反问其实是把"思考的杠杆"交给用户。',
+        id: 'a1', side: 'pro', authorId: 'p_e2', authorName: '李松蔚', authorAvatar: panelists[1].avatar,
+        content: '心理咨询的核心就是"问"。AI 学会反问，意味着它开始像咨询师一样工作。这是范式跃迁，不是优化。',
         upvotes: 234, downvotes: 12, createdAt: '2026-05-28T11:20:00Z',
+        isExpert: true, isFeatured: true,
+        citations: [yc1, ai1],
       },
       {
         id: 'a2', side: 'pro', authorId: 'u_02', authorName: '青衫客', authorAvatar: 'https://i.pravatar.cc/120?img=64',
@@ -28,9 +80,11 @@ export const debates: Debate[] = [
         upvotes: 187, downvotes: 8, createdAt: '2026-05-28T12:05:00Z',
       },
       {
-        id: 'a3', side: 'con', authorId: 'u_03', authorName: '晚风', authorAvatar: 'https://i.pravatar.cc/120?img=52',
-        content: '用户来咨询，期待的是答案，不是另一个问题。AI 应该是简化者，不是反问机器。',
+        id: 'a3', side: 'con', authorId: 'p_e5', authorName: '连岳', authorAvatar: panelists[4].avatar,
+        content: '用户来咨询，期待的是答案，不是另一个问题。AI 应该是简化者，不是反问机器。当工具开始定义问题边界，权力就倾斜了。',
         upvotes: 89, downvotes: 5, createdAt: '2026-05-28T13:14:00Z',
+        isExpert: true, isFeatured: true,
+        citations: [rich1],
       },
       {
         id: 'a4', side: 'con', authorId: 'u_04', authorName: '鹿鸣', authorAvatar: 'https://i.pravatar.cc/120?img=37',
@@ -58,11 +112,18 @@ export const debates: Debate[] = [
     linkedNewsId: 'n2',
     cover: 'https://images.unsplash.com/photo-1556742502-ec7c0e9f34b1?w=1200&q=80&auto=format&fit=crop',
     tags: ['消费', '价值观', '品牌'],
+    status: 'live',
+    format: 'open',
+    proStance: '好生活是个人化的，资本无权定义',
+    conStance: '个人选择本身就被资本塑造',
+    difficulty: 'easy',
     arguments: [
       {
-        id: 'a6', side: 'pro', authorId: 'u_06', authorName: '南风', authorAvatar: 'https://i.pravatar.cc/120?img=9',
+        id: 'a6', side: 'pro', authorId: 'p_e4', authorName: '和菜头', authorAvatar: panelists[3].avatar,
         content: '好生活从来都是个人化的。一旦你被"应该过得好"绑架，那才是真正的消费降级。',
         upvotes: 421, downvotes: 32, createdAt: '2026-05-26T17:00:00Z',
+        isExpert: true, isFeatured: true,
+        citations: [consumer1],
       },
       {
         id: 'a7', side: 'con', authorId: 'u_07', authorName: '清和', authorAvatar: 'https://i.pravatar.cc/120?img=14',
@@ -90,16 +151,27 @@ export const debates: Debate[] = [
     linkedNewsId: 'n4',
     cover: 'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=1200&q=80&auto=format&fit=crop',
     tags: ['天文', '伦理', '文明'],
+    status: 'live',
+    format: 'roundtable',
+    moderator: moderators[0],
+    panelists: [panelists[0], panelists[2]],
+    proStance: '科学的本质是探索，应该主动发声',
+    conStance: '黑暗森林 - 沉默是更明智的选择',
+    difficulty: 'hard',
     arguments: [
       {
-        id: 'a9', side: 'pro', authorId: 'u_09', authorName: '远山', authorAvatar: 'https://i.pravatar.cc/120?img=68',
+        id: 'a9', side: 'pro', authorId: 'p_e3', authorName: '万维钢', authorAvatar: panelists[2].avatar,
         content: 'SETI 听了几十年什么都没听到，是时候主动喊一嗓子了。科学的本质是探索。',
         upvotes: 187, downvotes: 23, createdAt: '2026-05-24T14:00:00Z',
+        isExpert: true, isFeatured: true,
+        citations: [seti1],
       },
       {
-        id: 'a10', side: 'con', authorId: 'u_10', authorName: '云间月', authorAvatar: 'https://i.pravatar.cc/120?img=64',
+        id: 'a10', side: 'con', authorId: 'p_e1', authorName: '袁越', authorAvatar: panelists[0].avatar,
         content: '黑暗森林假说提醒我们：暴露坐标可能招致灭顶之灾。在我们有能力星际航行之前，沉默是更明智的选择。',
         upvotes: 542, downvotes: 18, createdAt: '2026-05-24T15:10:00Z',
+        isExpert: true, isFeatured: true,
+        citations: [darkforest],
       },
       {
         id: 'a11', side: 'con', authorId: 'u_11', authorName: '莫问', authorAvatar: 'https://i.pravatar.cc/120?img=52',
@@ -123,11 +195,18 @@ export const debates: Debate[] = [
     linkedProductId: 'p2',
     cover: 'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=1200&q=80&auto=format&fit=crop',
     tags: ['汽车', '新能源', '传统行业'],
+    status: 'live',
+    format: 'oxford',
+    moderator: moderators[1],
+    proStance: '精益制造 + 氢能源，老牌车企能反扑',
+    conStance: '决策链太长，已无翻盘可能',
+    difficulty: 'medium',
     arguments: [
       {
         id: 'a12', side: 'con', authorId: 'u_12', authorName: '听雪', authorAvatar: 'https://i.pravatar.cc/120?img=37',
         content: '他们的产品决策链条、供应链、研发节奏都太慢了。除非彻底重组，否则看不到翻盘点。',
         upvotes: 412, downvotes: 28, createdAt: '2026-05-23T19:00:00Z',
+        citations: [byd1],
       },
       {
         id: 'a13', side: 'pro', authorId: 'u_13', authorName: '折光', authorAvatar: 'https://i.pravatar.cc/120?img=24',
@@ -150,11 +229,17 @@ export const debates: Debate[] = [
     linkedNewsId: 'n9',
     cover: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80&auto=format&fit=crop',
     tags: ['工作', '生活方式', '自由'],
+    status: 'live',
+    format: 'open',
+    proStance: '逃离地理束缚 = 真正的自由',
+    conStance: '没有根，没有深度 = 高级漂泊',
+    difficulty: 'easy',
     arguments: [
       {
         id: 'a14', side: 'pro', authorId: 'u_14', authorName: '白夜', authorAvatar: 'https://i.pravatar.cc/120?img=9',
         content: '我做了 4 年数字游民，最大的感受是：当你不再被一个地方绑住，你才能真正选择"我想在哪里生活"。',
         upvotes: 542, downvotes: 18, createdAt: '2026-05-18T18:00:00Z',
+        citations: [mmr, digital1],
       },
       {
         id: 'a15', side: 'con', authorId: 'u_15', authorName: '余晖', authorAvatar: 'https://i.pravatar.cc/120?img=14',
@@ -177,16 +262,25 @@ export const debates: Debate[] = [
     linkedNewsId: 'n10',
     cover: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=1200&q=80&auto=format&fit=crop',
     tags: ['意识', '哲学', '永生'],
+    status: 'live',
+    format: 'roundtable',
+    moderator: moderators[0],
+    panelists: [panelists[2], panelists[1]],
+    proStance: '意识连续性 = 身份认同',
+    conStance: '复制 ≠ 永生 = 制造克隆',
+    difficulty: 'hard',
     arguments: [
       {
-        id: 'a16', side: 'pro', authorId: 'u_16', authorName: '回声', authorAvatar: 'https://i.pravatar.cc/120?img=68',
+        id: 'a16', side: 'pro', authorId: 'p_e3', authorName: '万维钢', authorAvatar: panelists[2].avatar,
         content: '连续性才是身份的核心。每天的你都不是物理意义上"昨天那个你"，但你仍然认为自己是"你"。',
         upvotes: 387, downvotes: 41, createdAt: '2026-05-17T11:00:00Z',
+        isExpert: true, isFeatured: true,
       },
       {
-        id: 'a17', side: 'con', authorId: 'u_17', authorName: '拾光', authorAvatar: 'https://i.pravatar.cc/120?img=64',
+        id: 'a17', side: 'con', authorId: 'p_e2', authorName: '李松蔚', authorAvatar: panelists[1].avatar,
         content: '复制品有同样的记忆、思维模式，但它不是你——因为"它"不会死亡，而你最终会。这不是永生，是制造了一个"你"的克隆。',
         upvotes: 542, downvotes: 23, createdAt: '2026-05-17T12:00:00Z',
+        isExpert: true, isFeatured: true,
       },
     ],
   },
@@ -203,11 +297,18 @@ export const debates: Debate[] = [
     hot: 65,
     cover: 'https://images.unsplash.com/photo-1513151233558-d860c5398176?w=1200&q=80&auto=format&fit=crop',
     tags: ['消费', '生活方式', '品牌'],
+    status: 'live',
+    format: 'open',
+    proStance: '日常仪式是生活的锚点',
+    conStance: '被价格标签激活的仪式感 = 陷阱',
+    difficulty: 'easy',
     arguments: [
       {
-        id: 'a18', side: 'pro', authorId: 'u_18', authorName: '南山', authorAvatar: 'https://i.pravatar.cc/120?img=37',
+        id: 'a18', side: 'pro', authorId: 'p_e4', authorName: '和菜头', authorAvatar: panelists[3].avatar,
         content: '日常里的微小仪式是我们对抗平庸生活的武器。一杯好咖啡的 5 分钟是值得的。',
         upvotes: 423, downvotes: 12, createdAt: '2026-05-15T10:00:00Z',
+        isExpert: true, isFeatured: true,
+        citations: [ritual1],
       },
       {
         id: 'a19', side: 'con', authorId: 'u_19', authorName: '望舒', authorAvatar: 'https://i.pravatar.cc/120?img=24',
@@ -229,11 +330,20 @@ export const debates: Debate[] = [
     hot: 75,
     cover: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=1200&q=80&auto=format&fit=crop',
     tags: ['AI', '开源', '技术'],
+    status: 'live',
+    format: 'oxford',
+    moderator: moderators[2],
+    panelists: [panelists[2], panelists[3]],
+    proStance: '社区迭代 + 中国速度 = 5 年内追平',
+    conStance: '基础研究护城河 = 5 年内追不上',
+    difficulty: 'medium',
     arguments: [
       {
-        id: 'a20', side: 'pro', authorId: 'u_20', authorName: '谷雨', authorAvatar: 'https://i.pravatar.cc/120?img=68',
+        id: 'a20', side: 'pro', authorId: 'p_e3', authorName: '万维钢', authorAvatar: panelists[2].avatar,
         content: 'DeepSeek V4 已经追平 GPT-5 在 80% 任务上的表现。开源的优势是社区迭代速度，差距会越来越小。',
         upvotes: 521, downvotes: 18, createdAt: '2026-05-12T15:00:00Z',
+        isExpert: true, isFeatured: true,
+        citations: [opensoft, open1],
       },
       {
         id: 'a21', side: 'con', authorId: 'u_21', authorName: '微岚', authorAvatar: 'https://i.pravatar.cc/120?img=64',
@@ -242,4 +352,76 @@ export const debates: Debate[] = [
       },
     ],
   },
+  {
+    id: 'd9',
+    title: '"卷"是东亚社会的结构性问题还是文化选择？',
+    description: '从"鸡娃"到"996"，东亚社会的"卷"是经济发展的必然代价，还是可以靠制度选择避免？',
+    category: 'social',
+    creatorId: 'u_xu',
+    createdAt: '2026-06-01T08:00:00Z',
+    pros: 412,
+    cons: 298,
+    views: 5680,
+    hot: 55,
+    tags: ['社会', '教育', '文化'],
+    status: 'upcoming',
+    format: 'roundtable',
+    moderator: moderators[1],
+    proStance: '"卷"是文化选择，可以通过政策改变',
+    conStance: '"卷"是结构性问题，难以改变',
+    difficulty: 'medium',
+    arguments: [],
+  },
+  {
+    id: 'd10',
+    title: 'AI 创作的音乐/绘画算"艺术"吗？',
+    description: '当 AI 可以生成任何风格的作品，艺术的"人"的价值还剩多少？',
+    category: 'entertainment',
+    creatorId: 'u_yan',
+    createdAt: '2026-05-30T20:00:00Z',
+    pros: 678,
+    cons: 543,
+    views: 8930,
+    hot: 68,
+    tags: ['AI', '艺术', '创作'],
+    status: 'live',
+    format: 'open',
+    proStance: 'AI 是工具，艺术的本质是表达',
+    conStance: 'AI 作品没有灵魂，不是艺术',
+    difficulty: 'medium',
+    arguments: [
+      {
+        id: 'a22', side: 'pro', authorId: 'p_e6', authorName: '宁浩', authorAvatar: panelists[5].avatar,
+        content: '摄影出现时，画家们说它不是艺术。结果呢？每一种新的表达工具都会扩展艺术的边界。',
+        upvotes: 312, downvotes: 18, createdAt: '2026-05-30T21:00:00Z',
+        isExpert: true, isFeatured: true,
+      },
+      {
+        id: 'a23', side: 'con', authorId: 'u_23', authorName: '林清', authorAvatar: 'https://i.pravatar.cc/120?img=45',
+        content: '艺术的核心是"创作者的意图"。AI 没有意图，没有痛苦，没有喜悦——它只是统计了无数人类作品后的拼贴。',
+        upvotes: 234, downvotes: 12, createdAt: '2026-05-30T22:00:00Z',
+      },
+    ],
+  },
 ]
+
+export const featuredRoundtable = {
+  id: 'rt1',
+  title: '圆桌：AI 时代，人类还需要学习吗？',
+  description: '当 AI 可以帮我们写代码、做设计、写文章、看病、写法律文书——传统教育的价值还剩多少？我们邀请 6 位嘉宾参与这场深度讨论。',
+  cover: 'https://images.unsplash.com/photo-1488998427799-e3362cec87c3?w=1200&q=80&auto=format&fit=crop',
+  startedAt: '2026-06-01T19:00:00Z',
+  duration: 90,
+  host: moderators[2],
+  guests: [panelists[1], panelists[2], panelists[3], panelists[4], panelists[0], panelists[5]],
+  agenda: [
+    { time: '19:00', topic: '开场：AI 已经改变了哪些学习场景' },
+    { time: '19:15', topic: 'Round 1：知识 vs 能力——什么在贬值？' },
+    { time: '19:35', topic: 'Round 2：批判性思维还能教吗？' },
+    { time: '19:55', topic: 'Round 3：未来 10 年最值得学的是什么' },
+    { time: '20:20', topic: '观众提问 & 自由讨论' },
+  ],
+  status: 'live' as const,
+  viewerCount: 8932,
+  tags: ['AI', '教育', '终身学习'],
+}
