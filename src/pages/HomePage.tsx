@@ -1,27 +1,31 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import {
   Newspaper, Scale, ShoppingBag, Sparkles, ArrowRight,
-  TrendingUp, MessageCircle, Flame, Award, ChevronRight,
+  TrendingUp, MessageCircle, Flame, Award, ChevronRight, Zap, Eye, Clock,
 } from 'lucide-react'
-import { news, debates, products, moduleMeta } from '../data'
+import { news, debates, products, breakingNews, moduleMeta } from '../data'
 import { versa, useVersa, levelFor, levelTitle, levelProgress } from '../store/versa'
 import { NewsCard } from '../components/news/NewsCard'
 import { DebateCard } from '../components/debate/DebateCard'
-import { ProductCard } from '../components/shop/ProductCard'
+import { ProductCardV2 } from '../components/shop/ProductCardV2'
+import { BreakingTicker } from '../components/news/BreakingTicker'
 import { Badge } from '../components/ui/Badge'
 import { Button } from '../components/ui/Button'
 import { ProgressBar, ScorePill } from '../components/ui/Progress'
-import { formatNumber, cn } from '../lib/utils'
+import { formatNumber, formatTimeAgo, cn } from '../lib/utils'
 
 export function HomePage() {
   const { user, visitedModules } = useVersa()
   const navigate = useNavigate()
-  const trendingNews = news.slice(0, 3)
-  const featureNews = news[0]
-  const trendingDebates = [...debates].sort((a, b) => b.hot - a.hot).slice(0, 3)
-  const trendingProducts = products.slice(0, 4)
+  const featured = useMemo(() => news.filter((a) => a.isFeatured).slice(0, 4), [])
+  const mainFeatured = featured[0]
+  const sideFeatured = featured.slice(1, 4)
+  const longForm = useMemo(() => news.filter((a) => a.isLongForm), [])
+  const today = useMemo(() => [...news].sort((a, b) => +new Date(b.publishedAt) - +new Date(a.publishedAt)), [])
+  const trendingDebates = useMemo(() => [...debates].sort((a, b) => b.hot - a.hot).slice(0, 4), [])
+  const editorPicks = useMemo(() => products.filter((p) => p.originalPrice && p.originalPrice > p.price).slice(0, 4), [])
   const rep = levelProgress(user.reputation)
 
   useEffect(() => {
@@ -30,159 +34,265 @@ export function HomePage() {
 
   return (
     <div>
-      {/* HERO */}
+      {/* HERO Dashboard Banner */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 gradient-bg-hero opacity-30 dark:opacity-40" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(115,68,255,0.15),transparent_50%)]" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-20 sm:pt-20 sm:pb-28">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-12">
+          {/* Greeting + identity */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-center max-w-3xl mx-auto"
+            className="flex items-center justify-between mb-6 flex-wrap gap-3"
           >
-            <Badge variant="nova" className="mb-5">
-              <Sparkles className="w-3 h-3" /> 三体融合平台 · 重新定义消费决策
-            </Badge>
-            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold leading-[1.05] tracking-tight">
-              新闻激发辩论<br />
-              <span className="gradient-text-aurora">辩论推荐商品</span>
-            </h1>
-            <p className="mt-6 text-lg sm:text-xl text-ink-600 dark:text-ink-300 max-w-2xl mx-auto">
-              Versa 把资讯、辩论、购物编织成一个有机整体。
-              读一篇深度文章、参与一场思想碰撞、做出更明智的购买决定——一个回路完成。
-            </p>
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-              <Button size="lg" onClick={() => navigate('/news')} leftIcon={<Newspaper className="w-4 h-4" />}>
-                开始阅读
-              </Button>
-              <Button size="lg" variant="outline" onClick={() => navigate('/debates')} leftIcon={<Scale className="w-4 h-4" />}>
-                加入辩论
-              </Button>
+            <div>
+              <div className="text-sm text-ink-500 dark:text-ink-400">
+                {greeting()}，{user.displayName || '探索者'}
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-bold mt-1">
+                今天有 <span className="text-news-500">{today.length}</span> 篇新文章 ·{' '}
+                <span className="text-debate-500">{trendingDebates.length}</span> 场辩论 ·{' '}
+                <span className="text-shop-500">{editorPicks.length}</span> 件好物
+              </h1>
+            </div>
+            <div className="flex items-center gap-2">
+              <Badge variant="nova" className="text-xs">
+                <Sparkles className="w-3 h-3" /> Lv.{user.level} · {levelTitle(user.level)}
+              </Badge>
+              <Badge variant="outline" className="text-xs">{user.reputation} 声誉</Badge>
             </div>
           </motion.div>
 
-          {/* 模块入口卡片 */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6"
-          >
-            {([
-              { k: 'news' as const, ...moduleMeta.news, icon: Newspaper, to: '/news', gradient: 'from-news-500/20 to-news-500/0' },
-              { k: 'debate' as const, ...moduleMeta.debate, icon: Scale, to: '/debates', gradient: 'from-debate-500/20 to-debate-500/0' },
-              { k: 'shop' as const, ...moduleMeta.shop, icon: ShoppingBag, to: '/shop', gradient: 'from-shop-500/20 to-shop-500/0' },
-            ]).map((m, i) => (
+          {/* 快讯 ticker */}
+          <div className="mb-5">
+            <BreakingTicker />
+          </div>
+
+          {/* Hero featured news grid */}
+          {mainFeatured && (
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
               <Link
-                key={m.k}
-                to={m.to}
-                className="group relative rounded-2xl p-6 sm:p-8 bg-white/70 dark:bg-ink-900/60 border border-ink-200/60 dark:border-ink-800/60 overflow-hidden card-hover"
-                style={{ animationDelay: `${i * 0.1}s` }}
+                to={`/news/${mainFeatured.id}`}
+                className="lg:col-span-3 group relative rounded-3xl overflow-hidden bg-ink-900 aspect-[16/10] lg:aspect-[21/10]"
               >
-                <div className={cn('absolute -top-12 -right-12 w-40 h-40 rounded-full bg-gradient-to-br opacity-50 blur-2xl group-hover:opacity-80 transition-opacity', m.gradient)} />
-                <div className="relative">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: m.color + '20', color: m.color }}>
-                      <m.icon className="w-6 h-6" />
-                    </div>
-                    <ChevronRight className="w-5 h-5 text-ink-400 group-hover:translate-x-1 transition-transform" />
+                <img src={mainFeatured.cover} alt="" className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
+                <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/60 to-transparent" />
+                <div className="relative h-full p-6 sm:p-10 flex flex-col justify-end text-white">
+                  <div className="flex items-center gap-2 mb-3 flex-wrap">
+                    <Badge variant="nova" size="sm" icon={<Sparkles className="w-3 h-3" />}>头条</Badge>
+                    <Badge variant="news" size="sm">{categoryLabel(mainFeatured.category)}</Badge>
+                    {mainFeatured.isLongForm && <Badge variant="outline" size="sm" className="bg-white/10 border-white/30 text-white">深度</Badge>}
                   </div>
-                  <h3 className="text-2xl font-bold mb-1">{m.name} <span className="text-sm font-normal text-ink-500">{m.nameEn}</span></h3>
-                  <p className="text-sm text-ink-600 dark:text-ink-300">{m.description}</p>
-                  <div className="mt-5 text-xs text-ink-500 dark:text-ink-400 flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full" style={{ background: m.color }} />
-                    您已访问 {visitedModules[m.k]} 次
+                  <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight max-w-2xl text-balance">
+                    {mainFeatured.title}
+                  </h2>
+                  <p className="text-sm sm:text-base text-ink-200 mt-3 max-w-xl line-clamp-2">{mainFeatured.subtitle}</p>
+                  <div className="mt-4 flex items-center gap-2 text-xs text-ink-300">
+                    <img src={mainFeatured.author.avatar} alt="" className="w-5 h-5 rounded-full ring-1 ring-white/40" />
+                    <span className="font-medium">{mainFeatured.author.name}</span>
+                    <span>·</span>
+                    <span>{mainFeatured.readTime} 分钟</span>
+                    <span>·</span>
+                    <span className="flex items-center gap-0.5"><Eye className="w-3 h-3" />{formatNumber(mainFeatured.views)}</span>
                   </div>
                 </div>
               </Link>
-            ))}
-          </motion.div>
+              <div className="lg:col-span-2 flex flex-col gap-3">
+                {sideFeatured.map((a) => (
+                  <Link
+                    key={a.id}
+                    to={`/news/${a.id}`}
+                    className="group relative rounded-2xl overflow-hidden bg-ink-900 flex-1 min-h-[120px]"
+                  >
+                    <img src={a.cover} alt="" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/40 to-transparent" />
+                    <div className="relative h-full p-4 flex flex-col justify-end text-white">
+                      <div className="flex items-center gap-1.5 mb-1.5">
+                        <Badge variant="news" size="sm">{categoryLabel(a.category)}</Badge>
+                      </div>
+                      <h3 className="text-sm sm:text-base font-bold leading-snug line-clamp-2">{a.title}</h3>
+                      <div className="mt-1.5 text-[10px] text-ink-300 flex items-center gap-2">
+                        <span>{a.readTime} 分钟</span>
+                        <span>·</span>
+                        <span>{formatNumber(a.views)} 阅读</span>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
-      {/* 特性新闻 */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <SectionHeader title="编辑精选" subtitle="本周最值得花时间阅读的深度内容" icon={Sparkles} />
-        <div className="mt-6">
-          <NewsCard article={featureNews} variant="feature" />
-        </div>
-        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {trendingNews.slice(1).map((a) => (
-            <NewsCard key={a.id} article={a} />
+      {/* 模块入口 - 紧凑条 */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-2">
+        <div className="grid grid-cols-3 gap-3">
+          {([
+            { k: 'news' as const, ...moduleMeta.news, icon: Newspaper, to: '/news', color: 'news' },
+            { k: 'debate' as const, ...moduleMeta.debate, icon: Scale, to: '/debates', color: 'debate' },
+            { k: 'shop' as const, ...moduleMeta.shop, icon: ShoppingBag, to: '/shop', color: 'shop' },
+          ]).map((m) => (
+            <Link
+              key={m.k}
+              to={m.to}
+              className="group flex items-center gap-3 p-4 rounded-2xl bg-white/80 dark:bg-ink-900/60 border border-ink-200/60 dark:border-ink-800/60 hover:border-current transition-colors"
+              style={{ color: m.color === 'news' ? '#0EA5E9' : m.color === 'debate' ? '#F97316' : '#10B981' }}
+            >
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'currentColor', color: 'white', opacity: 0.9 }}>
+                <m.icon className="w-5 h-5" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="font-bold text-sm text-ink-900 dark:text-white">{m.name}</div>
+                <div className="text-[10px] text-ink-500">已访问 {visitedModules[m.k]} 次</div>
+              </div>
+              <ChevronRight className="w-4 h-4 text-ink-400 group-hover:translate-x-0.5 transition-transform" />
+            </Link>
           ))}
         </div>
       </section>
 
-      {/* 融合：跨模块关联 */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="rounded-3xl p-6 sm:p-10 bg-gradient-to-br from-nova-500/10 via-debate-500/10 to-shop-500/10 border border-ink-200/60 dark:border-ink-800/60">
-          <SectionHeader
-            title="三体融合 · 案例"
-            subtitle="看资讯、辩论、购物如何在 Versa 真实地连接"
-            icon={Flame}
-            variant="aurora"
-          />
-          <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <FusionCard
-              color="news"
-              icon={Newspaper}
-              title="资讯 → 辩论"
-              description="读完一篇关于 AI 的深度文章，一键进入正反双方观点交锋"
-              example="《生成式 AI 进入协作时代》 → 辩论：AI 该主动向用户提问吗？"
-            />
-            <FusionCard
-              color="debate"
-              icon={Scale}
-              title="辩论 → 商品"
-              description="在辩论中看到大家讨论的产品，直接跳转购买"
-              example="辩论：传统车企还能翻盘吗？ → BYD Atto 3 升级版"
-            />
-            <FusionCard
-              color="shop"
-              icon={ShoppingBag}
-              title="商品 → 资讯"
-              description="商品详情页附带相关资讯、评测和媒体报道"
-              example="Versa Smart Hub X1 → 30 天深度评测报道"
-            />
+      {/* 今日要闻列表 + 侧栏 */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <div className="lg:col-span-8">
+            <SectionHeader title="今日要闻" subtitle="今日最新更新" icon={Newspaper} accentColor="news" link="/news" />
+            <div className="mt-6 space-y-0 divide-y divide-ink-100 dark:divide-ink-800">
+              {today.slice(0, 6).map((a) => (
+                <Link
+                  key={a.id}
+                  to={`/news/${a.id}`}
+                  className="group flex gap-4 py-4 first:pt-0 hover:opacity-90"
+                >
+                  <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-xl overflow-hidden bg-ink-100 dark:bg-ink-800 flex-shrink-0">
+                    <img src={a.cover} alt="" className="w-full h-full object-cover" />
+                  </div>
+                  <div className="flex-1 min-w-0 flex flex-col">
+                    <div className="flex items-center gap-1.5 flex-wrap mb-1">
+                      <Badge variant={categoryColor(a.category)} size="sm">{categoryLabel(a.category)}</Badge>
+                      {a.isLongForm && <Badge variant="nova" size="sm">深度</Badge>}
+                    </div>
+                    <h3 className="font-semibold text-base sm:text-lg leading-snug line-clamp-2 group-hover:text-news-600 transition-colors">
+                      {a.title}
+                    </h3>
+                    <p className="text-sm text-ink-500 dark:text-ink-400 line-clamp-2 mt-1 hidden sm:block">{a.subtitle}</p>
+                    <div className="mt-auto pt-2 text-[11px] text-ink-500 flex items-center gap-2">
+                      <span>{a.author.name}</span>
+                      <span>·</span>
+                      <span>{formatTimeAgo(a.publishedAt)}</span>
+                      <span>·</span>
+                      <span className="flex items-center gap-0.5"><Eye className="w-3 h-3" />{formatNumber(a.views)}</span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
           </div>
+
+          {/* Right sidebar */}
+          <aside className="lg:col-span-4 space-y-5">
+            {/* 今日辩论 */}
+            <div className="rounded-2xl border border-debate-500/20 bg-gradient-to-br from-debate-500/5 to-transparent overflow-hidden">
+              <div className="flex items-center justify-between px-5 py-3.5 border-b border-debate-500/15">
+                <div className="flex items-center gap-2">
+                  <Scale className="w-4 h-4 text-debate-500" />
+                  <h3 className="font-bold text-sm">今日辩论</h3>
+                </div>
+                <Link to="/debates" className="text-xs text-debate-600 hover:underline">全部 ›</Link>
+              </div>
+              <div className="p-3 space-y-1.5">
+                {trendingDebates.slice(0, 3).map((d) => (
+                  <Link
+                    key={d.id}
+                    to={`/debates/${d.id}`}
+                    className="block p-3 rounded-xl hover:bg-white/60 dark:hover:bg-ink-900/40 transition-colors"
+                  >
+                    <div className="text-sm font-medium line-clamp-2 leading-snug">{d.title}</div>
+                    <div className="mt-1.5 flex items-center gap-2 text-[10px] text-ink-500">
+                      <MessageCircle className="w-3 h-3" />
+                      <span>{d.arguments.length} 论点</span>
+                      <span>·</span>
+                      <span className="flex items-center gap-0.5"><Eye className="w-3 h-3" />{formatNumber(d.views)}</span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* 24h 热读榜 */}
+            <div className="rounded-2xl border border-ink-200/60 dark:border-ink-800/60 bg-white/60 dark:bg-ink-900/40 overflow-hidden">
+              <div className="flex items-center gap-2 px-5 py-3.5 border-b border-ink-200/60 dark:border-ink-800/60">
+                <Flame className="w-4 h-4 text-red-500" />
+                <h3 className="font-bold text-sm">24h 热读</h3>
+              </div>
+              <div className="divide-y divide-ink-100 dark:divide-ink-800">
+                {today.slice(0, 6).sort((a, b) => b.views - a.views).map((a, i) => (
+                  <Link
+                    key={a.id}
+                    to={`/news/${a.id}`}
+                    className="flex items-start gap-3 px-5 py-3 hover:bg-ink-50/60 dark:hover:bg-ink-900/40 transition-colors group"
+                  >
+                    <span className={cn('text-2xl font-bold leading-none flex-shrink-0 w-7 tabular-nums', i < 3 ? 'text-red-500' : 'text-ink-300')}>{i + 1}</span>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-sm font-medium line-clamp-2 group-hover:text-news-600">{a.title}</h4>
+                      <div className="text-[10px] text-ink-500 mt-1 flex items-center gap-2">
+                        <Eye className="w-3 h-3" />
+                        <span className="tabular-nums">{formatNumber(a.views)}</span>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </aside>
         </div>
       </section>
 
-      {/* 辩论 + 购物并排 */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      {/* 深度阅读 - 大图卡片 */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <SectionHeader title="深度阅读" subtitle="值得花一个下午读完的" icon={Sparkles} accentColor="nova" link="/news" />
+        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {longForm.slice(0, 3).map((a) => <NewsCard key={a.id} article={a} />)}
+        </div>
+      </section>
+
+      {/* 选品 + 跨模块 */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div>
-            <SectionHeader title="热议话题" subtitle="当下最值得参与的观点交锋" icon={Scale} accentColor="debate" />
-            <div className="mt-6 space-y-4">
-              {trendingDebates.map((d) => (
-                <DebateCard key={d.id} debate={d} />
-              ))}
-            </div>
-            <div className="mt-6 text-center">
-              <Link to="/debates" className="text-sm text-nova-600 font-medium hover:underline inline-flex items-center gap-1">
-                查看全部辩论 <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
+            <SectionHeader title="编辑选品" subtitle="本周值得入手的好物" icon={ShoppingBag} accentColor="shop" link="/shop" />
+            <div className="mt-6 grid grid-cols-2 gap-4">
+              {editorPicks.map((p) => <ProductCardV2 key={p.id} product={p} compact />)}
             </div>
           </div>
           <div>
-            <SectionHeader title="编辑选品" subtitle="来自 Versa 编辑部的好物推荐" icon={ShoppingBag} accentColor="shop" />
-            <div className="mt-6 grid grid-cols-2 gap-4">
-              {trendingProducts.map((p) => (
-                <ProductCard key={p.id} product={p} />
-              ))}
-            </div>
-            <div className="mt-6 text-center">
-              <Link to="/shop" className="text-sm text-nova-600 font-medium hover:underline inline-flex items-center gap-1">
-                浏览全部商品 <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
+            <SectionHeader title="三体融合 · 真实案例" subtitle="看三个模块如何自然连接" icon={Flame} accentColor="nova" />
+            <div className="mt-6 space-y-3">
+              <FusionCard
+                color="news"
+                icon={Newspaper}
+                title="资讯 → 辩论"
+                desc="读完一篇 AI 深度文章 → 直接参与 'AI 应该主动提问吗' 的正反辩论"
+              />
+              <FusionCard
+                color="debate"
+                icon={Scale}
+                title="辩论 → 商品"
+                desc="在 '传统车企能否翻盘' 辩论中看到大家讨论的车款 → 跳转到评测页购买"
+              />
+              <FusionCard
+                color="shop"
+                icon={ShoppingBag}
+                title="商品 → 资讯"
+                desc="商品详情页附带 30 天深度评测、媒体报道、用户真实使用笔记"
+              />
             </div>
           </div>
         </div>
       </section>
 
       {/* 跨模块成就/积分 */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="rounded-3xl p-6 sm:p-10 bg-white/70 dark:bg-ink-900/60 border border-ink-200/60 dark:border-ink-800/60">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
             <div>
@@ -191,12 +301,12 @@ export function HomePage() {
               </Badge>
               <h2 className="text-3xl font-bold">在 Versa 积累你的<span className="gradient-text"> 思想货币</span></h2>
               <p className="mt-3 text-ink-600 dark:text-ink-300">
-                读资讯、参与辩论、收藏商品都会获得声誉值。声誉代表你对三个领域的参与深度，跨模块活跃的用户将获得专属勋章。
+                读资讯、参与辩论、收藏商品都会获得声誉值。声誉代表你对三个领域的参与深度。
               </p>
               <div className="mt-6 space-y-3">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-ink-500">Lv.{user.level} {levelTitle(user.level)}</span>
-                  <span className="text-ink-500">{user.reputation} / {rep.next + user.reputation - rep.current} 声誉</span>
+                  <span className="text-ink-500">{user.reputation} 声誉</span>
                 </div>
                 <ProgressBar value={rep.percent} variant="gradient" height="lg" />
               </div>
@@ -213,7 +323,7 @@ export function HomePage() {
                     <Award className="w-6 h-6 text-nova-500" />
                   </div>
                   <div className="font-semibold text-sm">{b.name}</div>
-                  <div className="text-xs text-ink-500 mt-0.5">{b.description}</div>
+                  <div className="text-xs text-ink-500 mt-0.5 line-clamp-1">{b.description}</div>
                 </div>
               ))}
             </div>
@@ -224,55 +334,57 @@ export function HomePage() {
   )
 }
 
-function SectionHeader({
-  title,
-  subtitle,
-  icon: Icon,
-  accentColor = 'nova',
-  variant = 'default',
-}: {
-  title: string
-  subtitle?: string
-  icon: any
-  accentColor?: 'nova' | 'debate' | 'shop' | 'news'
-  variant?: 'default' | 'aurora'
-}) {
-  const colorMap = {
-    nova: 'text-nova-500',
-    debate: 'text-debate-500',
-    shop: 'text-shop-500',
-    news: 'text-news-500',
-  }
+function greeting() {
+  const h = new Date().getHours()
+  if (h < 6) return '夜深了'
+  if (h < 12) return '早上好'
+  if (h < 18) return '下午好'
+  return '晚上好'
+}
+
+function categoryLabel(c: string) {
+  return { tech: '科技', finance: '财经', culture: '文化', science: '科学', world: '国际', lifestyle: '生活' }[c] || c
+}
+function categoryColor(c: string): any {
+  return ({ tech: 'nova', finance: 'shop', culture: 'news', science: 'nova', world: 'debate', lifestyle: 'default' } as any)[c] || 'default'
+}
+
+function SectionHeader({ title, subtitle, icon: Icon, accentColor = 'nova', link }: { title: string; subtitle?: string; icon: any; accentColor?: 'nova' | 'debate' | 'shop' | 'news'; link?: string }) {
+  const colorMap: any = { nova: 'text-nova-500', debate: 'text-debate-500', shop: 'text-shop-500', news: 'text-news-500' }
   return (
-    <div className="flex items-end justify-between">
+    <div className="flex items-end justify-between flex-wrap gap-2">
       <div>
         <div className="flex items-center gap-2 mb-1.5">
           <Icon className={cn('w-4 h-4', colorMap[accentColor])} />
-          <h2 className={cn('text-2xl sm:text-3xl font-bold tracking-tight', variant === 'aurora' && 'gradient-text-aurora')}>
-            {title}
-          </h2>
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">{title}</h2>
         </div>
         {subtitle && <p className="text-sm text-ink-500 dark:text-ink-400">{subtitle}</p>}
       </div>
+      {link && (
+        <Link to={link} className="text-sm text-nova-600 font-medium hover:underline inline-flex items-center gap-1">
+          查看全部 <ArrowRight className="w-3.5 h-3.5" />
+        </Link>
+      )}
     </div>
   )
 }
 
-function FusionCard({ icon: Icon, title, description, example, color }: { icon: any; title: string; description: string; example: string; color: 'news' | 'debate' | 'shop' }) {
-  const colorMap = {
+function FusionCard({ icon: Icon, title, desc, color }: { icon: any; title: string; desc: string; color: 'news' | 'debate' | 'shop' }) {
+  const colorMap: any = {
     news: { bg: 'bg-news-500/10', text: 'text-news-600' },
     debate: { bg: 'bg-debate-500/10', text: 'text-debate-600' },
     shop: { bg: 'bg-shop-500/10', text: 'text-shop-600' },
   }
   return (
-    <div className="rounded-2xl p-5 bg-white/60 dark:bg-ink-900/40 border border-ink-200/60 dark:border-ink-800/60">
-      <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center mb-3', colorMap[color].bg, colorMap[color].text)}>
-        <Icon className="w-5 h-5" />
-      </div>
-      <h3 className="font-semibold mb-1.5">{title}</h3>
-      <p className="text-sm text-ink-600 dark:text-ink-300 mb-3">{description}</p>
-      <div className="text-xs text-ink-500 dark:text-ink-400 italic border-l-2 border-ink-200 dark:border-ink-800 pl-3">
-        {example}
+    <div className="rounded-2xl p-4 bg-white/60 dark:bg-ink-900/40 border border-ink-200/60 dark:border-ink-800/60 hover:border-current transition-colors" style={{ color: color === 'news' ? '#0EA5E9' : color === 'debate' ? '#F97316' : '#10B981' }}>
+      <div className="flex items-start gap-3">
+        <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0', colorMap[color].bg, colorMap[color].text)}>
+          <Icon className="w-5 h-5" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <h3 className="font-semibold text-sm text-ink-900 dark:text-white">{title}</h3>
+          <p className="text-xs text-ink-600 dark:text-ink-300 mt-1 line-clamp-2">{desc}</p>
+        </div>
       </div>
     </div>
   )

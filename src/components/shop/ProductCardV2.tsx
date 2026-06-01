@@ -13,7 +13,7 @@ const categoryLabel: Record<string, string> = {
   tech: '数码', fashion: '服饰', home: '家居', books: '图书', food: '食品', sports: '运动', beauty: '美妆',
 }
 
-export function ProductCardV2({ product, variant = 'default' }: { product: Product; variant?: 'default' | 'recommend' }) {
+export function ProductCardV2({ product, variant = 'default', compact = false }: { product: Product; variant?: 'default' | 'recommend'; compact?: boolean }) {
   const state = useVersa()
   const inWishlist = state.wishlist.includes(product.id)
   const discount = product.originalPrice ? Math.round((1 - product.price / product.originalPrice) * 100) : 0
@@ -36,9 +36,9 @@ export function ProductCardV2({ product, variant = 'default' }: { product: Produ
   }
 
   return (
-    <div className="group card-hover rounded-2xl overflow-hidden bg-white dark:bg-ink-900/60 border border-ink-200/60 dark:border-ink-800/60 relative">
+    <div className={cn('group card-hover rounded-2xl overflow-hidden bg-white dark:bg-ink-900/60 border border-ink-200/60 dark:border-ink-800/60 relative', compact && 'rounded-xl')}>
       <Link to={`/shop/${product.id}`} className="block">
-        <div className="aspect-square overflow-hidden bg-ink-100 dark:bg-ink-800 relative">
+        <div className={cn('overflow-hidden bg-ink-100 dark:bg-ink-800 relative', compact ? 'aspect-square' : 'aspect-square')}>
           <img
             src={product.images[0]}
             alt={product.name}
@@ -80,56 +80,62 @@ export function ProductCardV2({ product, variant = 'default' }: { product: Produ
       >
         <Heart className={cn('w-4 h-4', inWishlist && 'fill-current')} />
       </button>
-      <Link to={`/shop/${product.id}`} className="block p-3">
-        <h3 className="font-medium text-sm leading-snug line-clamp-1 group-hover:text-shop-600 transition-colors">
+      <Link to={`/shop/${product.id}`} className={cn('block', compact ? 'p-2.5' : 'p-3')}>
+        <h3 className={cn('font-medium leading-snug line-clamp-1 group-hover:text-shop-600 transition-colors', compact ? 'text-xs' : 'text-sm')}>
           {product.name}
         </h3>
-        <p className="text-xs text-ink-500 dark:text-ink-400 mt-0.5 line-clamp-1">{product.tagline}</p>
+        {!compact && (
+          <p className="text-xs text-ink-500 dark:text-ink-400 mt-0.5 line-clamp-1">{product.tagline}</p>
+        )}
 
         {/* 价格 - 淘宝风: 红色大字 + 划线原价 */}
-        <div className="mt-2 flex items-baseline gap-1.5">
+        <div className={cn('flex items-baseline gap-1.5', compact ? 'mt-1' : 'mt-2')}>
           {isFlash && flashPrice ? (
             <>
-              <span className="text-lg font-bold text-debate-600">
-                <span className="text-xs">¥</span>{flashPrice}
+              <span className={cn('font-bold text-debate-600', compact ? 'text-sm' : 'text-lg')}>
+                <span className="text-[10px]">¥</span>{flashPrice}
               </span>
-              <span className="text-xs text-ink-400 line-through">{formatCurrency(product.price)}</span>
+              <span className="text-[10px] text-ink-400 line-through">{formatCurrency(product.price)}</span>
             </>
           ) : (
             <>
-              <span className="text-lg font-bold text-shop-600">
-                <span className="text-xs">¥</span>{product.price}
+              <span className={cn('font-bold text-shop-600', compact ? 'text-sm' : 'text-lg')}>
+                <span className="text-[10px]">¥</span>{product.price}
               </span>
               {product.originalPrice && product.originalPrice > product.price && (
-                <span className="text-xs text-ink-400 line-through">{formatCurrency(product.originalPrice)}</span>
+                <span className="text-[10px] text-ink-400 line-through">{formatCurrency(product.originalPrice)}</span>
               )}
             </>
           )}
         </div>
 
-        {/* 销量 + 评价 - 淘宝风 */}
-        <div className="mt-1.5 flex items-center gap-2 text-[10px] text-ink-500">
-          <span>⭐ {product.rating}</span>
-          <span>·</span>
-          <span>{(product.sales || 0).toLocaleString()} 人付款</span>
-        </div>
-
-        {/* 限时秒杀进度条 */}
-        {isFlash && (
-          <div className="mt-1.5">
-            <div className="h-1.5 rounded-full bg-ink-100 dark:bg-ink-800 overflow-hidden">
-              <div className="h-full bg-gradient-to-r from-debate-500 to-orange-500" style={{ width: `${soldPct}%` }} />
+        {!compact && (
+          <>
+            {/* 销量 + 评价 - 淘宝风 */}
+            <div className="mt-1.5 flex items-center gap-2 text-[10px] text-ink-500">
+              <span>⭐ {product.rating}</span>
+              <span>·</span>
+              <span>{(product.sales || 0).toLocaleString()} 人付款</span>
             </div>
-            <div className="text-[10px] text-debate-600 mt-0.5">已抢 {soldPct.toFixed(0)}%</div>
-          </div>
-        )}
 
-        {/* 优惠券/标签 */}
-        {!isFlash && product.coupons && product.coupons.length > 0 && (
-          <div className="mt-1.5 flex items-center gap-1 text-[10px] text-debate-600">
-            <Tag className="w-3 h-3" />
-            <span>领券减 {product.coupons[0].amount}</span>
-          </div>
+            {/* 限时秒杀进度条 */}
+            {isFlash && (
+              <div className="mt-1.5">
+                <div className="h-1.5 rounded-full bg-ink-100 dark:bg-ink-800 overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-debate-500 to-orange-500" style={{ width: `${soldPct}%` }} />
+                </div>
+                <div className="text-[10px] text-debate-600 mt-0.5">已抢 {soldPct.toFixed(0)}%</div>
+              </div>
+            )}
+
+            {/* 优惠券/标签 */}
+            {!isFlash && product.coupons && product.coupons.length > 0 && (
+              <div className="mt-1.5 flex items-center gap-1 text-[10px] text-debate-600">
+                <Tag className="w-3 h-3" />
+                <span>领券减 {product.coupons[0].amount}</span>
+              </div>
+            )}
+          </>
         )}
       </Link>
     </div>

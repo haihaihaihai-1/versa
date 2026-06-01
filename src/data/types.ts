@@ -9,10 +9,16 @@ export interface Author {
   avatar: string
   bio?: string
   verified?: boolean
+  followers?: number
 }
 
 // ---------- News ----------
 export type NewsCategory = 'tech' | 'finance' | 'culture' | 'science' | 'world' | 'lifestyle'
+
+export interface NewsSection {
+  heading: string
+  anchor: string
+}
 
 export interface NewsArticle {
   id: string
@@ -31,6 +37,21 @@ export interface NewsArticle {
   linkedDebateId?: string
   linkedProductIds?: string[]
   source?: string
+  // Editorial
+  isFeatured?: boolean
+  isBreaking?: boolean
+  isLongForm?: boolean
+  wordCount?: number
+  toc?: NewsSection[]
+  relatedIds?: string[]
+}
+
+export interface BreakingNews {
+  id: string
+  title: string
+  category: NewsCategory
+  publishedAt: string
+  linkId?: string
 }
 
 // ---------- Debate ----------
@@ -252,14 +273,27 @@ export interface CartItem {
   addedAt: string
 }
 
+export type OrderStatus = 'pending_payment' | 'paid' | 'shipped' | 'delivered' | 'reviewing' | 'cancelled' | 'refunded'
+
+export interface OrderTimelineEvent {
+  status: OrderStatus
+  label: string
+  at?: string
+  description?: string
+}
+
 export interface Order {
   id: string
   items: { productId: string; name: string; price: number; quantity: number; image: string }[]
   total: number
-  status: 'paid' | 'shipped' | 'delivered' | 'cancelled'
+  status: OrderStatus
   placedAt: string
   address: string
   trackingNumber?: string
+  carrier?: string
+  paymentMethod?: 'wechat' | 'alipay' | 'huabei' | 'card'
+  shippingMethod?: 'standard' | 'express' | 'jd'
+  timeline?: OrderTimelineEvent[]
 }
 
 export interface AppState {

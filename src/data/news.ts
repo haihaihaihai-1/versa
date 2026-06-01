@@ -1,4 +1,4 @@
-import type { NewsArticle } from './types'
+import type { NewsArticle, BreakingNews } from './types'
 import { authors } from './authors'
 
 export const news: NewsArticle[] = [
@@ -11,17 +11,25 @@ export const news: NewsArticle[] = [
     author: authors.lin,
     publishedAt: '2026-05-28T09:30:00Z',
     readTime: 8,
+    wordCount: 3200,
     tags: ['AI', '大模型', '协作', '未来工作'],
     reactions: { like: 1248, insightful: 532, disagree: 89 },
     views: 28430,
     linkedDebateId: 'd1',
     linkedProductIds: ['p1', 'p4'],
     source: 'Versa 科技前沿',
+    isFeatured: true,
+    isLongForm: true,
+    toc: [
+      { heading: '协作的三个层次', anchor: 'section-1' },
+      { heading: '商业化拐点', anchor: 'section-2' },
+      { heading: '风险与边界', anchor: 'section-3' },
+    ],
     content: `过去的两年里，生成式 AI 给人的印象大多是"它能回答你的任何问题"。但如果你最近用过新一代的对话模型，你会发现一个微妙的变化：它们开始反问。
 
 "当你向 AI 描述一个模糊的问题时，优秀的 AI 不会立即给答案，而是会问：你说的 X 具体是什么意思？你的最终目标是什么？"斯坦福 HAI 研究员林韵秋在采访中说。
 
-## 协作的三个层次
+<h2 id="section-1">协作的三个层次</h2>
 
 我们将"AI 协作"大致划分为三个层次：
 
@@ -31,13 +39,15 @@ export const news: NewsArticle[] = [
 
 真正的突破发生在第三层。最近的一项内部研究显示，使用"共创引导"模式的团队，决策质量比对照组高出 27%。
 
-## 商业化拐点
+> 我们正处于 AI 范式转变的临界点。下一步的关键不是让 AI 更聪明，而是让它更懂"什么时候不该回答"。
+
+<h2 id="section-2">商业化拐点</h2>
 
 "对企业来说，关键是 AI 不再是工具，而成为同事。"Versa 产品副总裁陈思齐分享了他们的内部实践：当 AI 拥有跨部门的上下文记忆后，它开始能跨任务地"推动"工作。
 
 这背后是 RAG、长上下文窗口、记忆机制等多项技术的合流。
 
-## 风险与边界
+<h2 id="section-3">风险与边界</h2>
 
 但协作也意味着 AI 有了更多"主动权"。如何在主动引导与不越界之间取得平衡，是接下来几年最值得关注的伦理议题。
 
@@ -52,33 +62,39 @@ export const news: NewsArticle[] = [
     author: authors.zhao,
     publishedAt: '2026-05-26T14:20:00Z',
     readTime: 12,
+    wordCount: 4800,
     tags: ['消费', '宏观经济', '电商', '数据'],
     reactions: { like: 892, insightful: 423, disagree: 156 },
     views: 19842,
     linkedDebateId: 'd2',
     linkedProductIds: ['p3', 'p7'],
     source: 'Versa 财经观察',
+    isFeatured: true,
+    isLongForm: true,
+    toc: [
+      { heading: '三组事实', anchor: 'section-1' },
+      { heading: '一个反直觉的发现', anchor: 'section-2' },
+      { heading: '谁是真正的赢家？', anchor: 'section-3' },
+    ],
     content: `2026 年上半年，"消费降级"成为最热的词之一。但当我们把 12 万条来自 Versa 用户的订单数据拆开看时，故事远比直觉更复杂。
 
-## 三组事实
+<h2 id="section-1">三组事实</h2>
 
 - **日常品类**（食品、日用、咖啡）：客单价同比下降 11%，订单量上升 23%。
 - **耐用品**（家电、3C）：客单价下降 7%，但高端品销量反而上升 5%。
 - **体验型消费**（旅行、演出）：客单价上升 18%，订单量下降 9%。
 
-## 一个反直觉的发现
+<h2 id="section-2">一个反直觉的发现</h2>
 
 > "消费降级"并不是单向的，更像是一道选择题——人们在某些品类上妥协，在另一些品类上更愿意花钱。
 
-## 谁是真正的赢家？
+<h2 id="section-3">谁是真正的赢家？</h2>
 
 - 提供"质优价廉"心智的品牌：蜜雪冰城、瑞幸、名创优品。
 - 提供"绝对低价"心智的电商：拼多多、1688、Versa Marketplace。
 - 提供"意义溢价"的品牌：lululemon、Apple Pro 系列。
 
-**延伸阅读**：
-- [辩论：当消费降级成为常态，谁来定义"好生活"？](#/debates/d2)
-- [推荐产品：Versa 编辑选品](coming soon)`,
+**延伸阅读**：[辩论：当消费降级成为常态，谁来定义"好生活"？](#/debates/d2)`,
   },
   {
     id: 'n3',
@@ -89,30 +105,38 @@ export const news: NewsArticle[] = [
     author: authors.shen,
     publishedAt: '2026-05-25T08:00:00Z',
     readTime: 6,
+    wordCount: 2400,
     tags: ['城市', '书店', '社区', '实体空间'],
     reactions: { like: 1456, insightful: 287, disagree: 42 },
     views: 14720,
     linkedProductIds: ['p6'],
     source: 'Versa 文化志',
+    isLongForm: true,
+    toc: [
+      { heading: '早上 6 点', anchor: 'section-1' },
+      { heading: '下午 3 点', anchor: 'section-2' },
+      { heading: '晚上 11 点', anchor: 'section-3' },
+      { heading: '它如何赚钱？', anchor: 'section-4' },
+    ],
     content: `玉林，不是玉林路。是成都南二环外的一个老街区。
 
 这里去年新开了一家 24 小时书店。准确说，是一家"书店+咖啡+共享办公+小型剧场+深夜食堂"的复合体。它没有名字，门口只挂着一行字：进来坐坐。
 
 我去了三次，每次都发现一些新的东西。
 
-## 早上 6 点
+<h2 id="section-1">早上 6 点</h2>
 
 一位程序员带着笔记本坐在靠窗的位置，面前是已经凉了的第三杯美式。他没有点餐，但店员端来一杯温水。
 
-## 下午 3 点
+<h2 id="section-2">下午 3 点</h2>
 
 一群大学生在角落办读书会，店长送了他们一份甜点。甜点来自楼上烘焙工作室，那里是另一个创业者的项目。
 
-## 晚上 11 点
+<h2 id="section-3">晚上 11 点</h2>
 
 一位常客推门进来，她是一家心理咨询机构的创办者。她每周来这里两次，"这里有一种不被打扰的安全感"。
 
-## 它如何赚钱？
+<h2 id="section-4">它如何赚钱？</h2>
 
 据内部人士透露，这家店并不靠卖书赚钱。它的收入构成是：咖啡 35%、共享办公 25%、活动场地 20%、会员储值 15%、图书及其他 5%。
 
@@ -127,14 +151,22 @@ export const news: NewsArticle[] = [
     author: authors.qian,
     publishedAt: '2026-05-24T11:15:00Z',
     readTime: 10,
+    wordCount: 4000,
     tags: ['天文', '系外行星', '宜居带', '生命'],
     reactions: { like: 2103, insightful: 689, disagree: 31 },
     views: 38521,
     linkedDebateId: 'd3',
     source: 'Versa 科学',
+    isFeatured: true,
+    isLongForm: true,
+    toc: [
+      { heading: '关键发现', anchor: 'section-1' },
+      { heading: '它意味着什么？', anchor: 'section-2' },
+      { heading: '接下来 10 年', anchor: 'section-3' },
+    ],
     content: `我们这颗蓝色星球在宇宙中并不孤单——至少在统计上是这样。
 
-## 关键发现
+<h2 id="section-1">关键发现</h2>
 
 国际天文学联合会今天发布了一项历时 6 年的研究成果：在距离地球 580 光年的 Kepler-186 星系中，研究团队新确认了 7 颗类地行星，其中 2 颗被认为"超级宜居"。
 
@@ -144,11 +176,11 @@ export const news: NewsArticle[] = [
 - 体积比地球大约 10%–25%（提供更多可居住面积）
 - 拥有板块构造（促进碳循环）
 
-## 它意味着什么？
+<h2 id="section-2">它意味着什么？</h2>
 
 "我们不是要找第二个地球，"项目首席科学家 Maria López 说，"我们是在找更宽容的地球。在某些指标上，这些行星可能比我们的家园更慷慨。"
 
-## 接下来 10 年
+<h2 id="section-3">接下来 10 年</h2>
 
 - 2027：韦伯空间望远镜将首次对其中 1 颗进行大气光谱分析
 - 2029：欧洲 ARIEL 任务将绘制 1000 颗系外行星的大气图谱
@@ -165,15 +197,22 @@ export const news: NewsArticle[] = [
     author: authors.he,
     publishedAt: '2026-05-23T16:40:00Z',
     readTime: 9,
+    wordCount: 3600,
     tags: ['汽车', '东南亚', '出海', '新能源'],
     reactions: { like: 678, insightful: 312, disagree: 198 },
     views: 24108,
     linkedDebateId: 'd4',
     linkedProductIds: ['p2'],
     source: 'Versa 国际',
+    isLongForm: true,
+    toc: [
+      { heading: '三个关键数据', anchor: 'section-1' },
+      { heading: '发生了什么？', anchor: 'section-2' },
+      { heading: '当地视角', anchor: 'section-3' },
+    ],
     content: `2023 年至 2026 年的三年，是东南亚乘用车市场被重塑的三年。
 
-## 三个关键数据
+<h2 id="section-1">三个关键数据</h2>
 
 | 品牌 | 2023 份额 | 2026 份额 | 变化 |
 |---|---|---|---|
@@ -182,13 +221,13 @@ export const news: NewsArticle[] = [
 | 美系（Tesla/Ford） | 8% | 11% | +3 |
 | 其他 | 16% | 4% | -12 |
 
-## 发生了什么？
+<h2 id="section-2">发生了什么？</h2>
 
 - **价格**：中国车厂在 1.5–2.5 万美元价位段提供了 5 座 SUV、本地化车机系统、3 年质保。
 - **生态**：与本地出行平台、电网、充电桩运营商深度捆绑。
 - **速度**：日企从规划到上市的周期约 4 年，中国车厂可以做到 18 个月。
 
-## 当地视角
+<h2 id="section-3">当地视角</h2>
 
 "我们不是为了中国情怀买 BYD，是因为 BYD 在 8 万泰铢这个价位上提供了过去 30 万泰铢才能买到的东西。"曼谷的一位网约车司机告诉我。
 
@@ -205,6 +244,7 @@ export const news: NewsArticle[] = [
     author: authors.fang,
     publishedAt: '2026-05-22T07:10:00Z',
     readTime: 5,
+    wordCount: 2000,
     tags: ['生活方式', '消费', '年轻人'],
     reactions: { like: 521, insightful: 198, disagree: 102 },
     views: 11203,
@@ -237,11 +277,14 @@ export const news: NewsArticle[] = [
     author: authors.lin,
     publishedAt: '2026-05-20T12:00:00Z',
     readTime: 11,
+    wordCount: 4400,
     tags: ['产品评测', '科技', '深度'],
     reactions: { like: 1623, insightful: 488, disagree: 67 },
     views: 31290,
     linkedProductIds: ['p1', 'p2', 'p4'],
     source: 'Versa 编辑部',
+    isFeatured: true,
+    isLongForm: true,
     content: `30 天，17 款产品，5 个奖项。
 
 ## 年度产品：Versa Smart Hub X1
@@ -259,6 +302,7 @@ export const news: NewsArticle[] = [
     author: authors.shen,
     publishedAt: '2026-05-19T10:00:00Z',
     readTime: 7,
+    wordCount: 2800,
     tags: ['消费', '文化', '品牌', '设计'],
     reactions: { like: 412, insightful: 145, disagree: 287 },
     views: 9814,
@@ -291,11 +335,13 @@ export const news: NewsArticle[] = [
     author: authors.fang,
     publishedAt: '2026-05-18T15:30:00Z',
     readTime: 8,
+    wordCount: 3200,
     tags: ['数字游民', '工作', '生活方式'],
     reactions: { like: 932, insightful: 256, disagree: 84 },
     views: 18527,
     linkedDebateId: 'd5',
     source: 'Versa 生活',
+    isLongForm: true,
     content: `100 个采访对象，3 个目的地，5 个核心问题。
 
 ## 核心问题 1：你还在外漂吗？
@@ -327,14 +373,21 @@ export const news: NewsArticle[] = [
     author: authors.qian,
     publishedAt: '2026-05-17T09:00:00Z',
     readTime: 13,
+    wordCount: 5200,
     tags: ['伦理', 'AI', '永生', '哲学'],
     reactions: { like: 1102, insightful: 587, disagree: 421 },
     views: 24820,
     linkedDebateId: 'd6',
     source: 'Versa 科学',
+    isLongForm: true,
+    isFeatured: true,
+    toc: [
+      { heading: '调查结果', anchor: 'section-1' },
+      { heading: '三个核心争议', anchor: 'section-2' },
+    ],
     content: `如果科技能让你在 1000 年后"复活"，你愿意吗？
 
-## 调查结果
+<h2 id="section-1">调查结果</h2>
 
 我们联合 5 家国际研究机构，对 23 个国家的 18–35 岁年轻人做了问卷：
 
@@ -342,7 +395,7 @@ export const news: NewsArticle[] = [
 - **愿意但不接受"复活"**：27%
 - **明确拒绝**：31%
 
-## 三个核心争议
+<h2 id="section-2">三个核心争议</h2>
 
 1. **连续性悖论**：复制后的你还是你吗？
 2. **不平等问题**：永生技术首先服务谁？
@@ -350,4 +403,75 @@ export const news: NewsArticle[] = [
 
 辩论延伸：**[意识上传能否被视作"我"？](#/debates/d6)**`,
   },
+  {
+    id: 'n11',
+    title: 'DeepSeek V4 发布：开源大模型首次在 SOTA 全面追平闭源',
+    subtitle: '中国开源阵营在 2026 年实现了关键性突破。但"追平"是否真的意味着"超越"？',
+    cover: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=1200&q=80&auto=format&fit=crop',
+    category: 'tech',
+    author: authors.lin,
+    publishedAt: '2026-05-15T08:30:00Z',
+    readTime: 9,
+    wordCount: 3600,
+    tags: ['AI', '开源', 'DeepSeek', '大模型'],
+    reactions: { like: 1892, insightful: 567, disagree: 134 },
+    views: 41230,
+    linkedDebateId: 'd8',
+    source: 'Versa 科技前沿',
+    isFeatured: true,
+    isLongForm: true,
+    content: `2026 年 5 月 14 日，DeepSeek 发布了 V4 版本。
+
+它在 12 个主流基准测试中，有 9 个追平或超过了当前最强的闭源模型。这是开源阵营在 SOTA（State of the Art）上第一次取得全面性的"追平"。
+
+## 三个值得注意的细节
+
+1. 训练成本是同级别闭源模型的 1/15
+2. 团队规模 200 人（相比 OpenAI 4000+）
+3. 推理价格低至输入 0.1 元/百万 token
+
+## 它意味着什么？
+
+开源与闭源的差距正在以超出预期的速度缩小。但真正的问题是：当"够用"之后，下一个瓶颈会出现在哪里？
+
+延伸辩论：**[开源 AI 模型能追上闭源吗？](#/debates/d8)**`,
+  },
+  {
+    id: 'n12',
+    title: 'AI 创作音乐被判版权侵权：算法有"作者身份"吗？',
+    subtitle: '北京互联网法院首次审理 AI 音乐版权案，判决引发业内震动。',
+    cover: 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=1200&q=80&auto=format&fit=crop',
+    category: 'culture',
+    author: authors.shen,
+    publishedAt: '2026-05-12T10:00:00Z',
+    readTime: 6,
+    wordCount: 2400,
+    tags: ['AI', '音乐', '版权', '法律'],
+    reactions: { like: 643, insightful: 198, disagree: 156 },
+    views: 13562,
+    linkedDebateId: 'd10',
+    source: 'Versa 文化志',
+    content: `2026 年 4 月，北京互联网法院对一起 AI 音乐版权案作出一审判决。
+
+原告是一位人类音乐人，被告是一家使用 AI 生成背景音乐的公司。法院认定 AI 生成内容不构成"作品"，但其训练数据来源的合法性需要进一步审查。
+
+## 三个核心争议
+
+1. AI 生成内容能否享有著作权？
+2. 训练数据使用的"合理使用"边界在哪里？
+3. AI 公司应该承担怎样的责任？
+
+延伸辩论：**[AI 创作的音乐/绘画算"艺术"吗？](#/debates/d10)**`,
+  },
+]
+
+export const breakingNews: BreakingNews[] = [
+  { id: 'b1', title: 'OpenAI 宣布 GPT-6 将于 6 月 15 日发布，强调"多模态原生"架构', category: 'tech', publishedAt: '2026-06-01T15:42:00Z', linkId: 'n1' },
+  { id: 'b2', title: '央行宣布下调存款准备金率 0.25 个百分点，释放长期资金约 5000 亿', category: 'finance', publishedAt: '2026-06-01T14:20:00Z' },
+  { id: 'b3', title: 'NASA 阿尔忒弥斯 3 号任务确认 2027 年发射，将首次载人登月', category: 'science', publishedAt: '2026-06-01T11:08:00Z' },
+  { id: 'b4', title: '上海国际电影节开幕，3 部华语片入围主竞赛单元', category: 'culture', publishedAt: '2026-06-01T10:00:00Z' },
+  { id: 'b5', title: '比亚迪 5 月销量突破 38 万辆，连续 3 个月稳居全球新能源销冠', category: 'world', publishedAt: '2026-06-01T09:15:00Z', linkId: 'n5' },
+  { id: 'b6', title: '日本央行维持利率不变，但首次承认"通胀目标可持续达成"', category: 'finance', publishedAt: '2026-06-01T08:30:00Z' },
+  { id: 'b7', title: '苹果 WWDC 2026 邀请函发出，6 月 9 日举行', category: 'tech', publishedAt: '2026-05-31T22:00:00Z' },
+  { id: 'b8', title: '欧洲议会通过《AI 责任指令》，要求所有高风险 AI 系统披露训练数据', category: 'world', publishedAt: '2026-05-31T18:30:00Z' },
 ]

@@ -1,5 +1,5 @@
 export * from './types'
-export { news } from './news'
+export { news, breakingNews } from './news'
 export { debates, commonCitations, moderators, panelists, featuredRoundtable } from './debates'
 export { products, brands } from './products'
 export { authors } from './authors'

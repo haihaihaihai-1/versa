@@ -255,15 +255,31 @@ export const versa = {
   },
 
   // orders
-  placeOrder(items: { productId: string; name: string; price: number; quantity: number; image: string }[], total: number, address: string): Order {
+  placeOrder(
+    items: { productId: string; name: string; price: number; quantity: number; image: string }[],
+    total: number,
+    address: string,
+    extras?: { paymentMethod?: Order['paymentMethod']; shippingMethod?: Order['shippingMethod'] }
+  ): Order {
+    const now = new Date().toISOString()
     const order: Order = {
       id: uid('ord'),
       items,
       total,
       status: 'paid',
-      placedAt: new Date().toISOString(),
+      placedAt: now,
       address,
       trackingNumber: 'SF' + Math.random().toString(36).slice(2, 10).toUpperCase(),
+      paymentMethod: extras?.paymentMethod,
+      shippingMethod: extras?.shippingMethod,
+      carrier: '顺丰快递',
+      timeline: [
+        { status: 'pending_payment', label: '待付款', description: '订单已创建' },
+        { status: 'paid', label: '已支付', at: now, description: '支付成功，商家将尽快发货' },
+        { status: 'shipped', label: '已发货', description: '预计 1-2 天内送达' },
+        { status: 'delivered', label: '已签收', description: '点击确认收货' },
+        { status: 'reviewing', label: '已评价', description: '完成订单' },
+      ],
     }
     setState((s) =>
       addActivity(
