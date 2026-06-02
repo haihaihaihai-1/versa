@@ -9,6 +9,9 @@ export default defineConfig({
     outDir: 'dist',
     sourcemap: false,
     chunkSizeWarningLimit: 1500,
+    rollupOptions: {
+      external: (id) => id.includes('vitest') || id.includes('.test.'),
+    },
   },
   server: {
     port: 5173,
