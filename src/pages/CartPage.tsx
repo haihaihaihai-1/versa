@@ -45,8 +45,19 @@ export function CartPage() {
   const selectedItems = items.filter((c) => selected.has(c.productId))
   const subtotal = selectedItems.reduce((sum, c) => sum + c.product.price * c.quantity, 0)
   const shipping = selectedItems.length === 0 ? 0 : subtotal > 99 ? 0 : 12
+  // 自动满减 (与优惠券互斥: 选其一)
+  const tierDiscount = useMemo(() => {
+    const tiers = [
+      { threshold: 1000, amount: 150, label: '满 1000 减 150' },
+      { threshold: 600, amount: 80, label: '满 600 减 80' },
+      { threshold: 300, amount: 30, label: '满 300 减 30' },
+    ]
+    const hit = tiers.filter((t) => subtotal >= t.threshold).sort((a, b) => b.amount - a.amount)[0]
+    return hit || { threshold: 0, amount: 0, label: '' }
+  }, [subtotal])
   const couponDiscount = coupon ? Math.min(coupon.amount, subtotal) : 0
-  const total = Math.max(0, subtotal + shipping - couponDiscount)
+  const discount = Math.max(tierDiscount.amount, couponDiscount)
+  const total = Math.max(0, subtotal + shipping - discount)
 
   // 跨品牌券（演示）
   const availableCoupons = useMemo(() => {
@@ -473,6 +484,12 @@ export function CartPage() {
                 <div className="flex items-center justify-between text-red-500">
                   <span>店铺券</span>
                   <span className="font-semibold tabular-nums">-{formatCurrency(couponDiscount)}</span>
+                </div>
+              )}
+              {tierDiscount.amount > 0 && couponDiscount === 0 && (
+                <div className="flex items-center justify-between text-rose-500">
+                  <span className="flex items-center gap-1">🎁 满减优惠 <span className="text-[10px] px-1 rounded bg-rose-100 dark:bg-rose-900/30 text-rose-600">{tierDiscount.label}</span></span>
+                  <span className="font-semibold tabular-nums">-{formatCurrency(tierDiscount.amount)}</span>
                 </div>
               )}
               {reachedThresholds.length > 0 && (
