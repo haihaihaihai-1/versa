@@ -4,7 +4,7 @@ import {
   Home, Newspaper, Scale, ShoppingBag, Sun, Moon, Monitor,
   ShoppingCart, User, Bell, LogOut, Settings, ChevronDown, Sparkles,
   Search, Plus, MessageCircle, Users, Shield, Calendar, FileText,
-  StickyNote, Video, Palette, LayoutDashboard, Inbox, Vote, Hash, Heart, Ticket, Target,
+  StickyNote, Video, Palette, LayoutDashboard, Inbox, Vote, Hash, Heart, Ticket, Target, Edit3,
   Package, Mail, MessageSquare, Truck, GitCompare, BarChart3, Trophy, Gift, Scissors, BookOpen, Building, Image,
 } from 'lucide-react'
 import { versa, useVersa, useCartTotals } from '../../store/versa'
@@ -261,6 +261,7 @@ export function Header() {
                         { to: '/tools/explore', label: '探索中心', icon: BookOpen },
                         { to: '/tools/insights', label: '洞察中心', icon: Target },
                         { to: '/tools/create', label: '创作中心', icon: Palette },
+                        { to: '/tools/dev', label: '开发工具', icon: Edit3 },
                       ].map((item) => (
                         <Link
                           key={item.to}
