@@ -64,6 +64,7 @@ const GroupsPage = lazy(() => import('./pages/GroupsPage').then(m => ({ default:
 const GroupDetailPage = lazy(() => import('./pages/GroupDetailPage').then(m => ({ default: m.GroupDetailPage })))
 const NotificationsPage = lazy(() => import('./pages/NotificationsPage').then(m => ({ default: m.NotificationsPage })))
 const SearchPage = lazy(() => import('./pages/SearchPage').then(m => ({ default: m.SearchPage })))
+const GlobalSearchPage = lazy(() => import('./pages/GlobalSearchPage').then(m => ({ default: m.GlobalSearchPage })))
 const SettingsPage = lazy(() => import('./pages/SettingsPage').then(m => ({ default: m.SettingsPage })))
 const AdminLayout = lazy(() => import('./pages/AdminPage').then(m => ({ default: m.AdminLayout })))
 const AdminDashboardPage = lazy(() => import('./pages/AdminDashboardPage').then(m => ({ default: m.AdminDashboardPage })))
@@ -81,6 +82,7 @@ export const router = createBrowserRouter(
         { path: 'feed', element: withSuspense(<FeedPage />) },
         { path: 'explore', element: withSuspense(<FeedPage />) },
         { path: 'search', element: withSuspense(<SearchPage />) },
+        { path: 'discover', element: withSuspense(<GlobalSearchPage />) },
         { path: 'notifications', element: withSuspense(<NotificationsPage />) },
         { path: 'messages', element: withSuspense(<NotificationsHubPage />) },
         { path: 'messages/:id', element: withSuspense(<ChatPage />) },
