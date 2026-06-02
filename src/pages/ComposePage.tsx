@@ -10,6 +10,7 @@ import { cn } from '../lib/utils'
 import { useAI } from '../hooks/useAI'
 import { PROMPTS } from '../data/prompts'
 import { AIBadge, AIErrorBanner, AIIndicator } from '../components/ai/AIIndicator'
+import { AITemplateWriter } from '../components/ai/AITemplateWriter'
 import type { Post } from '../api/types'
 
 const TYPES = [
@@ -172,6 +173,7 @@ export function ComposePage() {
               AI 帮我润色
               <AIBadge className="ml-1" />
             </button>
+            <AITemplateWriter onUse={(text) => setContent(text)} />
             <div className="text-xs text-ink-400">{content.length} / 2000</div>
           </div>
 

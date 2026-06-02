@@ -94,6 +94,9 @@ const MaintenancePage = lazy(() => import('./pages/NotFoundPage').then(m => ({ d
 const OfflinePage = lazy(() => import('./pages/NotFoundPage').then(m => ({ default: m.OfflinePage })))
 const AISearchPage = lazy(() => import('./pages/AISearchPage').then(m => ({ default: m.AISearchPage })))
 const SmartListPage = lazy(() => import('./pages/SmartListPage').then(m => ({ default: m.SmartListPage })))
+const NotesPage = lazy(() => import('./pages/NotesPage').then(m => ({ default: m.NotesPage })))
+const LiveReplayPage = lazy(() => import('./pages/LiveReplayPage').then(m => ({ default: m.LiveReplayPage })))
+const QuickNotesPage = lazy(() => import('./pages/QuickNotesPage').then(m => ({ default: m.QuickNotesPage })))
 
 export const router = createBrowserRouter(
   [
@@ -129,6 +132,8 @@ export const router = createBrowserRouter(
         { path: 'reviews/:productId', element: withSuspense(<ReviewsPage />) },
         { path: 'shop/live', element: withSuspense(<LiveShoppingPage />) },
         { path: 'shop/live/:id', element: withSuspense(<LiveShoppingPage />) },
+        { path: 'shop/live/replay', element: withSuspense(<LiveReplayPage />) },
+        { path: 'shop/live/replay/:id', element: withSuspense(<LiveReplayPage />) },
         { path: 'shop/live-schedule', element: withSuspense(<LiveSchedulePage />) },
         { path: 'help', element: withSuspense(<HelpCenterPage />) },
         { path: 'qa', element: withSuspense(<ProductQAPage />) },
@@ -147,6 +152,8 @@ export const router = createBrowserRouter(
         { path: 'demo/offline', element: withSuspense(<OfflinePage />) },
         { path: 'discover/ai', element: withSuspense(<AISearchPage />) },
         { path: 'smartlist', element: withSuspense(<SmartListPage />) },
+        { path: 'notes', element: withSuspense(<NotesPage />) },
+        { path: 'quicknotes', element: withSuspense(<QuickNotesPage />) },
         { path: 'shop/shorts', element: withSuspense(<ShortVideoPage />) },
         { path: 'shop/shorts/:id', element: withSuspense(<ShortVideoDetailPage />) },
         { path: 'shop/shorts/creator/:creatorId', element: withSuspense(<ShortVideoCreatorPage />) },
