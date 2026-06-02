@@ -11,6 +11,7 @@ import { useAuth } from '../../api/AuthContext'
 import { useUnreadCount } from '../../api/hooks'
 import { cn } from '../../lib/utils'
 import { ThemeSwitcher } from '../ThemeSwitcher'
+import { NotificationBell, NotificationCenter } from '../NotificationCenter'
 
 const NAV_ITEMS = [
   { to: '/feed', label: '动态', icon: Home, requireAuth: false },
@@ -29,6 +30,7 @@ export function Header() {
   const navigate = useNavigate()
   const [themeOpen, setThemeOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
+  const [notifOpen, setNotifOpen] = useState(false)
   const themeRef = useRef<HTMLDivElement>(null)
   const profileRef = useRef<HTMLDivElement>(null)
 
@@ -107,18 +109,7 @@ export function Header() {
                   发帖
                 </button>
 
-                <button
-                  onClick={() => navigate('/notifications')}
-                  className="relative h-9 w-9 flex items-center justify-center rounded-lg hover:bg-ink-100 dark:hover:bg-ink-800 transition-colors"
-                  aria-label="通知"
-                >
-                  <Bell className="w-4 h-4" />
-                  {unread.notifications > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 h-4 min-w-4 px-1 rounded-full bg-debate-500 text-white text-[10px] font-bold flex items-center justify-center">
-                      {unread.notifications > 99 ? '99+' : unread.notifications}
-                    </span>
-                  )}
-                </button>
+                <NotificationBell onClick={() => setNotifOpen(true)} />
 
                 <button
                   onClick={() => navigate('/messages')}
@@ -263,6 +254,11 @@ export function Header() {
           </div>
         </div>
       </div>
+      <NotificationCenter
+        open={notifOpen}
+        onClose={() => setNotifOpen(false)}
+        onNavigate={(link) => navigate(link)}
+      />
     </header>
   )
 }

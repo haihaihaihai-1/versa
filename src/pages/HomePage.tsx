@@ -16,6 +16,7 @@ import { Button } from '../components/ui/Button'
 import { ProgressBar, ScorePill } from '../components/ui/Progress'
 import { formatNumber, formatTimeAgo, cn } from '../lib/utils'
 import { StoriesBar } from '../components/social/StoriesBar'
+import { HotSearches } from '../components/HotSearches'
 import { CountUp, StaggerContainer, StaggerItem } from '../components/StaggerContainer'
 
 export function HomePage() {
@@ -160,6 +161,7 @@ export function HomePage() {
       {/* Stories 24h 故事 */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-2">
         <StoriesBar />
+        <HotSearches compact onSelect={() => {}} />
       </section>
 
       {/* 模块入口 - 紧凑条 */}
