@@ -146,8 +146,10 @@ export function ProfilePage() {
           <QuickLink to="/profile/wishlist" icon={Heart} label="我的收藏" color="debate" count={stats.wishlist} />
           <QuickLink to="/help/member" icon={Crown} label="会员中心" color="nova" count={user.points} />
           <QuickLink to="/help/support" icon={Headphones} label="客服中心" color="news" />
-          <QuickLink to="/news" icon={Newspaper} label="继续阅读" color="news" />
+          <QuickLink to="/profile/addresses" icon={MapPin} label="收货地址" color="shop" />
           <QuickLink to="/debates" icon={Scale} label="参与辩论" color="nova" />
+          <QuickLink to="/news" icon={Newspaper} label="继续阅读" color="news" />
+          <QuickLink to="/shop/curator" icon={Sparkles} label="选品助手" color="nova" />
         </div>
 
         {/* Reputation progress */}

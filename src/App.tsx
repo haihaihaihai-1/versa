@@ -24,6 +24,7 @@ import MemberPage from './pages/MemberPage'
 import NotificationsHubPage from './pages/NotificationsHubPage'
 import BundlesPage from './pages/BundlesPage'
 import CuratorPage from './pages/CuratorPage'
+import AddressBookPage from './pages/AddressBookPage'
 import { DebateHomePage } from './pages/DebateHomePage'
 import { DebateDetailV2 } from './pages/DebateDetailV2'
 import { RoundTablePage } from './pages/RoundTablePage'
@@ -111,6 +112,7 @@ export const router = createBrowserRouter(
         { path: 'orders/:orderId/review', element: <ReviewPage /> },
         { path: 'help/support', element: <SupportPage /> },
         { path: 'help/member', element: <MemberPage /> },
+        { path: 'profile/addresses', element: <AddressBookPage /> },
         { path: 'settings', element: <SettingsPage /> },
 
         { path: 'p/:id', element: <PostDetailPage /> },
