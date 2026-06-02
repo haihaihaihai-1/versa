@@ -156,6 +156,7 @@
   0% { background-position: -1000px 0; }
   100% { background-position: 1000px 0; }
 }
+.animate-shimmer { animation: shimmer 2s linear infinite; }
 .skeleton {
   background: linear-gradient(90deg, var(--color-ink-100) 0%, var(--color-ink-200) 50%, var(--color-ink-100) 100%);
   background-size: 1000px 100%;

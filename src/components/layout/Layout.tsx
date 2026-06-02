@@ -16,6 +16,7 @@ import { CompareFloatingBar } from '../CompareFloatingBar'
 import { AIFloatingButton } from '../ai/AIFloatingButton'
 import { PROMPTS } from '../../data/prompts'
 import { PWAStatus } from '../PWAStatus'
+import { CommandPalette } from '../CommandPalette'
 
 export function Layout() {
   useTheme()
@@ -38,6 +39,7 @@ export function Layout() {
       <CompareFloatingBar />
       <AIFloatingButton systemPrompt={PROMPTS.customerService} title="Versa AI 助手" />
       <PWAStatus />
+      <CommandPalette />
       <Toaster />
       <KeyboardShortcutsHelp open={helpOpen} onClose={() => setHelpOpen(false)} />
       <ScrollRestoration />

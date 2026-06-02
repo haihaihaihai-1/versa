@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Save, Camera, Shield, Bell, Lock, Eye, Trash2, Sun, Moon, Monitor, Globe, Zap } from 'lucide-react'
+import { Save, Camera, Shield, Bell, Lock, Eye, Trash2, Sun, Moon, Monitor, Globe, Zap, LogOut, MessageCircle, Phone, AtSign, Heart, Download, Upload } from 'lucide-react'
 import { useAuth } from '../api/AuthContext'
 import api from '../api'
 import { UserAvatar } from '../components/social/UserAvatar'
@@ -217,6 +217,43 @@ export function SettingsPage() {
           >
             <Trash2 className="w-4 h-4" /> 重置全部数据
           </button>
+          <button
+            onClick={() => {
+              const data = localStorage.getItem('versa:store') || '{}'
+              const blob = new Blob([data], { type: 'application/json' })
+              const url = URL.createObjectURL(blob)
+              const a = document.createElement('a')
+              a.href = url
+              a.download = `versa-data-${new Date().toISOString().slice(0, 10)}.json`
+              a.click()
+              URL.revokeObjectURL(url)
+            }}
+            className="w-full px-4 py-2 rounded-lg border border-nova-300 hover:bg-nova-50 text-sm font-medium text-left text-nova-600 flex items-center gap-2"
+          >
+            <Download className="w-4 h-4" /> 导出我的数据 (JSON)
+          </button>
+          <label className="w-full px-4 py-2 rounded-lg border border-ink-200 hover:bg-ink-50 text-sm font-medium text-left text-ink-700 flex items-center gap-2 cursor-pointer">
+            <Upload className="w-4 h-4" /> 导入数据 (JSON)
+            <input
+              type="file"
+              accept=".json,application/json"
+              className="hidden"
+              onChange={async (e) => {
+                const f = e.target.files?.[0]
+                if (!f) return
+                const text = await f.text()
+                try {
+                  JSON.parse(text)
+                  if (confirm('确认导入？这将覆盖当前数据。')) {
+                    localStorage.setItem('versa:store', text)
+                    window.location.reload()
+                  }
+                } catch {
+                  alert('JSON 格式错误')
+                }
+              }}
+            />
+          </label>
         </div>
       </div>
     </div>
