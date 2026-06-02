@@ -4,7 +4,7 @@ import {
   Home, Newspaper, Scale, ShoppingBag, Sun, Moon, Monitor,
   ShoppingCart, User, Bell, LogOut, Settings, ChevronDown, Sparkles,
   Search, Plus, MessageCircle, Users, Shield, Calendar, FileText,
-  StickyNote, Video, Palette, LayoutDashboard,
+  StickyNote, Video, Palette, LayoutDashboard, Inbox, Vote, Hash, Heart, Ticket,
 } from 'lucide-react'
 import { versa, useVersa, useCartTotals } from '../../store/versa'
 import { useScrollPosition } from '../../hooks/useScrollPosition'
@@ -211,12 +211,19 @@ export function Header() {
                         { to: '/profile/orders', label: '我的订单', icon: ShoppingBag },
                         { to: '/settings', label: '账号设置', icon: Settings },
                         { to: '/dashboard', label: '工作台', icon: LayoutDashboard },
+                        { to: '/my-content', label: '我的内容', icon: Inbox },
                         { to: '/smartlist', label: '智能清单', icon: Sparkles },
                         { to: '/calendar', label: '我的日程', icon: Calendar },
                         { to: '/notes', label: '笔记', icon: FileText },
                         { to: '/quicknotes', label: '便签墙', icon: StickyNote },
                         { to: '/live-subs', label: '直播订阅', icon: Video },
+                        { to: '/live-calendar', label: '直播日历', icon: Calendar },
                         { to: '/theme', label: '主题定制', icon: Palette },
+                        { to: '/polls', label: '投票广场', icon: Vote },
+                        { to: '/tags', label: '热门标签', icon: Hash },
+                        { to: '/users', label: '发现用户', icon: Users },
+                        { to: '/wishlist-folders', label: '收藏夹', icon: Heart },
+                        { to: '/coupons', label: '优惠券', icon: Ticket },
                       ].map((item) => (
                         <Link
                           key={item.to}

@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import { DanmuOverlay, useDanmuStream } from '../components/live/DanmuOverlay'
 import { GiftPanel, fireGiftToast, type Gift as GiftItem } from '../components/live/GiftPanel'
+import { GiftCombo } from '../components/GiftCombo'
 import { LiveLeaderboard } from '../components/live/LiveLeaderboard'
 import { cn, formatCurrency, formatNumber, uid } from '../lib/utils'
 
@@ -493,6 +494,9 @@ function LiveRoom({ room }: { room?: LiveRoom }) {
                 <GiftPanel onSend={handleSendGift} onClose={() => setShowGift(false)} />
               </div>
             )}
+            <div className="mt-2">
+              <GiftCombo />
+            </div>
             <p className="text-[10px] text-ink-500 flex items-center gap-1">
               <MessageSquare className="w-3 h-3" />
               弹幕会从直播间飘过

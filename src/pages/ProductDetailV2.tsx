@@ -20,6 +20,8 @@ import { ShareCard } from '../components/ShareCard'
 import { PriceHistory } from '../components/shop/PriceHistory'
 import { RecentlyViewed, useRecentlyViewed } from '../components/RecentlyViewed'
 import { ProductBundle } from '../components/ProductBundle'
+import { ProductQnA } from '../components/ProductQnA'
+import { VideoPreview } from '../components/VideoPreview'
 import { cn, formatCurrency, formatNumber } from '../lib/utils'
 import { toast } from '../components/ui/Toaster'
 import type { SkuSelection } from '../data/types'
@@ -393,6 +395,7 @@ export function ProductDetailV2() {
                 { value: 'specs', label: '规格参数' },
                 { value: 'reviews', label: `评价 (${formatNumber(product.reviewCount)})` },
                 { value: 'qna', label: `问大家 (${qaList.length})` },
+                { value: 'video', label: '视频' },
               ]}
               value={tab}
               onChange={setTab}
@@ -437,42 +440,10 @@ export function ProductDetailV2() {
               <ReviewList reviews={product.reviews} rating={product.rating} reviewCount={product.reviewCount} />
             )}
             {tab === 'qna' && (
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="text-sm text-ink-500">共 {qaList.length} 个问答 · 已购买用户的真实反馈</div>
-                  <button
-                    onClick={() => toast('问题已提交', 'success')}
-                    className="text-xs px-3 h-8 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold hover:shadow-lg shadow-amber-500/30 inline-flex items-center gap-1"
-                  >
-                    <MessageCircle className="w-3 h-3" /> 我要提问
-                  </button>
-                </div>
-                {qaList.map((qa: QA, i: number) => (
-                  <div key={i} className="p-4 rounded-2xl bg-white/80 dark:bg-ink-900/40 border border-ink-200/60 dark:border-ink-800/60">
-                    <div className="flex items-start gap-2.5">
-                      <div className="w-7 h-7 rounded-full bg-amber-500/20 text-amber-700 flex items-center justify-center text-xs font-bold flex-shrink-0">问</div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm font-semibold">{qa.q}</div>
-                      </div>
-                    </div>
-                    <div className="mt-3 ml-9 pl-2 border-l-2 border-shop-500/30">
-                      <div className="flex items-start gap-2.5">
-                        <div className="w-7 h-7 rounded-full bg-shop-500/20 text-shop-700 flex items-center justify-center text-xs font-bold flex-shrink-0">答</div>
-                        <div className="flex-1 min-w-0">
-                          <div className="text-sm text-ink-700 dark:text-ink-200 leading-relaxed">{qa.a}</div>
-                          <div className="mt-2 flex items-center gap-3 text-[10px] text-ink-400">
-                            <span>{qa.author}</span>
-                            <span>{qa.date}</span>
-                            <button className="ml-auto inline-flex items-center gap-1 px-2 py-0.5 rounded-full border border-amber-500/30 text-amber-600 hover:bg-amber-500/10">
-                              <Award className="w-2.5 h-2.5" />有用 ({qa.helpful})
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <ProductQnA productId={product.id} />
+            )}
+            {tab === 'video' && (
+              <VideoPreview productId={product.id} />
             )}
           </div>
         </div>

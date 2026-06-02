@@ -101,6 +101,13 @@ const CalendarPage = lazy(() => import('./pages/CalendarPage').then(m => ({ defa
 const LiveSubsPage = lazy(() => import('./pages/LiveSubsPage').then(m => ({ default: m.LiveSubsPage })))
 const ThemeBuilderPage = lazy(() => import('./pages/ThemeBuilderPage').then(m => ({ default: m.ThemeBuilderPage })))
 const UserDashboardPage = lazy(() => import('./pages/UserDashboardPage').then(m => ({ default: m.UserDashboardPage })))
+const MyContentPage = lazy(() => import('./pages/MyContentPage').then(m => ({ default: m.MyContentPage })))
+const TagCloudPage = lazy(() => import('./pages/TagCloudPage').then(m => ({ default: m.TagCloudPage })))
+const UserSearchPage = lazy(() => import('./pages/UserSearchPage').then(m => ({ default: m.UserSearchPage })))
+const WishlistFoldersPage = lazy(() => import('./pages/WishlistFoldersPage').then(m => ({ default: m.WishlistFoldersPage })))
+const CouponCenterPage = lazy(() => import('./pages/CouponCenterPage').then(m => ({ default: m.CouponCenterPage })))
+const PollPage = lazy(() => import('./pages/PollPage').then(m => ({ default: m.PollPage })))
+const LiveCalendarPage = lazy(() => import('./pages/LiveCalendarPage').then(m => ({ default: m.LiveCalendarPage })))
 
 export const router = createBrowserRouter(
   [
@@ -162,6 +169,13 @@ export const router = createBrowserRouter(
         { path: 'live-subs', element: withSuspense(<LiveSubsPage />) },
         { path: 'theme', element: withSuspense(<ThemeBuilderPage />) },
         { path: 'dashboard', element: withSuspense(<UserDashboardPage />) },
+        { path: 'my-content', element: withSuspense(<MyContentPage />) },
+        { path: 'tags', element: withSuspense(<TagCloudPage />) },
+        { path: 'users', element: withSuspense(<UserSearchPage />) },
+        { path: 'wishlist-folders', element: withSuspense(<WishlistFoldersPage />) },
+        { path: 'coupons', element: withSuspense(<CouponCenterPage />) },
+        { path: 'polls', element: withSuspense(<PollPage />) },
+        { path: 'live-calendar', element: withSuspense(<LiveCalendarPage />) },
         { path: 'shop/shorts', element: withSuspense(<ShortVideoPage />) },
         { path: 'shop/shorts/:id', element: withSuspense(<ShortVideoDetailPage />) },
         { path: 'shop/shorts/creator/:creatorId', element: withSuspense(<ShortVideoCreatorPage />) },
