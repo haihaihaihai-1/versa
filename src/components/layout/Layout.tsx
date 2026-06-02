@@ -12,6 +12,7 @@ import { SkipLink } from '../a11y/SkipLink'
 import { KeyboardShortcutsHelp } from '../a11y/KeyboardShortcutsHelp'
 import { KeyboardHelpButton } from '../a11y/KeyboardHelpButton'
 import { OfflineBanner } from '../OfflineBanner'
+import { CompareFloatingBar } from '../CompareFloatingBar'
 
 export function Layout() {
   useTheme()
@@ -31,6 +32,7 @@ export function Layout() {
       <SupportQuickChat />
       <SupportWidget />
       <KeyboardHelpButton />
+      <CompareFloatingBar />
       <Toaster />
       <KeyboardShortcutsHelp open={helpOpen} onClose={() => setHelpOpen(false)} />
       <ScrollRestoration />
