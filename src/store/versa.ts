@@ -637,6 +637,23 @@ export const versa = {
       }
     })
   },
+  addPoints(amount: number, title: string = '签到奖励') {
+    setState((s) => {
+      const record: PointsRecord = {
+        id: uid('pr'),
+        type: 'earn',
+        source: 'signin',
+        title,
+        amount,
+        at: new Date().toISOString(),
+      }
+      return {
+        ...s,
+        user: { ...s.user, points: s.user.points + amount },
+        pointsRecords: [record, ...s.pointsRecords],
+      }
+    })
+  },
   redeemReward(itemId: string) {
     setState((s) => {
       const item = seedRewards.find((r) => r.id === itemId)
