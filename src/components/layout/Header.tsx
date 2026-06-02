@@ -258,6 +258,7 @@ export function Header() {
                         { to: '/tools/personal', label: '个性化中心', icon: Palette },
                         { to: '/tools/creator', label: '创作者中心', icon: Users },
                         { to: '/tools/life', label: '生活中心', icon: LayoutDashboard },
+                        { to: '/tools/explore', label: '探索中心', icon: BookOpen },
                       ].map((item) => (
                         <Link
                           key={item.to}
