@@ -127,6 +127,14 @@ const Product3DPage = lazy(() => import('./pages/Product3DPage').then(m => ({ de
 const ReplayEditorPage = lazy(() => import('./pages/ReplayEditorPage').then(m => ({ default: m.ReplayEditorPage })))
 const MerchantOnboardingPage = lazy(() => import('./pages/MerchantOnboardingPage').then(m => ({ default: m.MerchantOnboardingPage })))
 const InviteV2Page = lazy(() => import('./pages/InviteV2Page').then(m => ({ default: m.InviteV2Page })))
+const VideoCommentsPage = lazy(() => import('./pages/VideoCommentsPage').then(m => ({ default: m.VideoCommentsPage })))
+const DanmakuSentimentPage = lazy(() => import('./pages/DanmakuSentimentPage').then(m => ({ default: m.DanmakuSentimentPage })))
+const RevenueCalendarPage = lazy(() => import('./pages/RevenueCalendarPage').then(m => ({ default: m.RevenueCalendarPage })))
+const CartSuggestionsPage = lazy(() => import('./pages/CartSuggestionsPage').then(m => ({ default: m.CartSuggestionsPage })))
+const PrivacySettingsPage = lazy(() => import('./pages/PrivacySettingsPage').then(m => ({ default: m.PrivacySettingsPage })))
+const UserJourneyPage = lazy(() => import('./pages/UserJourneyPage').then(m => ({ default: m.UserJourneyPage })))
+const ProductGalleryPage = lazy(() => import('./pages/ProductGalleryPage').then(m => ({ default: m.ProductGalleryPage })))
+const BrandStoryPage = lazy(() => import('./pages/BrandStoryPage').then(m => ({ default: m.BrandStoryPage })))
 
 export const router = createBrowserRouter(
   [
@@ -215,6 +223,14 @@ export const router = createBrowserRouter(
         { path: 'replay-editor', element: withSuspense(<ReplayEditorPage />) },
         { path: 'merchant', element: withSuspense(<MerchantOnboardingPage />) },
         { path: 'invite-v2', element: withSuspense(<InviteV2Page />) },
+        { path: 'video-comments', element: withSuspense(<VideoCommentsPage />) },
+        { path: 'danmaku-sentiment', element: withSuspense(<DanmakuSentimentPage />) },
+        { path: 'revenue-calendar', element: withSuspense(<RevenueCalendarPage />) },
+        { path: 'cart-suggestions', element: withSuspense(<CartSuggestionsPage />) },
+        { path: 'privacy', element: withSuspense(<PrivacySettingsPage />) },
+        { path: 'journey', element: withSuspense(<UserJourneyPage />) },
+        { path: 'gallery', element: withSuspense(<ProductGalleryPage />) },
+        { path: 'brand-story', element: withSuspense(<BrandStoryPage />) },
         { path: 'shop/shorts', element: withSuspense(<ShortVideoPage />) },
         { path: 'shop/shorts/:id', element: withSuspense(<ShortVideoDetailPage />) },
         { path: 'shop/shorts/creator/:creatorId', element: withSuspense(<ShortVideoCreatorPage />) },
