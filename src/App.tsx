@@ -77,6 +77,7 @@ const AdminUsersPage = lazy(() => import('./pages/AdminUsersPage').then(m => ({ 
 const AdminModerationPage = lazy(() => import('./pages/AdminModerationPage').then(m => ({ default: m.AdminModerationPage })))
 const AdminStatsPage = lazy(() => import('./pages/AdminStatsPage').then(m => ({ default: m.AdminStatsPage })))
 const AdminAnalyticsPage = lazy(() => import('./pages/AdminAnalyticsPage').then(m => ({ default: m.AdminAnalyticsPage })))
+const ReviewsPage = lazy(() => import('./pages/ReviewsPage').then(m => ({ default: m.ReviewsPage })))
 
 export const router = createBrowserRouter(
   [
@@ -108,6 +109,8 @@ export const router = createBrowserRouter(
         { path: 'shop/brands', element: withSuspense(<BrandStreetPage />) },
         { path: 'shop/coupons', element: withSuspense(<CouponsPage />) },
         { path: 'shop/compare', element: withSuspense(<ComparePage />) },
+        { path: 'reviews', element: withSuspense(<ReviewsPage />) },
+        { path: 'reviews/:productId', element: withSuspense(<ReviewsPage />) },
         { path: 'shop/live', element: withSuspense(<LiveShoppingPage />) },
         { path: 'shop/live/:id', element: withSuspense(<LiveShoppingPage />) },
         { path: 'shop/shorts', element: withSuspense(<ShortVideoPage />) },

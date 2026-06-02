@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback, useMemo } from 'react'
 import type { AppState, CartItem, Order, UserProfile, Activity, ModuleKey, AfterSalesRequest, ProductReview, AfterSalesType, UserCoupon, UserInvoice, UserAddress, ShortVideo, ShortVideoComment, ChatMessage, SupportTicket, PointsRecord, TaskItem } from '../data/types'
 import { seedShortVideos, seedShortVideoComments } from '../data/shortVideos'
+import { seedReviews } from '../data/reviews'
 import { seedFAQs, seedTickets, seedChatMessages, BOT_INTENTS } from '../data/support'
 import { seedSignInDays, seedTasks, seedRewards } from '../data/member'
 import { seedMessages } from '../data/messages'
@@ -36,7 +37,7 @@ function defaultState(): AppState {
     reactedArticles: {},
     orders: [],
     afterSales: [],
-    reviews: [],
+    reviews: seedReviews,
     coupons: [
       { id: 'c1', name: '新人专享', amount: 30, threshold: 100, scope: 'all', expiresAt: '2099-12-31', description: '满 100 可用' },
       { id: 'c2', name: '数码专享', amount: 50, threshold: 500, scope: 'category', scopeValue: 'tech', expiresAt: '2099-12-31', description: '数码类满 500 可用' },
@@ -412,6 +413,44 @@ export const versa = {
       return { ...s, reviews: [r, ...s.reviews], orders: updatedOrders }
     })
     return r
+  },
+
+  appendReview(reviewId: string, content: string) {
+    setState((s) => ({
+      ...s,
+      reviews: s.reviews.map((r) =>
+        r.id === reviewId
+          ? { ...r, append: { at: new Date().toISOString(), content } }
+          : r
+      ),
+    }))
+  },
+
+  addReviewReply(reviewId: string, content: string, fromName: string, fromRole: 'seller' | 'user' | 'admin' = 'user') {
+    setState((s) => ({
+      ...s,
+      reviews: s.reviews.map((r) => {
+        if (r.id !== reviewId) return r
+        const newReply: import('../data/types').ReviewReply = {
+          id: uid('rp'),
+          content,
+          at: new Date().toISOString(),
+          fromName,
+          fromRole,
+          isOfficial: fromRole === 'seller' || fromRole === 'admin',
+        }
+        return { ...r, replies: [...(r.replies || []), newReply] }
+      }),
+    }))
+  },
+
+  markReviewHelpful(reviewId: string) {
+    setState((s) => ({
+      ...s,
+      reviews: s.reviews.map((r) =>
+        r.id === reviewId ? { ...r, helpful: (r.helpful || 0) + 1 } : r
+      ),
+    }))
   },
 
   // addresses

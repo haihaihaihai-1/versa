@@ -348,6 +348,21 @@ export interface ProductReview {
   createdAt: string
   append?: { at: string; content: string }
   helpful?: number
+  reply?: {
+    content: string
+    at: string
+    sellerName: string
+  }
+  replies?: ReviewReply[]
+}
+
+export interface ReviewReply {
+  id: string
+  content: string
+  at: string
+  fromName: string
+  fromRole: 'seller' | 'user' | 'admin'
+  isOfficial?: boolean
 }
 
 export interface Order {

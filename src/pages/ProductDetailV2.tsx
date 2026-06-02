@@ -206,6 +206,10 @@ export function ProductDetailV2() {
                     <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
                     <strong className="text-ink-700 dark:text-ink-200">{product.rating}</strong>
                     <span>({formatNumber(product.reviewCount)} 评价)</span>
+                    <span>·</span>
+                    <Link to={`/reviews/${product.id}`} className="text-shop-600 hover:underline">
+                      查看全部评价 →
+                    </Link>
                   </span>
                 </div>
               </div>
