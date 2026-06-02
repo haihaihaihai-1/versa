@@ -73,6 +73,7 @@ const AdminDashboardPage = lazy(() => import('./pages/AdminDashboardPage').then(
 const AdminUsersPage = lazy(() => import('./pages/AdminUsersPage').then(m => ({ default: m.AdminUsersPage })))
 const AdminModerationPage = lazy(() => import('./pages/AdminModerationPage').then(m => ({ default: m.AdminModerationPage })))
 const AdminStatsPage = lazy(() => import('./pages/AdminStatsPage').then(m => ({ default: m.AdminStatsPage })))
+const AdminAnalyticsPage = lazy(() => import('./pages/AdminAnalyticsPage').then(m => ({ default: m.AdminAnalyticsPage })))
 
 export const router = createBrowserRouter(
   [
@@ -144,6 +145,7 @@ export const router = createBrowserRouter(
             { path: 'users', element: withSuspense(<AdminUsersPage />) },
             { path: 'moderation', element: withSuspense(<AdminModerationPage />) },
             { path: 'stats', element: withSuspense(<AdminStatsPage />) },
+            { path: 'analytics', element: withSuspense(<AdminAnalyticsPage />) },
           ],
         },
 

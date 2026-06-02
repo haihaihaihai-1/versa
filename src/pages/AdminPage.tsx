@@ -1,7 +1,7 @@
 // ============== 管理后台布局 ==============
 
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { Shield, Users, Flag, BarChart3, ArrowLeft } from 'lucide-react'
+import { Shield, Users, Flag, BarChart3, ArrowLeft, LineChart } from 'lucide-react'
 import { useAuth } from '../api/AuthContext'
 import { isAuditor, isAdmin } from '../api/index'
 import { cn } from '../lib/utils'
@@ -12,6 +12,7 @@ const TABS: Tab[] = [
   { to: '/admin/users', label: '用户管理', icon: Users, adminOnly: true },
   { to: '/admin/moderation', label: '内容审核', icon: Flag },
   { to: '/admin/stats', label: '数据看板', icon: BarChart3, adminOnly: true },
+  { to: '/admin/analytics', label: '高级分析', icon: LineChart, adminOnly: true },
 ]
 
 export function AdminLayout() {
