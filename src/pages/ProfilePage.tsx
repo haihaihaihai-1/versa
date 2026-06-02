@@ -3,7 +3,7 @@ import { useState } from 'react'
 import {
   Edit3, Award, Newspaper, Scale, ShoppingBag, Heart, Package, Activity, Settings, LogOut,
   Sparkles, TrendingUp, Check, MapPin, Calendar, Link2, Share2, Camera, Grid3x3, Bookmark,
-  MessageCircle, Heart as HeartIcon, Eye,
+  MessageCircle, Heart as HeartIcon, Eye, Headphones,
 } from 'lucide-react'
 import { useVersa, versa, levelFor, levelTitle, levelProgress } from '../store/versa'
 import { allBadges, moduleMeta, news, debates, products } from '../data'
@@ -146,6 +146,7 @@ export function ProfilePage() {
           <QuickLink to="/profile/wishlist" icon={Heart} label="我的收藏" color="debate" count={stats.wishlist} />
           <QuickLink to="/news" icon={Newspaper} label="继续阅读" color="news" />
           <QuickLink to="/debates" icon={Scale} label="参与辩论" color="nova" />
+          <QuickLink to="/help/support" icon={Headphones} label="客服中心" color="news" />
         </div>
 
         {/* Reputation progress */}

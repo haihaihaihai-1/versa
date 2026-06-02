@@ -4,6 +4,7 @@ import { Footer } from './Footer'
 import { MobileNav } from './MobileNav'
 import { Toaster } from '../ui/Toaster'
 import { useTheme } from '../../hooks/useTheme'
+import { SupportWidget, SupportQuickChat } from './SupportWidget'
 
 export function Layout() {
   useTheme()
@@ -15,6 +16,8 @@ export function Layout() {
       </main>
       <Footer />
       <MobileNav />
+      <SupportQuickChat />
+      <SupportWidget />
       <Toaster />
       <ScrollRestoration />
     </div>

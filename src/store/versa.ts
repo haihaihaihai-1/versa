@@ -1,11 +1,12 @@
 import { useEffect, useState, useCallback, useMemo } from 'react'
-import type { AppState, CartItem, Order, UserProfile, Activity, ModuleKey, AfterSalesRequest, ProductReview, AfterSalesType, UserCoupon, UserInvoice, UserAddress, ShortVideo, ShortVideoComment } from '../data/types'
+import type { AppState, CartItem, Order, UserProfile, Activity, ModuleKey, AfterSalesRequest, ProductReview, AfterSalesType, UserCoupon, UserInvoice, UserAddress, ShortVideo, ShortVideoComment, ChatMessage, SupportTicket } from '../data/types'
 import { seedShortVideos, seedShortVideoComments } from '../data/shortVideos'
+import { seedFAQs, seedTickets, seedChatMessages, BOT_INTENTS } from '../data/support'
 import { seedUser } from '../data/users'
 import { uid } from '../lib/utils'
-const STORAGE_KEY = 'versa:state:v3'
+const STORAGE_KEY = 'versa:state:v4'
 
-const STATE_VERSION = 3
+const STATE_VERSION = 4
 
 const POINTS = {
   READ_ARTICLE: 5,
@@ -52,6 +53,9 @@ function defaultState(): AppState {
     shortVideos: seedShortVideos,
     shortVideoComments: seedShortVideoComments,
     followingCreators: ['u_creator_lila', 'u_creator_momo'],
+    chatMessages: seedChatMessages,
+    supportTickets: seedTickets,
+    faqHelpful: seedFAQs.reduce<Record<string, number>>((acc, f) => ({ ...acc, [f.id]: f.helpful }), {}),
   }
 }
 
@@ -489,6 +493,70 @@ export const versa = {
       const has = s.followingCreators.includes(creatorId)
       return { ...s, followingCreators: has ? s.followingCreators.filter((id) => id !== creatorId) : [...s.followingCreators, creatorId] }
     })
+  },
+
+  // support
+  sendChatMessage(content: string) {
+    setState((s) => {
+      const now = new Date().toISOString()
+      const userMsg: ChatMessage = { id: uid('cm'), role: 'user', content, at: now }
+      // 智能助手自动回复
+      const matched = BOT_INTENTS.find((b) => b.patterns.some((p) => content.includes(p)))
+      const botMsg: ChatMessage = matched
+        ? { id: uid('cm'), role: 'bot', content: matched.reply, intent: matched.intent, at: new Date(Date.now() + 800).toISOString() }
+        : { id: uid('cm'), role: 'bot', content: '抱歉，我还在学习中。您可以换种说法，或转接人工客服。', at: new Date(Date.now() + 800).toISOString() }
+      return { ...s, chatMessages: [...s.chatMessages, userMsg, botMsg] }
+    })
+  },
+  clearChat() {
+    setState((s) => ({ ...s, chatMessages: seedChatMessages }))
+  },
+  markFAQHelpful(id: string) {
+    setState((s) => ({ ...s, faqHelpful: { ...s.faqHelpful, [id]: (s.faqHelpful[id] || 0) + 1 } }))
+  },
+  createTicket(title: string, category: string) {
+    setState((s) => {
+      const now = new Date().toISOString()
+      const t: SupportTicket = {
+        id: uid('t'),
+        title,
+        status: 'open',
+        category,
+        lastMessage: '工单已创建，等待客服接入...',
+        messages: [
+          { id: uid('tm'), role: 'system', content: '工单创建成功，预计 5 分钟内有人工客服接入', at: now },
+        ],
+        createdAt: now,
+        updatedAt: now,
+      }
+      return { ...s, supportTickets: [t, ...s.supportTickets] }
+    })
+  },
+  replyTicket(ticketId: string, content: string) {
+    setState((s) => {
+      const now = new Date().toISOString()
+      return {
+        ...s,
+        supportTickets: s.supportTickets.map((t) => {
+          if (t.id !== ticketId) return t
+          const userMsg: ChatMessage = { id: uid('tm'), role: 'user', content, at: now }
+          const agentMsg: ChatMessage = { id: uid('tm'), role: 'agent', content: '客服小王已收到，正在为您处理…', at: new Date(Date.now() + 2000).toISOString() }
+          return {
+            ...t,
+            status: 'waiting',
+            messages: [...t.messages, userMsg, agentMsg],
+            lastMessage: agentMsg.content,
+            updatedAt: now,
+          }
+        }),
+      }
+    })
+  },
+  closeTicket(ticketId: string) {
+    setState((s) => ({
+      ...s,
+      supportTickets: s.supportTickets.map((t) => (t.id === ticketId ? { ...t, status: 'closed' as const, updatedAt: new Date().toISOString() } : t)),
+    }))
   },
 
   // reset

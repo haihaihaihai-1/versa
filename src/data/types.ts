@@ -388,6 +388,40 @@ export interface AppState {
   shortVideos: ShortVideo[]
   shortVideoComments: ShortVideoComment[]
   followingCreators: string[]
+  chatMessages: ChatMessage[]
+  supportTickets: SupportTicket[]
+  faqHelpful: Record<string, number>
+}
+
+export type ChatRole = 'user' | 'bot' | 'agent' | 'system'
+
+export interface ChatMessage {
+  id: string
+  role: ChatRole
+  content: string
+  intent?: string
+  at: string
+}
+
+export type TicketStatus = 'open' | 'waiting' | 'resolved' | 'closed'
+
+export interface SupportTicket {
+  id: string
+  title: string
+  status: TicketStatus
+  category: string
+  lastMessage: string
+  messages: ChatMessage[]
+  createdAt: string
+  updatedAt: string
+}
+
+export interface FAQ {
+  id: string
+  category: 'order' | 'shipping' | 'payment' | 'refund' | 'member' | 'coupon' | 'account' | 'product'
+  question: string
+  answer: string
+  helpful: number
 }
 
 export type ShortVideoCategory = 'food' | 'fashion' | 'tech' | 'beauty' | 'home' | 'travel' | 'fitness' | 'lifestyle'
