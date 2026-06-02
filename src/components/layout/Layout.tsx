@@ -22,10 +22,12 @@ import { ScrollProgress } from '../ScrollProgress'
 import { ConfettiHost } from '../Confetti'
 import { GiftToastHost } from '../live/GiftPanel'
 import { LoadingBarHost } from '../LoadingBar'
+import { OnboardingTour, useOnboardingTour } from '../OnboardingTour'
 
 export function Layout() {
   useTheme()
   const { helpOpen, setHelpOpen } = useGlobalShortcuts()
+  const tour = useOnboardingTour()
   return (
     <div className="min-h-screen flex flex-col">
       <ScrollProgress />
@@ -50,6 +52,7 @@ export function Layout() {
       <ConfettiHost />
       <GiftToastHost />
       <LoadingBarHost />
+      <OnboardingTour open={tour.open} onClose={() => tour.setOpen(false)} />
       <Toaster />
       <KeyboardShortcutsHelp open={helpOpen} onClose={() => setHelpOpen(false)} />
       <ScrollRestoration />

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Save, Camera, Shield, Bell, Lock, Eye, Trash2, Sun, Moon, Monitor, Globe, Zap, LogOut, MessageCircle, Phone, AtSign, Heart, Download, Upload } from 'lucide-react'
+import { Save, Camera, Shield, Bell, Lock, Eye, Trash2, Sun, Moon, Monitor, Globe, Zap, LogOut, MessageCircle, Phone, AtSign, Heart, Download, Upload, Compass, Volume2 } from 'lucide-react'
 import { useAuth } from '../api/AuthContext'
 import api from '../api'
 import { UserAvatar } from '../components/social/UserAvatar'
@@ -10,6 +10,7 @@ import { roleLabel, roleColor, ROLE_DESCRIPTIONS } from '../api/permissions'
 import { versa, useVersa } from '../store/versa'
 import { ThemeToggle } from '../hooks/useTheme'
 import { cn } from '../lib/utils'
+import { toast } from '../components/ui/Toaster'
 
 export function SettingsPage() {
   const navigate = useNavigate()
@@ -254,6 +255,31 @@ export function SettingsPage() {
               }}
             />
           </label>
+          <button
+            onClick={() => {
+              try { localStorage.removeItem('versa:tour:completed') } catch {}
+              window.location.reload()
+            }}
+            className="w-full px-4 py-2 rounded-lg border border-ink-200 hover:bg-ink-50 text-sm font-medium text-left text-ink-700 flex items-center gap-2"
+          >
+            <Compass className="w-4 h-4" /> 重新查看引导
+          </button>
+          <button
+            onClick={() => {
+              const enabled = localStorage.getItem('versa:sound-enabled') === 'true'
+              if (enabled) {
+                localStorage.setItem('versa:sound-enabled', 'false')
+                toast('已关闭音效', 'info')
+              } else {
+                localStorage.setItem('versa:sound-enabled', 'true')
+                toast('已开启音效', 'success')
+              }
+              window.location.reload()
+            }}
+            className="w-full px-4 py-2 rounded-lg border border-ink-200 hover:bg-ink-50 text-sm font-medium text-left text-ink-700 flex items-center gap-2"
+          >
+            <Volume2 className="w-4 h-4" /> 切换音效提示
+          </button>
         </div>
       </div>
     </div>
