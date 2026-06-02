@@ -13,6 +13,9 @@ import { KeyboardShortcutsHelp } from '../a11y/KeyboardShortcutsHelp'
 import { KeyboardHelpButton } from '../a11y/KeyboardHelpButton'
 import { OfflineBanner } from '../OfflineBanner'
 import { CompareFloatingBar } from '../CompareFloatingBar'
+import { AIFloatingButton } from '../ai/AIFloatingButton'
+import { PROMPTS } from '../../data/prompts'
+import { PWAStatus } from '../PWAStatus'
 
 export function Layout() {
   useTheme()
@@ -33,6 +36,8 @@ export function Layout() {
       <SupportWidget />
       <KeyboardHelpButton />
       <CompareFloatingBar />
+      <AIFloatingButton systemPrompt={PROMPTS.customerService} title="Versa AI 助手" />
+      <PWAStatus />
       <Toaster />
       <KeyboardShortcutsHelp open={helpOpen} onClose={() => setHelpOpen(false)} />
       <ScrollRestoration />

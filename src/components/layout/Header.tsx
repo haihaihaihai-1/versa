@@ -10,6 +10,7 @@ import { useScrollPosition } from '../../hooks/useScrollPosition'
 import { useAuth } from '../../api/AuthContext'
 import { useUnreadCount } from '../../api/hooks'
 import { cn } from '../../lib/utils'
+import { ThemeSwitcher } from '../ThemeSwitcher'
 
 const NAV_ITEMS = [
   { to: '/feed', label: '动态', icon: Home, requireAuth: false },
@@ -177,6 +178,8 @@ export function Header() {
                 </div>
               )}
             </div>
+
+            <ThemeSwitcher />
 
             {user ? (
               <div ref={profileRef} className="relative">
