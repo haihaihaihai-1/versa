@@ -18,6 +18,7 @@ import { ReviewList } from '../components/shop/ReviewList'
 import { Lightbox } from '../components/Lightbox'
 import { ShareCard } from '../components/ShareCard'
 import { PriceHistory } from '../components/shop/PriceHistory'
+import { RecentlyViewed, useRecentlyViewed } from '../components/RecentlyViewed'
 import { cn, formatCurrency, formatNumber } from '../lib/utils'
 import { toast } from '../components/ui/Toaster'
 import type { SkuSelection } from '../data/types'
@@ -27,6 +28,7 @@ export function ProductDetailV2() {
   const navigate = useNavigate()
   const product = products.find((p) => p.id === id)
   const { wishlist } = useVersa()
+  useRecentlyViewed(product?.id)
   const [activeImage, setActiveImage] = useState(0)
   const [qty, setQty] = useState(1)
   const [tab, setTab] = useState('description')
@@ -496,6 +498,10 @@ export function ProductDetailV2() {
             </div>
           </div>
         )}
+
+        <div className="mt-8">
+          <RecentlyViewed excludeId={product.id} />
+        </div>
       </div>
 
       {/* 底部固定操作栏 */}
