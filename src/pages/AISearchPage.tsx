@@ -6,6 +6,7 @@ import { useAI } from '../hooks/useAI'
 import { PROMPTS } from '../data/prompts'
 import { products } from '../data'
 import { AIBadge, AIIndicator, AIErrorBanner, AIThinkingDots } from '../components/ai/AIIndicator'
+import { VoiceInputButton } from '../components/VoiceInputButton'
 import { formatCurrency } from '../lib/utils'
 import { toast } from '../components/ui/Toaster'
 import {
@@ -120,9 +121,12 @@ export function AISearchPage() {
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && runSearch(query)}
                 placeholder="例如：送女朋友的生日礼物，预算 500 以内，要小众有设计感"
-                className="w-full pl-10 pr-4 h-12 rounded-full bg-white text-ink-900 text-sm outline-none focus:ring-4 ring-white/30"
+                className="w-full pl-10 pr-12 h-12 rounded-full bg-white text-ink-900 text-sm outline-none focus:ring-4 ring-white/30"
                 disabled={ai.loading}
               />
+              <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                <VoiceInputButton onResult={(t) => setQuery((p) => (p ? p + ' ' + t : t))} size="md" />
+              </div>
             </div>
             <Button
               onClick={() => runSearch(query)}

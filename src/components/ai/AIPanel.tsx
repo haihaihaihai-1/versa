@@ -5,6 +5,7 @@ import { Button } from '../ui/Button'
 import { cn } from '../../lib/utils'
 import { useAI } from '../../hooks/useAI'
 import { AIThinkingDots, AIErrorBanner } from './AIIndicator'
+import { VoiceInputButton } from '../VoiceInputButton'
 import type { ChatMessage } from '../../lib/ai'
 
 interface Props {
@@ -118,6 +119,7 @@ export function AIPanel({
           {/* Input */}
           <div className="p-3 border-t border-ink-200 dark:border-ink-800 bg-white dark:bg-ink-900">
             <div className="flex items-center gap-2">
+              <VoiceInputButton onResult={(t) => setInput((p) => (p ? p + ' ' + t : t))} />
               <input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
