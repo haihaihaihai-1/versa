@@ -25,6 +25,7 @@ import NotificationsHubPage from './pages/NotificationsHubPage'
 import BundlesPage from './pages/BundlesPage'
 import CuratorPage from './pages/CuratorPage'
 import AddressBookPage from './pages/AddressBookPage'
+import FlashSalePage from './pages/FlashSalePage'
 import { DebateHomePage } from './pages/DebateHomePage'
 import { DebateDetailV2 } from './pages/DebateDetailV2'
 import { RoundTablePage } from './pages/RoundTablePage'
@@ -95,6 +96,7 @@ export const router = createBrowserRouter(
         { path: 'shop/shorts/creator/:creatorId', element: <ShortVideoCreatorPage /> },
         { path: 'shop/bundles', element: <BundlesPage /> },
         { path: 'shop/curator', element: <CuratorPage /> },
+        { path: 'shop/flash', element: <FlashSalePage /> },
         { path: 'shop/:id', element: <ProductDetailV2 /> },
         { path: 'shop-legacy', element: <ShopListPage /> },
         { path: 'shop-legacy/:id', element: <ProductDetailPage /> },

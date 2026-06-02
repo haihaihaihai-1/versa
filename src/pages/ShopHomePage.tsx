@@ -7,7 +7,7 @@ import { BrandZone } from '../components/shop/BrandZone'
 import { ProductCardV2 } from '../components/shop/ProductCardV2'
 import { Tabs } from '../components/ui/Tabs'
 import { SearchBar, useDebounce } from '../components/ui/Search'
-import { Sparkles, Crown, TrendingUp, ShoppingBag, Newspaper, Scale, ArrowUpRight, Star, Ticket, Video, Award, GitCompareArrows, Bell, PlayCircle, Package } from 'lucide-react'
+import { Sparkles, Crown, TrendingUp, ShoppingBag, Newspaper, Scale, ArrowUpRight, Star, Ticket, Video, Award, GitCompareArrows, Bell, PlayCircle, Package, Zap } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { versa } from '../store/versa'
 import { useVersa } from '../store/versa'
@@ -96,11 +96,11 @@ export function ShopHomePage() {
           { icon: Ticket, label: '领券中心', to: '/shop/coupons', gradient: 'from-red-500 to-orange-500' },
           { icon: PlayCircle, label: '短视频', to: '/shop/shorts', gradient: 'from-rose-500 to-pink-500', badge: 'HOT' },
           { icon: Video, label: '直播', to: '/shop/live', gradient: 'from-pink-500 to-rose-500', badge: 'LIVE' },
+          { icon: Zap, label: '限时秒杀', to: '/shop/flash', gradient: 'from-red-500 to-rose-600', badge: '5折' },
           { icon: Crown, label: '品牌街', to: '/shop/brands', gradient: 'from-amber-500 to-orange-500' },
           { icon: Package, label: '凑单套餐', to: '/shop/bundles', gradient: 'from-fuchsia-500 to-pink-500', badge: '省' },
           { icon: Sparkles, label: '选品助手', to: '/shop/curator', gradient: 'from-violet-500 to-fuchsia-500', badge: 'AI' },
           { icon: GitCompareArrows, label: '商品对比', to: '/shop/compare', gradient: 'from-cyan-500 to-blue-500' },
-          { icon: TrendingUp, label: '排行榜', to: '/shop?sort=sales', gradient: 'from-emerald-500 to-teal-500' },
         ].map((it) => (
           <Link
             key={it.label}
