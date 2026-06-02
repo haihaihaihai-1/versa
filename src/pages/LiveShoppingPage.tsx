@@ -7,7 +7,7 @@ import { ProductCardV2 } from '../components/shop/ProductCardV2'
 import { toast } from '../components/ui/Toaster'
 import {
   Tv, Play, Heart, Share2, Users, Eye, ShoppingCart, Zap, Star, MessageCircle,
-  Sparkles, Send, ChevronRight, Flame, Crown, Award, X, Plus, ChevronUp
+  Sparkles, Send, ChevronRight, Flame, Crown, Award, X, Plus, ChevronUp, Calendar
 } from 'lucide-react'
 import { cn, formatCurrency, formatNumber, uid } from '../lib/utils'
 
@@ -146,6 +146,23 @@ export function LiveShoppingPage() {
           <div className="hidden sm:block text-6xl">📺</div>
         </div>
       </div>
+
+      {/* Calendar quicklink */}
+      <Link
+        to="/shop/live-schedule"
+        className="flex items-center justify-between gap-3 p-4 rounded-2xl bg-gradient-to-r from-news-50 to-shop-50 dark:from-news-950/30 dark:to-shop-950/30 border border-news-200/50 dark:border-news-800/50 hover:shadow-md transition"
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-news-500 to-shop-500 flex items-center justify-center text-white">
+            <Calendar className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="font-semibold text-sm">直播日历</p>
+            <p className="text-xs text-ink-500">查看未来 7 天直播预告 · 订阅开播提醒</p>
+          </div>
+        </div>
+        <ChevronRight className="w-5 h-5 text-ink-400" />
+      </Link>
 
       {/* 直播中 */}
       <div>
