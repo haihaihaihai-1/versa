@@ -255,6 +255,7 @@ export function Header() {
                         { to: '/gallery', label: '图集欣赏', icon: Image },
                         { to: '/brand-story', label: '品牌故事', icon: BookOpen },
                         { to: '/tools/social', label: '社交工具集', icon: Users },
+                        { to: '/tools/personal', label: '个性化中心', icon: Palette },
                       ].map((item) => (
                         <Link
                           key={item.to}

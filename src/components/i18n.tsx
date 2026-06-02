@@ -73,13 +73,17 @@ export function setLang(l: Lang) {
 }
 
 export function LanguageSwitcher({ onChange }: { onChange?: (lang: Lang) => void }) {
-  const [lang, setLocalLang] = useState<Lang>('zh-CN')
+  const [lang, setLocalLang] = useState<Lang>(() => getLang())
   const [open, setOpen] = useState(false)
 
   useState(() => {
-    if (typeof window !== 'undefined') {
-      setLocalLang(getLang())
+    if (typeof window === 'undefined') return
+    const handler = (e: Event) => {
+      const l = (e as CustomEvent<Lang>).detail
+      setLocalLang(l)
     }
+    window.addEventListener('versa:lang-change', handler)
+    return () => window.removeEventListener('versa:lang-change', handler)
   })
 
   const select = (l: Lang) => {
@@ -87,7 +91,6 @@ export function LanguageSwitcher({ onChange }: { onChange?: (lang: Lang) => void
     setLang(l)
     setOpen(false)
     onChange?.(l)
-    window.location.reload()
   }
 
   return (
