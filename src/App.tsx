@@ -79,6 +79,7 @@ const AdminStatsPage = lazy(() => import('./pages/AdminStatsPage').then(m => ({ 
 const AdminAnalyticsPage = lazy(() => import('./pages/AdminAnalyticsPage').then(m => ({ default: m.AdminAnalyticsPage })))
 const ReviewsPage = lazy(() => import('./pages/ReviewsPage').then(m => ({ default: m.ReviewsPage })))
 const LiveSchedulePage = lazy(() => import('./pages/LiveSchedulePage').then(m => ({ default: m.LiveSchedulePage })))
+const HelpCenterPage = lazy(() => import('./pages/HelpCenterPage').then(m => ({ default: m.HelpCenterPage })))
 
 export const router = createBrowserRouter(
   [
@@ -115,6 +116,7 @@ export const router = createBrowserRouter(
         { path: 'shop/live', element: withSuspense(<LiveShoppingPage />) },
         { path: 'shop/live/:id', element: withSuspense(<LiveShoppingPage />) },
         { path: 'shop/live-schedule', element: withSuspense(<LiveSchedulePage />) },
+        { path: 'help', element: withSuspense(<HelpCenterPage />) },
         { path: 'shop/shorts', element: withSuspense(<ShortVideoPage />) },
         { path: 'shop/shorts/:id', element: withSuspense(<ShortVideoDetailPage />) },
         { path: 'shop/shorts/creator/:creatorId', element: withSuspense(<ShortVideoCreatorPage />) },
