@@ -41,6 +41,7 @@ const FlashSalePage = lazy(() => import('./pages/FlashSalePage'))
 const ForYouPage = lazy(() => import('./pages/ForYouPage').then(m => ({ default: m.ForYouPage })))
 const CampaignPage = lazy(() => import('./pages/CampaignPage').then(m => ({ default: m.CampaignPage })))
 const SignInCalendarPage = lazy(() => import('./pages/SignInCalendarPage').then(m => ({ default: m.SignInCalendarPage })))
+const ShopFilterPage = lazy(() => import('./pages/ShopFilterPage').then(m => ({ default: m.ShopFilterPage })))
 const DebateHomePage = lazy(() => import('./pages/DebateHomePage').then(m => ({ default: m.DebateHomePage })))
 const DebateDetailV2 = lazy(() => import('./pages/DebateDetailV2').then(m => ({ default: m.DebateDetailV2 })))
 const RoundTablePage = lazy(() => import('./pages/RoundTablePage').then(m => ({ default: m.RoundTablePage })))
@@ -119,6 +120,7 @@ export const router = createBrowserRouter(
         { path: 'campaign', element: withSuspense(<CampaignPage />) },
         { path: 'campaign/:id', element: withSuspense(<CampaignPage />) },
         { path: 'checkin', element: withSuspense(<SignInCalendarPage />) },
+        { path: 'shop/filter', element: withSuspense(<ShopFilterPage />) },
         { path: 'shop/:id', element: withSuspense(<ProductDetailV2 />) },
         { path: 'shop-legacy', element: withSuspense(<ShopListPage />) },
         { path: 'shop-legacy/:id', element: withSuspense(<ProductDetailPage />) },
