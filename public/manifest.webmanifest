@@ -1,0 +1,56 @@
+{
+  "name": "Versa · 三体融合平台",
+  "short_name": "Versa",
+  "description": "购物·辩论·资讯 一体化融合平台",
+  "start_url": "/versa/",
+  "scope": "/versa/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b0b14",
+  "theme_color": "#0b0b14",
+  "lang": "zh-CN",
+  "dir": "ltr",
+  "categories": ["shopping", "social", "news", "lifestyle"],
+  "icons": [
+    {
+      "src": "/versa/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/versa/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/versa/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "购物首页",
+      "url": "/versa/shop",
+      "icons": [{ "src": "/versa/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "辩论广场",
+      "url": "/versa/debates",
+      "icons": [{ "src": "/versa/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "资讯流",
+      "url": "/versa/news",
+      "icons": [{ "src": "/versa/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "会员中心",
+      "url": "/versa/help/member",
+      "icons": [{ "src": "/versa/icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
