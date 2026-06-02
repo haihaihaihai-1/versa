@@ -58,6 +58,7 @@ const FeedPage = lazy(() => import('./pages/FeedPage').then(m => ({ default: m.F
 const PostDetailPage = lazy(() => import('./pages/PostDetailPage').then(m => ({ default: m.PostDetailPage })))
 const ComposePage = lazy(() => import('./pages/ComposePage').then(m => ({ default: m.ComposePage })))
 const UserProfilePage = lazy(() => import('./pages/UserProfilePage').then(m => ({ default: m.UserProfilePage })))
+const CreatorProfilePage = lazy(() => import('./pages/CreatorProfilePage').then(m => ({ default: m.CreatorProfilePage })))
 const MessagesPage = lazy(() => import('./pages/MessagesPage').then(m => ({ default: m.MessagesPage })))
 const ChatPage = lazy(() => import('./pages/ChatPage').then(m => ({ default: m.ChatPage })))
 const GroupsPage = lazy(() => import('./pages/GroupsPage').then(m => ({ default: m.GroupsPage })))
@@ -117,7 +118,8 @@ export const router = createBrowserRouter(
         { path: 'checkout', element: withSuspense(<CheckoutPage />) },
         { path: 'checkout/success', element: withSuspense(<CheckoutSuccessPage />) },
 
-        { path: 'u/:username', element: withSuspense(<UserProfilePage />) },
+        { path: 'u/:username', element: withSuspense(<CreatorProfilePage />) },
+        { path: 'profile-legacy/:username', element: withSuspense(<UserProfilePage />) },
         { path: 'profile', element: withSuspense(<ProfilePage />) },
         { path: 'profile/wishlist', element: withSuspense(<WishlistPage />) },
         { path: 'profile/orders', element: withSuspense(<OrdersPage />) },
