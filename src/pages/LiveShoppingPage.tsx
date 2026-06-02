@@ -8,9 +8,10 @@ import { toast } from '../components/ui/Toaster'
 import {
   Tv, Play, Heart, Share2, Users, Eye, ShoppingCart, Zap, Star, MessageCircle,
   Sparkles, Send, ChevronRight, Flame, Crown, Award, X, Plus, ChevronUp, Calendar,
-  MessageSquare
+  MessageSquare, Gift
 } from 'lucide-react'
 import { DanmuOverlay, useDanmuStream } from '../components/live/DanmuOverlay'
+import { GiftPanel, fireGiftToast, type Gift as GiftItem } from '../components/live/GiftPanel'
 import { cn, formatCurrency, formatNumber, uid } from '../lib/utils'
 
 interface LiveRoom {
@@ -292,6 +293,7 @@ function LiveRoom({ room }: { room?: LiveRoom }) {
   const [viewerCount, setViewerCount] = useState(0)
   const [showProducts, setShowProducts] = useState(true)
   const [danmuEnabled, setDanmuEnabled] = useState(true)
+  const [showGift, setShowGift] = useState(false)
 
   useEffect(() => {
     if (!room) return
@@ -328,6 +330,12 @@ function LiveRoom({ room }: { room?: LiveRoom }) {
     if (!chatInput.trim()) return
     setDanmu((prev) => [...prev.slice(-10), { id: uid('d'), user: '我', text: chatInput, color: '#ec4899' }])
     setChatInput('')
+  }
+
+  const handleSendGift = (gift: GiftItem, count: number) => {
+    fireGiftToast(gift, count)
+    setDanmu((prev) => [...prev.slice(-10), { id: uid('d'), user: '我', text: `送出了 ${gift.name} x${count}`, color: '#fbbf24' }])
+    setShowGift(false)
   }
 
   return (
@@ -468,10 +476,22 @@ function LiveRoom({ room }: { room?: LiveRoom }) {
                 placeholder="发条弹幕飘过~"
                 className="flex-1 px-3 h-9 rounded-full bg-ink-50 dark:bg-ink-800 text-sm outline-none focus:bg-white dark:focus:bg-ink-900 border border-transparent focus:border-rose-500"
               />
+              <button
+                onClick={() => setShowGift((v) => !v)}
+                className="w-9 h-9 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 text-white flex items-center justify-center hover:scale-105 transition shadow"
+                title="送礼物"
+              >
+                <Gift className="w-4 h-4" />
+              </button>
               <button onClick={handleSendMessage} className="w-9 h-9 rounded-full bg-gradient-to-r from-rose-500 to-pink-500 text-white flex items-center justify-center hover:scale-105 transition shadow">
                 <Send className="w-4 h-4" />
               </button>
             </div>
+            {showGift && (
+              <div className="flex justify-center pt-2">
+                <GiftPanel onSend={handleSendGift} onClose={() => setShowGift(false)} />
+              </div>
+            )}
             <p className="text-[10px] text-ink-500 flex items-center gap-1">
               <MessageSquare className="w-3 h-3" />
               弹幕会从直播间飘过
