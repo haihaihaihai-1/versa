@@ -17,6 +17,7 @@ import { AIFloatingButton } from '../ai/AIFloatingButton'
 import { PROMPTS } from '../../data/prompts'
 import { PWAStatus } from '../PWAStatus'
 import { CommandPalette } from '../CommandPalette'
+import { LiveCountdownBanner } from '../LiveCountdownBanner'
 
 export function Layout() {
   useTheme()
@@ -25,6 +26,7 @@ export function Layout() {
     <div className="min-h-screen flex flex-col">
       <OfflineBanner />
       <SkipLink />
+      <LiveCountdownBanner />
       <Header />
       <main id="main-content" className="flex-1 pt-16 pb-24 md:pb-0" tabIndex={-1}>
         <ErrorBoundary>

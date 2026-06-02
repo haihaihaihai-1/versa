@@ -3,7 +3,7 @@ import { useEffect, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import {
   Newspaper, Scale, ShoppingBag, Sparkles, ArrowRight,
-  TrendingUp, MessageCircle, Flame, Award, ChevronRight, Zap, Eye, Clock,
+  TrendingUp, MessageCircle, Flame, Award, ChevronRight, Zap, Eye, Clock, Users, Heart, Package,
 } from 'lucide-react'
 import { news, debates, products, breakingNews, moduleMeta } from '../data'
 import { versa, useVersa, levelFor, levelTitle, levelProgress } from '../store/versa'
@@ -16,6 +16,7 @@ import { Button } from '../components/ui/Button'
 import { ProgressBar, ScorePill } from '../components/ui/Progress'
 import { formatNumber, formatTimeAgo, cn } from '../lib/utils'
 import { StoriesBar } from '../components/social/StoriesBar'
+import { CountUp, StaggerContainer, StaggerItem } from '../components/StaggerContainer'
 
 export function HomePage() {
   const { user, visitedModules } = useVersa()
@@ -124,6 +125,36 @@ export function HomePage() {
             </div>
           )}
         </div>
+      </section>
+
+      {/* 平台数据 stat strip */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-4 mb-6">
+        <StaggerContainer stagger={0.08} className="grid grid-cols-2 md:grid-cols-4 gap-2">
+          {[
+            { icon: Users, value: 128000, suffix: '+', label: '活跃创作者', gradient: 'from-cyan-500 to-blue-500' },
+            { icon: Package, value: products.length * 320, suffix: '+', label: '在售好物', gradient: 'from-rose-500 to-pink-500' },
+            { icon: MessageCircle, value: debates.length * 1200, suffix: '+', label: '精彩辩论', gradient: 'from-violet-500 to-purple-500' },
+            { icon: Heart, value: 5_280_000, suffix: ' 喜爱', label: '用户收藏', gradient: 'from-amber-500 to-orange-500' },
+          ].map((s, i) => (
+            <StaggerItem key={i}>
+              <div className="relative overflow-hidden rounded-2xl bg-white/80 dark:bg-ink-900/60 border border-ink-200/40 dark:border-ink-800/40 p-4 hover:scale-[1.02] transition-transform cursor-default">
+                <div className={cn('absolute -top-4 -right-4 w-16 h-16 rounded-full blur-2xl opacity-30 bg-gradient-to-br', s.gradient)} />
+                <div className="relative flex items-center gap-3">
+                  <div className={cn('w-10 h-10 rounded-xl bg-gradient-to-br flex items-center justify-center text-white', s.gradient)}>
+                    <s.icon className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="text-xl font-black tracking-tight">
+                      <CountUp to={s.value} />
+                      {s.suffix}
+                    </div>
+                    <p className="text-[10px] text-ink-500">{s.label}</p>
+                  </div>
+                </div>
+              </div>
+            </StaggerItem>
+          ))}
+        </StaggerContainer>
       </section>
 
       {/* Stories 24h 故事 */}
