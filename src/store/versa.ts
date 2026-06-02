@@ -173,6 +173,9 @@ export const versa = {
   setLanguage(lang: 'zh' | 'en') {
     setState((s) => ({ ...s, preferences: { ...s.preferences, language: lang } }))
   },
+  setReducedMotion(v: boolean) {
+    setState((s) => ({ ...s, preferences: { ...s.preferences, reducedMotion: v } }))
+  },
 
   // profile
   updateProfile(patch: Partial<Pick<UserProfile, 'displayName' | 'bio' | 'avatar'>>) {

@@ -2,12 +2,13 @@
 
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Save, Camera, Shield, Bell, Lock, Eye, Trash2 } from 'lucide-react'
+import { Save, Camera, Shield, Bell, Lock, Eye, Trash2, Sun, Moon, Monitor, Globe, Zap } from 'lucide-react'
 import { useAuth } from '../api/AuthContext'
 import api from '../api'
 import { UserAvatar } from '../components/social/UserAvatar'
 import { roleLabel, roleColor, ROLE_DESCRIPTIONS } from '../api/permissions'
 import { versa, useVersa } from '../store/versa'
+import { ThemeToggle } from '../hooks/useTheme'
 import { cn } from '../lib/utils'
 
 export function SettingsPage() {
@@ -113,6 +114,48 @@ export function SettingsPage() {
             />
             <div className="text-right text-xs text-ink-400 mt-1">{form.bio.length} / 200</div>
           </Field>
+        </div>
+      </div>
+
+      {/* Preferences */}
+      <div className="bg-white dark:bg-ink-900 border border-ink-200 dark:border-ink-800 rounded-2xl p-5">
+        <h2 className="font-semibold mb-4 flex items-center gap-2"><Zap className="w-4 h-4" /> 偏好设置</h2>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <div className="text-sm font-medium">主题外观</div>
+              <div className="text-xs text-ink-500 mt-0.5">浅色 / 深色 / 跟随系统</div>
+            </div>
+            <ThemeToggle />
+          </div>
+          <div>
+            <div className="text-sm font-medium mb-2">语言</div>
+            <div className="grid grid-cols-2 gap-2">
+              {([
+                { v: 'zh' as const, label: '简体中文' },
+                { v: 'en' as const, label: 'English' },
+              ]).map((o) => (
+                <button
+                  key={o.v}
+                  onClick={() => versa.setLanguage(o.v)}
+                  className={cn(
+                    'px-3 py-2 rounded-lg text-sm font-medium border',
+                    prefs.preferences.language === o.v
+                      ? 'border-nova-500 bg-nova-50 dark:bg-nova-900/30 text-nova-600'
+                      : 'border-ink-200 dark:border-ink-800'
+                  )}
+                >
+                  {o.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <Toggle
+            label="减少动效"
+            description="降低页面切换动画 (省电 / 提升性能)"
+            checked={prefs.preferences.reducedMotion}
+            onChange={(v) => versa.setReducedMotion(v)}
+          />
         </div>
       </div>
 
