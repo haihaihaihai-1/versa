@@ -135,6 +135,7 @@ const PrivacySettingsPage = lazy(() => import('./pages/PrivacySettingsPage').the
 const UserJourneyPage = lazy(() => import('./pages/UserJourneyPage').then(m => ({ default: m.UserJourneyPage })))
 const ProductGalleryPage = lazy(() => import('./pages/ProductGalleryPage').then(m => ({ default: m.ProductGalleryPage })))
 const BrandStoryPage = lazy(() => import('./pages/BrandStoryPage').then(m => ({ default: m.BrandStoryPage })))
+const SocialToolsPage = lazy(() => import('./pages/SocialTools').then(m => ({ default: m.SocialTools })))
 
 export const router = createBrowserRouter(
   [
@@ -231,6 +232,7 @@ export const router = createBrowserRouter(
         { path: 'journey', element: withSuspense(<UserJourneyPage />) },
         { path: 'gallery', element: withSuspense(<ProductGalleryPage />) },
         { path: 'brand-story', element: withSuspense(<BrandStoryPage />) },
+        { path: 'tools/social', element: withSuspense(<SocialToolsPage />) },
         { path: 'shop/shorts', element: withSuspense(<ShortVideoPage />) },
         { path: 'shop/shorts/:id', element: withSuspense(<ShortVideoDetailPage />) },
         { path: 'shop/shorts/creator/:creatorId', element: withSuspense(<ShortVideoCreatorPage />) },

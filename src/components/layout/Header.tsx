@@ -254,6 +254,7 @@ export function Header() {
                         { to: '/journey', label: '我的旅程', icon: BookOpen },
                         { to: '/gallery', label: '图集欣赏', icon: Image },
                         { to: '/brand-story', label: '品牌故事', icon: BookOpen },
+                        { to: '/tools/social', label: '社交工具集', icon: Users },
                       ].map((item) => (
                         <Link
                           key={item.to}
