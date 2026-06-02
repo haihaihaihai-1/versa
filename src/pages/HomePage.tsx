@@ -15,6 +15,7 @@ import { Badge } from '../components/ui/Badge'
 import { Button } from '../components/ui/Button'
 import { ProgressBar, ScorePill } from '../components/ui/Progress'
 import { formatNumber, formatTimeAgo, cn } from '../lib/utils'
+import { StoriesBar } from '../components/social/StoriesBar'
 
 export function HomePage() {
   const { user, visitedModules } = useVersa()
@@ -123,6 +124,11 @@ export function HomePage() {
             </div>
           )}
         </div>
+      </section>
+
+      {/* Stories 24h 故事 */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-2">
+        <StoriesBar />
       </section>
 
       {/* 模块入口 - 紧凑条 */}
