@@ -257,6 +257,7 @@ export function Header() {
                         { to: '/tools/social', label: '社交工具集', icon: Users },
                         { to: '/tools/personal', label: '个性化中心', icon: Palette },
                         { to: '/tools/creator', label: '创作者中心', icon: Users },
+                        { to: '/tools/life', label: '生活中心', icon: LayoutDashboard },
                       ].map((item) => (
                         <Link
                           key={item.to}
