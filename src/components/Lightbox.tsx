@@ -4,7 +4,7 @@ import { X, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Download } from 'lucide-
 import { cn } from '../lib/utils'
 
 interface Props {
-  images: { src: string; alt?: string; title?: string }[]
+  images: ({ src: string; alt?: string; title?: string } | string)[]
   open: boolean
   initialIndex?: number
   onClose: () => void
@@ -42,7 +42,8 @@ export function Lightbox({ images, open, initialIndex = 0, onClose }: Props) {
   }, [open, next, prev, onClose])
 
   if (!open || images.length === 0) return null
-  const current = images[index]
+  const normalize = (img: { src: string; alt?: string; title?: string } | string) => (typeof img === 'string' ? { src: img } : img)
+  const current = normalize(images[index])
 
   return (
     <AnimatePresence>
@@ -118,7 +119,9 @@ export function Lightbox({ images, open, initialIndex = 0, onClose }: Props) {
         {/* Thumbnails */}
         {images.length > 1 && (
           <div className="px-4 py-3 flex items-center gap-2 overflow-x-auto" onClick={(e) => e.stopPropagation()}>
-            {images.map((img, i) => (
+            {images.map((raw, i) => {
+              const img = normalize(raw)
+              return (
               <button
                 key={i}
                 onClick={() => {
@@ -132,7 +135,8 @@ export function Lightbox({ images, open, initialIndex = 0, onClose }: Props) {
               >
                 <img src={img.src} alt="" className="w-full h-full object-cover" />
               </button>
-            ))}
+              )
+            })}
           </div>
         )}
       </motion.div>

@@ -20,6 +20,8 @@ import { CommandPalette } from '../CommandPalette'
 import { LiveCountdownBanner } from '../LiveCountdownBanner'
 import { ScrollProgress } from '../ScrollProgress'
 import { ConfettiHost } from '../Confetti'
+import { GiftToastHost } from '../live/GiftPanel'
+import { LoadingBarHost } from '../LoadingBar'
 
 export function Layout() {
   useTheme()
@@ -46,6 +48,8 @@ export function Layout() {
       <PWAStatus />
       <CommandPalette />
       <ConfettiHost />
+      <GiftToastHost />
+      <LoadingBarHost />
       <Toaster />
       <KeyboardShortcutsHelp open={helpOpen} onClose={() => setHelpOpen(false)} />
       <ScrollRestoration />

@@ -180,6 +180,28 @@ html.dark .skeleton {
 }
 .pulse-ring { animation: pulse-ring 1.6s cubic-bezier(0.66, 0, 0, 1) infinite; }
 
+/* 礼物稀有度光环 */
+@keyframes ring-rotate {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+.ring-common { box-shadow: 0 0 0 2px rgba(0,0,0,0.06); }
+.ring-rare {
+  background-size: 200% 200%;
+  animation: ring-rotate 3s linear infinite;
+  box-shadow: 0 0 0 2px #3b82f6, 0 0 12px rgba(59, 130, 246, 0.5);
+}
+.ring-epic {
+  background-size: 200% 200%;
+  animation: ring-rotate 2.5s linear infinite;
+  box-shadow: 0 0 0 2px #a855f7, 0 0 18px rgba(168, 85, 247, 0.6);
+}
+.ring-legendary {
+  background-size: 200% 200%;
+  animation: ring-rotate 2s linear infinite;
+  box-shadow: 0 0 0 3px #f59e0b, 0 0 24px rgba(245, 158, 11, 0.8);
+}
+
 /* 可访问性 - 焦点环 */
 *:focus-visible {
   outline: 2px solid var(--color-nova-500);

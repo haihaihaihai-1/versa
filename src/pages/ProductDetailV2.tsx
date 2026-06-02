@@ -3,7 +3,7 @@ import { useState, useEffect, useMemo } from 'react'
 import {
   ArrowLeft, Heart, Share2, Star, Minus, Plus, ShoppingCart, Scale, Truck,
   Shield, RotateCcw, Newspaper, ChevronRight, Tag, Check, MapPin,
-  Award, MessageCircle, Sparkles, ChevronDown, Package, TrendingUp, Zap
+  Award, MessageCircle, Sparkles, ChevronDown, Package, TrendingUp, Zap, Maximize2
 } from 'lucide-react'
 import { products, news, debates } from '../data'
 import { useVersa, versa } from '../store/versa'
@@ -15,6 +15,7 @@ import { CouponStrip } from '../components/shop/CouponStrip'
 import { SkuSelector } from '../components/shop/SkuSelector'
 import { ServiceGuarantees } from '../components/shop/ServiceGuarantees'
 import { ReviewList } from '../components/shop/ReviewList'
+import { Lightbox } from '../components/Lightbox'
 import { cn, formatCurrency, formatNumber } from '../lib/utils'
 import { toast } from '../components/ui/Toaster'
 import type { SkuSelection } from '../data/types'
@@ -28,6 +29,7 @@ export function ProductDetailV2() {
   const [qty, setQty] = useState(1)
   const [tab, setTab] = useState('description')
   const [showSkuPanel, setShowSkuPanel] = useState(false)
+  const [lightboxOpen, setLightboxOpen] = useState(false)
   const [skuAction, setSkuAction] = useState<'cart' | 'buy'>('cart')
   const [sku, setSku] = useState<SkuSelection>({})
   const [showQnaPreview, setShowQnaPreview] = useState(true)
@@ -132,7 +134,16 @@ export function ProductDetailV2() {
           {/* 图片区 */}
           <div className="lg:col-span-2">
             <div className="aspect-square rounded-3xl overflow-hidden bg-gradient-to-br from-ink-100 to-ink-50 dark:from-ink-800 dark:to-ink-900 relative group">
-              <img src={product.images[activeImage]} alt={product.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+              <button onClick={() => setLightboxOpen(true)} className="w-full h-full cursor-zoom-in">
+                <img src={product.images[activeImage]} alt={product.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+              </button>
+              <button
+                onClick={() => setLightboxOpen(true)}
+                className="absolute top-4 right-4 p-2 rounded-full bg-black/60 text-white opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-md"
+                title="放大查看"
+              >
+                <Maximize2 className="w-4 h-4" />
+              </button>
               {discount > 0 && (
                 <div className="absolute top-4 left-4 flex items-center gap-1 px-3 py-1.5 rounded-full bg-gradient-to-r from-debate-500 to-orange-500 text-white text-sm font-bold shadow-lg">
                   <Tag className="w-4 h-4" />立省 {discount}%
@@ -510,6 +521,12 @@ export function ProductDetailV2() {
       </div>
 
       {/* SKU 弹窗 */}
+      <Lightbox
+        images={product.images}
+        initialIndex={activeImage}
+        open={lightboxOpen}
+        onClose={() => setLightboxOpen(false)}
+      />
       {showSkuPanel && (
         <div className="fixed inset-0 z-50 flex items-end" onClick={() => setShowSkuPanel(false)}>
           <div className="absolute inset-0 bg-ink-950/40" />
