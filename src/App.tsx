@@ -20,6 +20,7 @@ import ShortVideoPage from './pages/ShortVideoPage'
 import ShortVideoDetailPage from './pages/ShortVideoDetailPage'
 import ShortVideoCreatorPage from './pages/ShortVideoCreatorPage'
 import SupportPage from './pages/SupportPage'
+import MemberPage from './pages/MemberPage'
 import { DebateHomePage } from './pages/DebateHomePage'
 import { DebateDetailV2 } from './pages/DebateDetailV2'
 import { RoundTablePage } from './pages/RoundTablePage'
@@ -104,6 +105,7 @@ export const router = createBrowserRouter(
         { path: 'orders/:orderId/aftersales', element: <AfterSalesPage /> },
         { path: 'orders/:orderId/review', element: <ReviewPage /> },
         { path: 'help/support', element: <SupportPage /> },
+        { path: 'help/member', element: <MemberPage /> },
         { path: 'settings', element: <SettingsPage /> },
 
         { path: 'p/:id', element: <PostDetailPage /> },

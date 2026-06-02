@@ -391,6 +391,10 @@ export interface AppState {
   chatMessages: ChatMessage[]
   supportTickets: SupportTicket[]
   faqHelpful: Record<string, number>
+  pointsRecords: PointsRecord[]
+  signInDays: SignInDay[]
+  tasks: TaskItem[]
+  redeemedRewards: string[]
 }
 
 export type ChatRole = 'user' | 'bot' | 'agent' | 'system'
@@ -460,4 +464,68 @@ export interface ShortVideoComment {
   content: string
   likes: number
   createdAt: string
+}
+
+export type MemberLevel = 'normal' | 'silver' | 'gold' | 'diamond'
+
+export interface MemberPrivilege {
+  level: MemberLevel
+  name: string
+  threshold: number
+  icon: string
+  gradient: string
+  benefits: string[]
+  discount: number
+  pointsRate: number
+}
+
+export type SignInStatus = 'done' | 'today' | 'missed' | 'future'
+
+export interface SignInDay {
+  day: number
+  points: number
+  status: SignInStatus
+  isToday: boolean
+  isReward: boolean
+}
+
+export type TaskType = 'daily' | 'achieve'
+
+export interface TaskItem {
+  id: string
+  name: string
+  desc: string
+  type: TaskType
+  icon: string
+  gradient: string
+  target: number
+  progress: number
+  points: number
+  completed: boolean
+  claimed: boolean
+}
+
+export type PointsSource = 'signin' | 'task' | 'order' | 'review' | 'comment' | 'redeem' | 'refund' | 'activity' | 'share'
+
+export interface PointsRecord {
+  id: string
+  type: 'earn' | 'spend'
+  source: PointsSource
+  title: string
+  amount: number
+  at: string
+}
+
+export type RewardType = 'coupon' | 'product' | 'privilege' | 'gift'
+
+export interface RewardItem {
+  id: string
+  name: string
+  desc: string
+  type: RewardType
+  cost: number
+  stock: number
+  cover: string
+  coverGradient: string
+  badge?: string
 }

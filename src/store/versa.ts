@@ -1,12 +1,13 @@
 import { useEffect, useState, useCallback, useMemo } from 'react'
-import type { AppState, CartItem, Order, UserProfile, Activity, ModuleKey, AfterSalesRequest, ProductReview, AfterSalesType, UserCoupon, UserInvoice, UserAddress, ShortVideo, ShortVideoComment, ChatMessage, SupportTicket } from '../data/types'
+import type { AppState, CartItem, Order, UserProfile, Activity, ModuleKey, AfterSalesRequest, ProductReview, AfterSalesType, UserCoupon, UserInvoice, UserAddress, ShortVideo, ShortVideoComment, ChatMessage, SupportTicket, PointsRecord, TaskItem } from '../data/types'
 import { seedShortVideos, seedShortVideoComments } from '../data/shortVideos'
 import { seedFAQs, seedTickets, seedChatMessages, BOT_INTENTS } from '../data/support'
+import { seedSignInDays, seedTasks, seedRewards } from '../data/member'
 import { seedUser } from '../data/users'
 import { uid } from '../lib/utils'
-const STORAGE_KEY = 'versa:state:v4'
+const STORAGE_KEY = 'versa:state:v5'
 
-const STATE_VERSION = 4
+const STATE_VERSION = 5
 
 const POINTS = {
   READ_ARTICLE: 5,
@@ -56,6 +57,16 @@ function defaultState(): AppState {
     chatMessages: seedChatMessages,
     supportTickets: seedTickets,
     faqHelpful: seedFAQs.reduce<Record<string, number>>((acc, f) => ({ ...acc, [f.id]: f.helpful }), {}),
+    pointsRecords: [
+      { id: 'pr1', type: 'earn', source: 'order', title: '订单 #20260520 实付 ¥280', amount: 280, at: '2026-05-20T10:00:00Z' },
+      { id: 'pr2', type: 'earn', source: 'review', title: '评价奖励 · 数码降噪耳机', amount: 50, at: '2026-05-22T15:00:00Z' },
+      { id: 'pr3', type: 'earn', source: 'signin', title: '连续签到 3 天', amount: 60, at: '2026-05-25T08:00:00Z' },
+      { id: 'pr4', type: 'spend', source: 'redeem', title: '兑换 ¥10 通用券', amount: -500, at: '2026-05-26T20:00:00Z' },
+      { id: 'pr5', type: 'earn', source: 'order', title: '订单 #20260527 实付 ¥890', amount: 890, at: '2026-05-27T14:30:00Z' },
+    ],
+    signInDays: seedSignInDays,
+    tasks: seedTasks,
+    redeemedRewards: [],
   }
 }
 
@@ -557,6 +568,87 @@ export const versa = {
       ...s,
       supportTickets: s.supportTickets.map((t) => (t.id === ticketId ? { ...t, status: 'closed' as const, updatedAt: new Date().toISOString() } : t)),
     }))
+  },
+
+  // member center
+  signIn() {
+    setState((s) => {
+      const dayIdx = s.signInDays.findIndex((d) => d.isToday)
+      if (dayIdx < 0) return s
+      const day = s.signInDays[dayIdx]
+      if (day.status === 'done') return s
+      const next = s.signInDays.map((d, i) => {
+        if (i < dayIdx) return d
+        if (i === dayIdx) return { ...d, status: 'done' as const }
+        if (i === dayIdx + 1) return { ...d, status: 'today' as const, isToday: true }
+        return { ...d, isToday: false }
+      })
+      const record: PointsRecord = {
+        id: uid('pr'),
+        type: 'earn',
+        source: 'signin',
+        title: `连续签到 ${dayIdx + 1} 天`,
+        amount: day.points,
+        at: new Date().toISOString(),
+      }
+      return {
+        ...s,
+        signInDays: next,
+        user: { ...s.user, points: s.user.points + day.points },
+        pointsRecords: [record, ...s.pointsRecords],
+        tasks: s.tasks.map((t) => (t.id === 't_d1' ? { ...t, progress: 1, completed: true } : t)),
+      }
+    })
+  },
+  progressTask(taskId: string, amount = 1) {
+    setState((s) => ({
+      ...s,
+      tasks: s.tasks.map((t) => {
+        if (t.id !== taskId) return t
+        const progress = Math.min(t.target, t.progress + amount)
+        return { ...t, progress, completed: progress >= t.target }
+      }),
+    }))
+  },
+  claimTask(taskId: string) {
+    setState((s) => {
+      const task = s.tasks.find((t) => t.id === taskId)
+      if (!task || !task.completed || task.claimed) return s
+      const record: PointsRecord = {
+        id: uid('pr'),
+        type: 'earn',
+        source: 'task',
+        title: `任务奖励 · ${task.name}`,
+        amount: task.points,
+        at: new Date().toISOString(),
+      }
+      return {
+        ...s,
+        tasks: s.tasks.map((t) => (t.id === taskId ? { ...t, claimed: true } : t)),
+        user: { ...s.user, points: s.user.points + task.points },
+        pointsRecords: [record, ...s.pointsRecords],
+      }
+    })
+  },
+  redeemReward(itemId: string) {
+    setState((s) => {
+      const item = seedRewards.find((r) => r.id === itemId)
+      if (!item || s.redeemedRewards.includes(itemId) || s.user.points < item.cost) return s
+      const record: PointsRecord = {
+        id: uid('pr'),
+        type: 'spend',
+        source: 'redeem',
+        title: `兑换 · ${item.name}`,
+        amount: -item.cost,
+        at: new Date().toISOString(),
+      }
+      return {
+        ...s,
+        redeemedRewards: [...s.redeemedRewards, itemId],
+        user: { ...s.user, points: s.user.points - item.cost },
+        pointsRecords: [record, ...s.pointsRecords],
+      }
+    })
   },
 
   // reset
