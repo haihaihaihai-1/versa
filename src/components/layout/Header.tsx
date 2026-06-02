@@ -5,6 +5,7 @@ import {
   ShoppingCart, User, Bell, LogOut, Settings, ChevronDown, Sparkles,
   Search, Plus, MessageCircle, Users, Shield, Calendar, FileText,
   StickyNote, Video, Palette, LayoutDashboard, Inbox, Vote, Hash, Heart, Ticket,
+  Package, Mail, MessageSquare, Truck,
 } from 'lucide-react'
 import { versa, useVersa, useCartTotals } from '../../store/versa'
 import { useScrollPosition } from '../../hooks/useScrollPosition'
@@ -12,6 +13,7 @@ import { useAuth } from '../../api/AuthContext'
 import { useUnreadCount } from '../../api/hooks'
 import { cn } from '../../lib/utils'
 import { ThemeSwitcher } from '../ThemeSwitcher'
+import { LanguageSwitcher } from '../i18n'
 import { NotificationBell, NotificationCenter } from '../NotificationCenter'
 
 const NAV_ITEMS = [
@@ -172,6 +174,7 @@ export function Header() {
             </div>
 
             <ThemeSwitcher />
+            <LanguageSwitcher />
 
             {user ? (
               <div ref={profileRef} className="relative">
@@ -212,6 +215,11 @@ export function Header() {
                         { to: '/settings', label: '账号设置', icon: Settings },
                         { to: '/dashboard', label: '工作台', icon: LayoutDashboard },
                         { to: '/my-content', label: '我的内容', icon: Inbox },
+                        { to: '/orders', label: '购买记录', icon: Package },
+                        { to: '/inbox', label: '站内信', icon: Mail },
+                        { to: '/forum', label: '社区论坛', icon: MessageSquare },
+                        { to: '/tracker', label: '物流跟踪', icon: Truck },
+                        { to: '/ai-writer', label: 'AI 写作', icon: Sparkles },
                         { to: '/smartlist', label: '智能清单', icon: Sparkles },
                         { to: '/calendar', label: '我的日程', icon: Calendar },
                         { to: '/notes', label: '笔记', icon: FileText },

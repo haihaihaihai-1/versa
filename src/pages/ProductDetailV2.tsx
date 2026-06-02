@@ -22,6 +22,8 @@ import { RecentlyViewed, useRecentlyViewed } from '../components/RecentlyViewed'
 import { ProductBundle } from '../components/ProductBundle'
 import { ProductQnA } from '../components/ProductQnA'
 import { VideoPreview } from '../components/VideoPreview'
+import { PriceCompare } from '../components/PriceCompare'
+import { OrderTracker } from '../components/OrderTracker'
 import { cn, formatCurrency, formatNumber } from '../lib/utils'
 import { toast } from '../components/ui/Toaster'
 import type { SkuSelection } from '../data/types'
@@ -396,6 +398,7 @@ export function ProductDetailV2() {
                 { value: 'reviews', label: `评价 (${formatNumber(product.reviewCount)})` },
                 { value: 'qna', label: `问大家 (${qaList.length})` },
                 { value: 'video', label: '视频' },
+                { value: 'compare', label: '比价' },
               ]}
               value={tab}
               onChange={setTab}
@@ -444,6 +447,9 @@ export function ProductDetailV2() {
             )}
             {tab === 'video' && (
               <VideoPreview productId={product.id} />
+            )}
+            {tab === 'compare' && (
+              <PriceCompare productId={product.id} />
             )}
           </div>
         </div>

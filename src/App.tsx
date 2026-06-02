@@ -108,6 +108,11 @@ const WishlistFoldersPage = lazy(() => import('./pages/WishlistFoldersPage').the
 const CouponCenterPage = lazy(() => import('./pages/CouponCenterPage').then(m => ({ default: m.CouponCenterPage })))
 const PollPage = lazy(() => import('./pages/PollPage').then(m => ({ default: m.PollPage })))
 const LiveCalendarPage = lazy(() => import('./pages/LiveCalendarPage').then(m => ({ default: m.LiveCalendarPage })))
+const PurchaseHistoryPage = lazy(() => import('./pages/PurchaseHistoryPage').then(m => ({ default: m.PurchaseHistoryPage })))
+const ForumPage = lazy(() => import('./pages/ForumPage').then(m => ({ default: m.ForumPage })))
+const InboxPageRoute = lazy(() => import('./pages/InboxPageRoute').then(m => ({ default: m.InboxPageRoute })))
+const AIWriterPage = lazy(() => import('./pages/AIWriterPage').then(m => ({ default: m.AIWriterPage })))
+const OrderTrackerPage = lazy(() => import('./pages/OrderTrackerPage').then(m => ({ default: m.OrderTrackerPage })))
 
 export const router = createBrowserRouter(
   [
@@ -176,6 +181,11 @@ export const router = createBrowserRouter(
         { path: 'coupons', element: withSuspense(<CouponCenterPage />) },
         { path: 'polls', element: withSuspense(<PollPage />) },
         { path: 'live-calendar', element: withSuspense(<LiveCalendarPage />) },
+        { path: 'orders', element: withSuspense(<PurchaseHistoryPage />) },
+        { path: 'forum', element: withSuspense(<ForumPage />) },
+        { path: 'inbox', element: withSuspense(<InboxPageRoute />) },
+        { path: 'ai-writer', element: withSuspense(<AIWriterPage />) },
+        { path: 'tracker', element: withSuspense(<OrderTrackerPage />) },
         { path: 'shop/shorts', element: withSuspense(<ShortVideoPage />) },
         { path: 'shop/shorts/:id', element: withSuspense(<ShortVideoDetailPage />) },
         { path: 'shop/shorts/creator/:creatorId', element: withSuspense(<ShortVideoCreatorPage />) },
