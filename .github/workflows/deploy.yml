@@ -24,7 +24,21 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm install --no-audit --no-fund
+      - name: Create .env file
+        if: env.VITE_MIMO_API_KEY != ''
+        run: |
+          cat > .env << EOF
+          VITE_MIMO_API_KEY=${{ secrets.VITE_MIMO_API_KEY }}
+          VITE_MIMO_BASE_URL=https://api.xiaomimimo.com/v1
+          VITE_MIMO_MODEL=mimo-v2.5
+          VITE_MIMO_ENABLED=true
+          EOF
       - run: npm run build
+        env:
+          VITE_MIMO_API_KEY: ${{ secrets.VITE_MIMO_API_KEY }}
+          VITE_MIMO_BASE_URL: https://api.xiaomimimo.com/v1
+          VITE_MIMO_MODEL: mimo-v2.5
+          VITE_MIMO_ENABLED: 'true'
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
