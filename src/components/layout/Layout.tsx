@@ -5,6 +5,7 @@ import { MobileNav } from './MobileNav'
 import { Toaster } from '../ui/Toaster'
 import { useTheme } from '../../hooks/useTheme'
 import { SupportWidget, SupportQuickChat } from './SupportWidget'
+import { PageTransition } from './PageTransition'
 
 export function Layout() {
   useTheme()
@@ -12,7 +13,7 @@ export function Layout() {
     <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-1 pt-16 pb-24 md:pb-0">
-        <Outlet />
+        <PageTransition />
       </main>
       <Footer />
       <MobileNav />
