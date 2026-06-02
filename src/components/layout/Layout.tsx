@@ -18,12 +18,14 @@ import { PROMPTS } from '../../data/prompts'
 import { PWAStatus } from '../PWAStatus'
 import { CommandPalette } from '../CommandPalette'
 import { LiveCountdownBanner } from '../LiveCountdownBanner'
+import { ScrollProgress } from '../ScrollProgress'
 
 export function Layout() {
   useTheme()
   const { helpOpen, setHelpOpen } = useGlobalShortcuts()
   return (
     <div className="min-h-screen flex flex-col">
+      <ScrollProgress />
       <OfflineBanner />
       <SkipLink />
       <LiveCountdownBanner />
