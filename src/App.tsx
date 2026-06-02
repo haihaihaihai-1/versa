@@ -119,6 +119,14 @@ const GiftLeaderboardPage = lazy(() => import('./pages/GiftLeaderboardPage').the
 const RedPacketPage = lazy(() => import('./pages/RedPacketPage').then(m => ({ default: m.RedPacketPage })))
 const GroupBuyPage = lazy(() => import('./pages/GroupBuyPage').then(m => ({ default: m.GroupBuyPage })))
 const DebateLeaderboardPage = lazy(() => import('./pages/DebateLeaderboardPage').then(m => ({ default: m.DebateLeaderboardPage })))
+const ProductQAV2Page = lazy(() => import('./pages/ProductQAV2Page').then(m => ({ default: m.ProductQAV2Page })))
+const LivePKPage = lazy(() => import('./pages/LivePKPage').then(m => ({ default: m.LivePKPage })))
+const CreatorAcademyPage = lazy(() => import('./pages/CreatorAcademyPage').then(m => ({ default: m.CreatorAcademyPage })))
+const LiveShopWindowPage = lazy(() => import('./pages/LiveShopWindowPage').then(m => ({ default: m.LiveShopWindowPage })))
+const Product3DPage = lazy(() => import('./pages/Product3DPage').then(m => ({ default: m.Product3DPage })))
+const ReplayEditorPage = lazy(() => import('./pages/ReplayEditorPage').then(m => ({ default: m.ReplayEditorPage })))
+const MerchantOnboardingPage = lazy(() => import('./pages/MerchantOnboardingPage').then(m => ({ default: m.MerchantOnboardingPage })))
+const InviteV2Page = lazy(() => import('./pages/InviteV2Page').then(m => ({ default: m.InviteV2Page })))
 
 export const router = createBrowserRouter(
   [
@@ -198,6 +206,15 @@ export const router = createBrowserRouter(
         { path: 'redpacket', element: withSuspense(<RedPacketPage />) },
         { path: 'groupbuy', element: withSuspense(<GroupBuyPage />) },
         { path: 'debate-leaderboard', element: withSuspense(<DebateLeaderboardPage />) },
+        { path: 'qa-v2', element: withSuspense(<ProductQAV2Page />) },
+        { path: 'qa-v2/:productId', element: withSuspense(<ProductQAV2Page />) },
+        { path: 'live-pk', element: withSuspense(<LivePKPage />) },
+        { path: 'academy', element: withSuspense(<CreatorAcademyPage />) },
+        { path: 'live-shop', element: withSuspense(<LiveShopWindowPage />) },
+        { path: 'product-3d/:id', element: withSuspense(<Product3DPage />) },
+        { path: 'replay-editor', element: withSuspense(<ReplayEditorPage />) },
+        { path: 'merchant', element: withSuspense(<MerchantOnboardingPage />) },
+        { path: 'invite-v2', element: withSuspense(<InviteV2Page />) },
         { path: 'shop/shorts', element: withSuspense(<ShortVideoPage />) },
         { path: 'shop/shorts/:id', element: withSuspense(<ShortVideoDetailPage />) },
         { path: 'shop/shorts/creator/:creatorId', element: withSuspense(<ShortVideoCreatorPage />) },

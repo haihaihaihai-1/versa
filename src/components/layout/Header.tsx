@@ -5,7 +5,7 @@ import {
   ShoppingCart, User, Bell, LogOut, Settings, ChevronDown, Sparkles,
   Search, Plus, MessageCircle, Users, Shield, Calendar, FileText,
   StickyNote, Video, Palette, LayoutDashboard, Inbox, Vote, Hash, Heart, Ticket,
-  Package, Mail, MessageSquare, Truck, GitCompare, BarChart3, Trophy, Gift,
+  Package, Mail, MessageSquare, Truck, GitCompare, BarChart3, Trophy, Gift, Scissors, BookOpen, Building,
 } from 'lucide-react'
 import { versa, useVersa, useCartTotals } from '../../store/versa'
 import { useScrollPosition } from '../../hooks/useScrollPosition'
@@ -239,6 +239,13 @@ export function Header() {
                         { to: '/debate-leaderboard', label: '辩论榜', icon: Scale },
                         { to: '/redpacket', label: '直播红包', icon: Gift },
                         { to: '/groupbuy', label: '超级拼团', icon: Users },
+                        { to: '/qa-v2', label: '商品问答', icon: MessageCircle },
+                        { to: '/live-pk', label: '主播 PK', icon: Trophy },
+                        { to: '/academy', label: '创作者学院', icon: BookOpen },
+                        { to: '/live-shop', label: '直播橱窗', icon: ShoppingBag },
+                        { to: '/replay-editor', label: '回放剪辑', icon: Scissors },
+                        { to: '/merchant', label: '商家入驻', icon: Building },
+                        { to: '/invite-v2', label: '邀请 2.0', icon: Gift },
                       ].map((item) => (
                         <Link
                           key={item.to}
