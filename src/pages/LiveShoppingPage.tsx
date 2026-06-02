@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import { DanmuOverlay, useDanmuStream } from '../components/live/DanmuOverlay'
 import { GiftPanel, fireGiftToast, type Gift as GiftItem } from '../components/live/GiftPanel'
+import { LiveLeaderboard } from '../components/live/LiveLeaderboard'
 import { cn, formatCurrency, formatNumber, uid } from '../lib/utils'
 
 interface LiveRoom {
@@ -502,6 +503,7 @@ function LiveRoom({ room }: { room?: LiveRoom }) {
 
         {/* 右侧商品列表 */}
         <div className="space-y-4">
+          <LiveLeaderboard roomId={room.id} limit={5} />
           <div className="flex items-center justify-between">
             <h3 className="font-bold text-base">本场商品 ({liveProducts.length})</h3>
             <button
