@@ -1,14 +1,21 @@
 import { Link, useSearchParams } from 'react-router-dom'
+import { useEffect } from 'react'
 import { CheckCircle2, Package, ArrowRight, Sparkles } from 'lucide-react'
 import { Button } from '../components/ui/Button'
 import { useVersa } from '../store/versa'
 import { formatCurrency, formatDate } from '../lib/utils'
+import { fireConfetti } from '../components/Confetti'
 
 export function CheckoutSuccessPage() {
   const [params] = useSearchParams()
   const { orders } = useVersa()
   const orderId = params.get('order')
   const order = orders.find((o) => o.id === orderId)
+
+  useEffect(() => {
+    if (order) fireConfetti(80)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [orderId])
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-16 text-center">

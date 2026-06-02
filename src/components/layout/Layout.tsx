@@ -19,6 +19,7 @@ import { PWAStatus } from '../PWAStatus'
 import { CommandPalette } from '../CommandPalette'
 import { LiveCountdownBanner } from '../LiveCountdownBanner'
 import { ScrollProgress } from '../ScrollProgress'
+import { ConfettiHost } from '../Confetti'
 
 export function Layout() {
   useTheme()
@@ -44,6 +45,7 @@ export function Layout() {
       <AIFloatingButton systemPrompt={PROMPTS.customerService} title="Versa AI 助手" />
       <PWAStatus />
       <CommandPalette />
+      <ConfettiHost />
       <Toaster />
       <KeyboardShortcutsHelp open={helpOpen} onClose={() => setHelpOpen(false)} />
       <ScrollRestoration />
