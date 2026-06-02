@@ -82,6 +82,7 @@ const LiveSchedulePage = lazy(() => import('./pages/LiveSchedulePage').then(m =>
 const HelpCenterPage = lazy(() => import('./pages/HelpCenterPage').then(m => ({ default: m.HelpCenterPage })))
 const ProductQAPage = lazy(() => import('./pages/ProductQAPage').then(m => ({ default: m.ProductQAPage })))
 const OrderTrackingPage = lazy(() => import('./pages/OrderTrackingPage').then(m => ({ default: m.OrderTrackingPage })))
+const AchievementsPage = lazy(() => import('./pages/AchievementsPage').then(m => ({ default: m.AchievementsPage })))
 
 export const router = createBrowserRouter(
   [
@@ -122,6 +123,7 @@ export const router = createBrowserRouter(
         { path: 'qa', element: withSuspense(<ProductQAPage />) },
         { path: 'qa/:productId', element: withSuspense(<ProductQAPage />) },
         { path: 'tracking/:orderId', element: withSuspense(<OrderTrackingPage />) },
+        { path: 'achievements', element: withSuspense(<AchievementsPage />) },
         { path: 'shop/shorts', element: withSuspense(<ShortVideoPage />) },
         { path: 'shop/shorts/:id', element: withSuspense(<ShortVideoDetailPage />) },
         { path: 'shop/shorts/creator/:creatorId', element: withSuspense(<ShortVideoCreatorPage />) },
