@@ -1,7 +1,9 @@
 import { useEffect, useState, useCallback, useMemo } from 'react'
-import type { AppState, CartItem, Order, UserProfile, Activity, ModuleKey, AfterSalesRequest, ProductReview, AfterSalesType, UserCoupon, UserInvoice, UserAddress, ShortVideo, ShortVideoComment, ChatMessage, SupportTicket, PointsRecord, TaskItem } from '../data/types'
+import type { AppState, CartItem, Order, UserProfile, Activity, ModuleKey, AfterSalesRequest, ProductReview, AfterSalesType, UserCoupon, UserInvoice, UserAddress, ShortVideo, ShortVideoComment, ChatMessage, SupportTicket, PointsRecord, TaskItem, ProductQA } from '../data/types'
+
 import { seedShortVideos, seedShortVideoComments } from '../data/shortVideos'
 import { seedReviews } from '../data/reviews'
+import { seedProductQAs } from '../data/productQAs'
 import { seedFAQs, seedTickets, seedChatMessages, BOT_INTENTS } from '../data/support'
 import { seedSignInDays, seedTasks, seedRewards } from '../data/member'
 import { seedMessages } from '../data/messages'
@@ -38,6 +40,7 @@ function defaultState(): AppState {
     orders: [],
     afterSales: [],
     reviews: seedReviews,
+    productQAs: seedProductQAs,
     coupons: [
       { id: 'c1', name: '新人专享', amount: 30, threshold: 100, scope: 'all', expiresAt: '2099-12-31', description: '满 100 可用' },
       { id: 'c2', name: '数码专享', amount: 50, threshold: 500, scope: 'category', scopeValue: 'tech', expiresAt: '2099-12-31', description: '数码类满 500 可用' },
@@ -449,6 +452,55 @@ export const versa = {
       ...s,
       reviews: s.reviews.map((r) =>
         r.id === reviewId ? { ...r, helpful: (r.helpful || 0) + 1 } : r
+      ),
+    }))
+  },
+
+  // product QAs
+  askProductQuestion(productId: string, question: string, authorName: string) {
+    const qa: ProductQA = {
+      id: uid('qa'),
+      productId,
+      question,
+      authorName,
+      askedAt: new Date().toISOString(),
+      helpful: 0,
+    }
+    setState((s) => ({ ...s, productQAs: [qa, ...s.productQAs] }))
+    return qa
+  },
+
+  answerProductQuestion(qaId: string, answer: string, fromName: string, isOfficial = false) {
+    setState((s) => ({
+      ...s,
+      productQAs: s.productQAs.map((q) =>
+        q.id === qaId
+          ? {
+              ...q,
+              answer,
+              answeredBy: fromName,
+              answerAt: new Date().toISOString(),
+              answers: [
+                ...(q.answers || []),
+                {
+                  id: uid('qar'),
+                  content: answer,
+                  at: new Date().toISOString(),
+                  fromName,
+                  isOfficial,
+                },
+              ],
+            }
+          : q
+      ),
+    }))
+  },
+
+  markQAHelpful(qaId: string) {
+    setState((s) => ({
+      ...s,
+      productQAs: s.productQAs.map((q) =>
+        q.id === qaId ? { ...q, helpful: q.helpful + 1 } : q
       ),
     }))
   },

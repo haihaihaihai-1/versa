@@ -365,6 +365,20 @@ export interface ReviewReply {
   isOfficial?: boolean
 }
 
+export interface ProductQA {
+  id: string
+  productId: string
+  question: string
+  answer?: string
+  answeredBy?: string
+  answerAt?: string
+  authorName: string
+  askedAt: string
+  helpful: number
+  answers?: { id: string; content: string; at: string; fromName: string; isOfficial?: boolean }[]
+  verified?: boolean
+}
+
 export interface Order {
   id: string
   items: { productId: string; name: string; price: number; quantity: number; image: string }[]
@@ -396,6 +410,7 @@ export interface AppState {
   orders: Order[]
   afterSales: AfterSalesRequest[]
   reviews: ProductReview[]
+  productQAs: ProductQA[]
   coupons: UserCoupon[]
   invoices: UserInvoice[]
   addresses: UserAddress[]

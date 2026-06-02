@@ -324,12 +324,12 @@ export function ProductDetailV2() {
                   <p className="text-[10px] text-ink-500">已购买用户的真实问答 · {qaList.length} 条</p>
                 </div>
               </div>
-              <button
-                onClick={() => { setTab('qna'); setShowQnaPreview(false) }}
+              <Link
+                to={`/qa/${product.id}`}
                 className="text-xs text-amber-700 dark:text-amber-400 hover:underline flex items-center gap-0.5"
               >
-                查看全部 <ChevronRight className="w-3 h-3" />
-              </button>
+                全部问答 <ChevronRight className="w-3 h-3" />
+              </Link>
             </div>
             <div className="space-y-2.5">
               {qaList.slice(0, 2).map((qa: QA, i: number) => (
