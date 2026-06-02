@@ -26,6 +26,7 @@ const NAV_ITEMS = [
   { path: '/discover/ai', label: 'AI 智能搜索', icon: Sparkles, group: 'AI 工具' },
   { path: '/insights', label: '个人数据看板', icon: Sparkles, group: 'AI 工具' },
   { path: '/achievements', label: '成就中心', icon: Sparkles, group: '个人中心' },
+  { path: '/smartlist', label: '智能购物清单', icon: Sparkles, group: 'AI 工具' },
   { path: '/profile', label: '我的资料', icon: User, group: '个人中心' },
   { path: '/settings', label: '设置', icon: Settings, group: '个人中心' },
   { path: '/creator-center', label: '创作者中心', icon: Sparkles, group: 'AI 工具' },
