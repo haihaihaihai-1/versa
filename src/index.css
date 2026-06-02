@@ -178,3 +178,27 @@ html.dark .skeleton {
   100% { box-shadow: 0 0 0 16px color-mix(in oklab, var(--color-nova-500) 0%, transparent); }
 }
 .pulse-ring { animation: pulse-ring 1.6s cubic-bezier(0.66, 0, 0, 1) infinite; }
+
+/* 可访问性 - 焦点环 */
+*:focus-visible {
+  outline: 2px solid var(--color-nova-500);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--color-nova-500);
+  outline-offset: 2px;
+}
+
+/* 减少动效 - 尊重用户偏好 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
