@@ -17,6 +17,7 @@ import { ServiceGuarantees } from '../components/shop/ServiceGuarantees'
 import { ReviewList } from '../components/shop/ReviewList'
 import { Lightbox } from '../components/Lightbox'
 import { ShareCard } from '../components/ShareCard'
+import { PriceHistory } from '../components/shop/PriceHistory'
 import { cn, formatCurrency, formatNumber } from '../lib/utils'
 import { toast } from '../components/ui/Toaster'
 import type { SkuSelection } from '../data/types'
@@ -408,6 +409,13 @@ export function ProductDetailV2() {
               </div>
             )}
             {tab === 'specs' && (
+              <>
+              <div className="max-w-2xl mb-4">
+                <PriceHistory productId={product.id} currentPrice={product.price} days={30} height={80} />
+              </div>
+              <div className="max-w-2xl mb-4">
+                <PriceHistory productId={product.id} currentPrice={product.price} days={30} height={80} />
+              </div>
               <div className="max-w-2xl rounded-xl border border-ink-200 dark:border-ink-800 overflow-hidden">
                 <table className="w-full text-sm">
                   <tbody>
@@ -420,6 +428,7 @@ export function ProductDetailV2() {
                   </tbody>
                 </table>
               </div>
+              </>
             )}
             {tab === 'reviews' && product.reviews && (
               <ReviewList reviews={product.reviews} rating={product.rating} reviewCount={product.reviewCount} />
