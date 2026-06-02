@@ -262,6 +262,7 @@ export function Header() {
                         { to: '/tools/insights', label: '洞察中心', icon: Target },
                         { to: '/tools/create', label: '创作中心', icon: Palette },
                         { to: '/tools/dev', label: '开发工具', icon: Edit3 },
+                        { to: '/tools/fun', label: '娱乐中心', icon: Sparkles },
                       ].map((item) => (
                         <Link
                           key={item.to}
