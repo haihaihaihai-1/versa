@@ -7,8 +7,10 @@ import { ProductCardV2 } from '../components/shop/ProductCardV2'
 import { toast } from '../components/ui/Toaster'
 import {
   Tv, Play, Heart, Share2, Users, Eye, ShoppingCart, Zap, Star, MessageCircle,
-  Sparkles, Send, ChevronRight, Flame, Crown, Award, X, Plus, ChevronUp, Calendar
+  Sparkles, Send, ChevronRight, Flame, Crown, Award, X, Plus, ChevronUp, Calendar,
+  MessageSquare
 } from 'lucide-react'
+import { DanmuOverlay, useDanmuStream } from '../components/live/DanmuOverlay'
 import { cn, formatCurrency, formatNumber, uid } from '../lib/utils'
 
 interface LiveRoom {
@@ -289,6 +291,7 @@ function LiveRoom({ room }: { room?: LiveRoom }) {
   const [chatInput, setChatInput] = useState('')
   const [viewerCount, setViewerCount] = useState(0)
   const [showProducts, setShowProducts] = useState(true)
+  const [danmuEnabled, setDanmuEnabled] = useState(true)
 
   useEffect(() => {
     if (!room) return
@@ -296,13 +299,13 @@ function LiveRoom({ room }: { room?: LiveRoom }) {
     const interval = setInterval(() => {
       setViewerCount((c) => c + Math.floor(Math.random() * 50) - 20)
       // 随机弹幕
-      if (Math.random() > 0.5) {
+      if (danmuEnabled && Math.random() > 0.5) {
         const d = FAKE_DANMU[Math.floor(Math.random() * FAKE_DANMU.length)]
         setDanmu((prev) => [...prev.slice(-10), { id: uid('d'), ...d }])
       }
     }, 3000)
     return () => clearInterval(interval)
-  }, [room?.id])
+  }, [room?.id, danmuEnabled])
 
   if (!room) {
     return (
@@ -341,6 +344,9 @@ function LiveRoom({ room }: { room?: LiveRoom }) {
             <img src={room.cover} alt="" className="absolute inset-0 w-full h-full object-cover opacity-70" />
             <div className="absolute inset-0 bg-gradient-to-t from-ink-950/80 via-transparent to-ink-950/40" />
 
+            {/* 弹幕浮层 */}
+            <DanmuOverlay danmus={danmu} />
+
             {/* 顶部状态条 */}
             <div className="absolute top-4 left-4 right-4 flex items-center justify-between flex-wrap gap-2 z-10">
               <div className="flex items-center gap-2">
@@ -361,6 +367,18 @@ function LiveRoom({ room }: { room?: LiveRoom }) {
                 </button>
                 <button onClick={() => navigate('/shop/live')} className="w-9 h-9 rounded-full bg-ink-950/50 backdrop-blur-md text-white flex items-center justify-center hover:bg-ink-950/70">
                   <X className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => {
+                    setDanmuEnabled((v) => {
+                      toast(!v ? '已开启弹幕' : '已关闭弹幕', 'info')
+                      return !v
+                    })
+                  }}
+                  className="px-3 h-9 rounded-full bg-ink-950/50 backdrop-blur-md text-white text-xs flex items-center gap-1 hover:bg-ink-950/70"
+                >
+                  <MessageSquare className="w-3.5 h-3.5" />
+                  弹幕
                 </button>
               </div>
             </div>
@@ -441,17 +459,24 @@ function LiveRoom({ room }: { room?: LiveRoom }) {
           )}
 
           {/* 互动输入 */}
-          <div className="rounded-2xl bg-white/80 dark:bg-ink-900/40 border border-ink-200/60 dark:border-ink-800/60 p-3 flex items-center gap-2">
-            <input
-              value={chatInput}
-              onChange={(e) => setChatInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-              placeholder="说点什么..."
-              className="flex-1 px-3 h-9 rounded-full bg-ink-50 dark:bg-ink-800 text-sm outline-none focus:bg-white dark:focus:bg-ink-900 border border-transparent focus:border-rose-500"
-            />
-            <button onClick={handleSendMessage} className="w-9 h-9 rounded-full bg-rose-500 text-white flex items-center justify-center hover:bg-rose-600">
-              <Send className="w-4 h-4" />
-            </button>
+          <div className="rounded-2xl bg-white/80 dark:bg-ink-900/40 border border-ink-200/60 dark:border-ink-800/60 p-3 space-y-2">
+            <div className="flex items-center gap-2">
+              <input
+                value={chatInput}
+                onChange={(e) => setChatInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                placeholder="发条弹幕飘过~"
+                className="flex-1 px-3 h-9 rounded-full bg-ink-50 dark:bg-ink-800 text-sm outline-none focus:bg-white dark:focus:bg-ink-900 border border-transparent focus:border-rose-500"
+              />
+              <button onClick={handleSendMessage} className="w-9 h-9 rounded-full bg-gradient-to-r from-rose-500 to-pink-500 text-white flex items-center justify-center hover:scale-105 transition shadow">
+                <Send className="w-4 h-4" />
+              </button>
+            </div>
+            <p className="text-[10px] text-ink-500 flex items-center gap-1">
+              <MessageSquare className="w-3 h-3" />
+              弹幕会从直播间飘过
+              {danmu.length > 0 && ` · 当前 ${danmu.length} 条`}
+            </p>
           </div>
         </div>
 
