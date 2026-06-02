@@ -4,13 +4,17 @@ import { Footer } from './Footer'
 import { MobileNav } from './MobileNav'
 import { Toaster } from '../ui/Toaster'
 import { useTheme } from '../../hooks/useTheme'
+import { useGlobalShortcuts } from '../../hooks/useGlobalShortcuts'
 import { SupportWidget, SupportQuickChat } from './SupportWidget'
 import { PageTransition } from './PageTransition'
 import { ErrorBoundary } from '../ErrorBoundary'
 import { SkipLink } from '../a11y/SkipLink'
+import { KeyboardShortcutsHelp } from '../a11y/KeyboardShortcutsHelp'
+import { KeyboardHelpButton } from '../a11y/KeyboardHelpButton'
 
 export function Layout() {
   useTheme()
+  const { helpOpen, setHelpOpen } = useGlobalShortcuts()
   return (
     <div className="min-h-screen flex flex-col">
       <SkipLink />
@@ -24,7 +28,9 @@ export function Layout() {
       <MobileNav />
       <SupportQuickChat />
       <SupportWidget />
+      <KeyboardHelpButton />
       <Toaster />
+      <KeyboardShortcutsHelp open={helpOpen} onClose={() => setHelpOpen(false)} />
       <ScrollRestoration />
     </div>
   )
