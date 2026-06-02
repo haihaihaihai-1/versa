@@ -39,6 +39,7 @@ const CuratorPage = lazy(() => import('./pages/CuratorPage'))
 const AddressBookPage = lazy(() => import('./pages/AddressBookPage'))
 const FlashSalePage = lazy(() => import('./pages/FlashSalePage'))
 const ForYouPage = lazy(() => import('./pages/ForYouPage').then(m => ({ default: m.ForYouPage })))
+const CampaignPage = lazy(() => import('./pages/CampaignPage').then(m => ({ default: m.CampaignPage })))
 const DebateHomePage = lazy(() => import('./pages/DebateHomePage').then(m => ({ default: m.DebateHomePage })))
 const DebateDetailV2 = lazy(() => import('./pages/DebateDetailV2').then(m => ({ default: m.DebateDetailV2 })))
 const RoundTablePage = lazy(() => import('./pages/RoundTablePage').then(m => ({ default: m.RoundTablePage })))
@@ -114,6 +115,8 @@ export const router = createBrowserRouter(
         { path: 'shop/curator', element: withSuspense(<CuratorPage />) },
         { path: 'shop/flash', element: withSuspense(<FlashSalePage />) },
         { path: 'foryou', element: withSuspense(<ForYouPage />) },
+        { path: 'campaign', element: withSuspense(<CampaignPage />) },
+        { path: 'campaign/:id', element: withSuspense(<CampaignPage />) },
         { path: 'shop/:id', element: withSuspense(<ProductDetailV2 />) },
         { path: 'shop-legacy', element: withSuspense(<ShopListPage />) },
         { path: 'shop-legacy/:id', element: withSuspense(<ProductDetailPage />) },
