@@ -98,8 +98,8 @@ export function ShopHomePage() {
           { icon: Video, label: '直播', to: '/shop/live', gradient: 'from-pink-500 to-rose-500', badge: 'LIVE' },
           { icon: Crown, label: '品牌街', to: '/shop/brands', gradient: 'from-amber-500 to-orange-500' },
           { icon: Package, label: '凑单套餐', to: '/shop/bundles', gradient: 'from-fuchsia-500 to-pink-500', badge: '省' },
+          { icon: Sparkles, label: '选品助手', to: '/shop/curator', gradient: 'from-violet-500 to-fuchsia-500', badge: 'AI' },
           { icon: GitCompareArrows, label: '商品对比', to: '/shop/compare', gradient: 'from-cyan-500 to-blue-500' },
-          { icon: Award, label: '官方旗舰', to: '/shop?section=flagship', gradient: 'from-violet-500 to-purple-500' },
           { icon: TrendingUp, label: '排行榜', to: '/shop?sort=sales', gradient: 'from-emerald-500 to-teal-500' },
         ].map((it) => (
           <Link

@@ -400,6 +400,23 @@ export interface AppState {
   bundles: BundleItem[]
 }
 
+export type ScenarioKey = 'outdoor' | 'home' | 'office' | 'gift' | 'student' | 'fitness'
+
+export interface Scenario {
+  key: ScenarioKey
+  name: string
+  desc: string
+  icon: string
+  gradient: string
+  productIds: string[]
+  tip: string
+}
+
+export interface PricePoint {
+  date: string
+  price: number
+}
+
 export type BundleType = 'bundle' | 'addon' | 'gift'
 
 export interface BundleItem {
