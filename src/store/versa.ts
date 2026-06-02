@@ -4,11 +4,12 @@ import { seedShortVideos, seedShortVideoComments } from '../data/shortVideos'
 import { seedFAQs, seedTickets, seedChatMessages, BOT_INTENTS } from '../data/support'
 import { seedSignInDays, seedTasks, seedRewards } from '../data/member'
 import { seedMessages } from '../data/messages'
+import { seedBundles } from '../data/bundles'
 import { seedUser } from '../data/users'
 import { uid } from '../lib/utils'
-const STORAGE_KEY = 'versa:state:v6'
+const STORAGE_KEY = 'versa:state:v7'
 
-const STATE_VERSION = 6
+const STATE_VERSION = 7
 
 const POINTS = {
   READ_ARTICLE: 5,
@@ -69,6 +70,7 @@ function defaultState(): AppState {
     tasks: seedTasks,
     redeemedRewards: [],
     messages: seedMessages,
+    bundles: seedBundles,
   }
 }
 
@@ -668,6 +670,21 @@ export const versa = {
   },
   togglePinMessage(id: string) {
     setState((s) => ({ ...s, messages: s.messages.map((m) => (m.id === id ? { ...m, pinned: !m.pinned } : m)) }))
+  },
+
+  // bundles
+  addBundleToCart(bundleId: string) {
+    setState((s) => {
+      const b = s.bundles.find((x) => x.id === bundleId)
+      if (!b) return s
+      const newCart = [...s.cart]
+      b.products.forEach((p) => {
+        const ex = newCart.find((c) => c.productId === p.productId)
+        if (ex) ex.quantity += p.quantity
+        else newCart.push({ productId: p.productId, quantity: p.quantity, addedAt: new Date().toISOString(), selected: true })
+      })
+      return { ...s, cart: newCart }
+    })
   },
 
   // reset

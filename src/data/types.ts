@@ -274,6 +274,7 @@ export interface CartItem {
   productId: string
   quantity: number
   addedAt: string
+  selected?: boolean
 }
 
 export type UserCoupon = {
@@ -396,6 +397,24 @@ export interface AppState {
   tasks: TaskItem[]
   redeemedRewards: string[]
   messages: AppMessage[]
+  bundles: BundleItem[]
+}
+
+export type BundleType = 'bundle' | 'addon' | 'gift'
+
+export interface BundleItem {
+  id: string
+  name: string
+  desc: string
+  type: BundleType
+  coverGradient: string
+  products: { productId: string; quantity: number }[]
+  bundlePrice: number
+  originalPrice: number
+  addonPrice?: number
+  addonThreshold?: number
+  badge?: string
+  endsAt?: string
 }
 
 export type MessageCategory = 'shipping' | 'promo' | 'interact' | 'system'
