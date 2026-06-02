@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   /* Versa 三色体系 */
   --color-ink-50:  #f6f6fb;
