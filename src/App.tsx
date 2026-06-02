@@ -84,6 +84,14 @@ const ProductQAPage = lazy(() => import('./pages/ProductQAPage').then(m => ({ de
 const OrderTrackingPage = lazy(() => import('./pages/OrderTrackingPage').then(m => ({ default: m.OrderTrackingPage })))
 const AchievementsPage = lazy(() => import('./pages/AchievementsPage').then(m => ({ default: m.AchievementsPage })))
 const InsightsPage = lazy(() => import('./pages/InsightsPage').then(m => ({ default: m.InsightsPage })))
+const CreatorCenterPage = lazy(() => import('./pages/CreatorCenterPage').then(m => ({ default: m.CreatorCenterPage })))
+const ActivityDetailPage = lazy(() => import('./pages/ActivityDetailPage').then(m => ({ default: m.ActivityDetailPage })))
+const InvitePage = lazy(() => import('./pages/InvitePage').then(m => ({ default: m.InvitePage })))
+const LiveChatPage = lazy(() => import('./pages/LiveChatPage').then(m => ({ default: m.LiveChatPage })))
+const SmartWishlistPage = lazy(() => import('./pages/WishlistDetailPage').then(m => ({ default: m.SmartWishlistPage })))
+const ServerErrorPage = lazy(() => import('./pages/NotFoundPage').then(m => ({ default: m.ServerErrorPage })))
+const MaintenancePage = lazy(() => import('./pages/NotFoundPage').then(m => ({ default: m.MaintenancePage })))
+const OfflinePage = lazy(() => import('./pages/NotFoundPage').then(m => ({ default: m.OfflinePage })))
 
 export const router = createBrowserRouter(
   [
@@ -126,6 +134,15 @@ export const router = createBrowserRouter(
         { path: 'tracking/:orderId', element: withSuspense(<OrderTrackingPage />) },
         { path: 'achievements', element: withSuspense(<AchievementsPage />) },
         { path: 'insights', element: withSuspense(<InsightsPage />) },
+        { path: 'creator-center', element: withSuspense(<CreatorCenterPage />) },
+        { path: 'activity', element: withSuspense(<ActivityDetailPage />) },
+        { path: 'activity/:id', element: withSuspense(<ActivityDetailPage />) },
+        { path: 'invite', element: withSuspense(<InvitePage />) },
+        { path: 'support/chat', element: withSuspense(<LiveChatPage />) },
+        { path: 'wishlist/collections', element: withSuspense(<SmartWishlistPage />) },
+        { path: 'demo/500', element: withSuspense(<ServerErrorPage />) },
+        { path: 'demo/maintenance', element: withSuspense(<MaintenancePage />) },
+        { path: 'demo/offline', element: withSuspense(<OfflinePage />) },
         { path: 'shop/shorts', element: withSuspense(<ShortVideoPage />) },
         { path: 'shop/shorts/:id', element: withSuspense(<ShortVideoDetailPage />) },
         { path: 'shop/shorts/creator/:creatorId', element: withSuspense(<ShortVideoCreatorPage />) },
