@@ -260,6 +260,7 @@ export function Header() {
                         { to: '/tools/life', label: '生活中心', icon: LayoutDashboard },
                         { to: '/tools/explore', label: '探索中心', icon: BookOpen },
                         { to: '/tools/insights', label: '洞察中心', icon: Target },
+                        { to: '/tools/create', label: '创作中心', icon: Palette },
                       ].map((item) => (
                         <Link
                           key={item.to}
