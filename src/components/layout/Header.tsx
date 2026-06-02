@@ -3,7 +3,8 @@ import { useState, useRef, useEffect } from 'react'
 import {
   Home, Newspaper, Scale, ShoppingBag, Sun, Moon, Monitor,
   ShoppingCart, User, Bell, LogOut, Settings, ChevronDown, Sparkles,
-  Search, Plus, MessageCircle, Users, Shield,
+  Search, Plus, MessageCircle, Users, Shield, Calendar, FileText,
+  StickyNote, Video, Palette, LayoutDashboard,
 } from 'lucide-react'
 import { versa, useVersa, useCartTotals } from '../../store/versa'
 import { useScrollPosition } from '../../hooks/useScrollPosition'
@@ -209,6 +210,13 @@ export function Header() {
                         { to: '/profile', label: '个人中心', icon: User },
                         { to: '/profile/orders', label: '我的订单', icon: ShoppingBag },
                         { to: '/settings', label: '账号设置', icon: Settings },
+                        { to: '/dashboard', label: '工作台', icon: LayoutDashboard },
+                        { to: '/smartlist', label: '智能清单', icon: Sparkles },
+                        { to: '/calendar', label: '我的日程', icon: Calendar },
+                        { to: '/notes', label: '笔记', icon: FileText },
+                        { to: '/quicknotes', label: '便签墙', icon: StickyNote },
+                        { to: '/live-subs', label: '直播订阅', icon: Video },
+                        { to: '/theme', label: '主题定制', icon: Palette },
                       ].map((item) => (
                         <Link
                           key={item.to}

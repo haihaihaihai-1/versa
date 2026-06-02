@@ -19,6 +19,7 @@ import { Lightbox } from '../components/Lightbox'
 import { ShareCard } from '../components/ShareCard'
 import { PriceHistory } from '../components/shop/PriceHistory'
 import { RecentlyViewed, useRecentlyViewed } from '../components/RecentlyViewed'
+import { ProductBundle } from '../components/ProductBundle'
 import { cn, formatCurrency, formatNumber } from '../lib/utils'
 import { toast } from '../components/ui/Toaster'
 import type { SkuSelection } from '../data/types'
@@ -501,6 +502,10 @@ export function ProductDetailV2() {
 
         <div className="mt-8">
           <RecentlyViewed excludeId={product.id} />
+        </div>
+
+        <div className="mt-8">
+          <ProductBundle productId={product.id} />
         </div>
       </div>
 

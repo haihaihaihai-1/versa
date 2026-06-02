@@ -97,6 +97,10 @@ const SmartListPage = lazy(() => import('./pages/SmartListPage').then(m => ({ de
 const NotesPage = lazy(() => import('./pages/NotesPage').then(m => ({ default: m.NotesPage })))
 const LiveReplayPage = lazy(() => import('./pages/LiveReplayPage').then(m => ({ default: m.LiveReplayPage })))
 const QuickNotesPage = lazy(() => import('./pages/QuickNotesPage').then(m => ({ default: m.QuickNotesPage })))
+const CalendarPage = lazy(() => import('./pages/CalendarPage').then(m => ({ default: m.CalendarPage })))
+const LiveSubsPage = lazy(() => import('./pages/LiveSubsPage').then(m => ({ default: m.LiveSubsPage })))
+const ThemeBuilderPage = lazy(() => import('./pages/ThemeBuilderPage').then(m => ({ default: m.ThemeBuilderPage })))
+const UserDashboardPage = lazy(() => import('./pages/UserDashboardPage').then(m => ({ default: m.UserDashboardPage })))
 
 export const router = createBrowserRouter(
   [
@@ -154,6 +158,10 @@ export const router = createBrowserRouter(
         { path: 'smartlist', element: withSuspense(<SmartListPage />) },
         { path: 'notes', element: withSuspense(<NotesPage />) },
         { path: 'quicknotes', element: withSuspense(<QuickNotesPage />) },
+        { path: 'calendar', element: withSuspense(<CalendarPage />) },
+        { path: 'live-subs', element: withSuspense(<LiveSubsPage />) },
+        { path: 'theme', element: withSuspense(<ThemeBuilderPage />) },
+        { path: 'dashboard', element: withSuspense(<UserDashboardPage />) },
         { path: 'shop/shorts', element: withSuspense(<ShortVideoPage />) },
         { path: 'shop/shorts/:id', element: withSuspense(<ShortVideoDetailPage />) },
         { path: 'shop/shorts/creator/:creatorId', element: withSuspense(<ShortVideoCreatorPage />) },
