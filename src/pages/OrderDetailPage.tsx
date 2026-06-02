@@ -114,7 +114,7 @@ export function OrderDetailPage() {
           {order.status === 'shipped' && (
             <>
               <Button onClick={() => { versa.confirmReceipt(order.id); toast('已确认收货 🎉', 'success') }} size="sm">确认收货</Button>
-              <Button variant="outline" size="sm" onClick={() => setShowLogistics(true)}>查看物流</Button>
+              <Button variant="outline" size="sm" onClick={() => navigate(`/tracking/${order.id}`)}>查看物流</Button>
               <Button variant="outline" size="sm" onClick={() => toast('已申请延长收货', 'success')}>延长收货</Button>
             </>
           )}
