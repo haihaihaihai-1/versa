@@ -21,6 +21,7 @@ import ShortVideoDetailPage from './pages/ShortVideoDetailPage'
 import ShortVideoCreatorPage from './pages/ShortVideoCreatorPage'
 import SupportPage from './pages/SupportPage'
 import MemberPage from './pages/MemberPage'
+import NotificationsHubPage from './pages/NotificationsHubPage'
 import { DebateHomePage } from './pages/DebateHomePage'
 import { DebateDetailV2 } from './pages/DebateDetailV2'
 import { RoundTablePage } from './pages/RoundTablePage'
@@ -66,7 +67,7 @@ export const router = createBrowserRouter(
         { path: 'explore', element: <FeedPage /> },
         { path: 'search', element: <SearchPage /> },
         { path: 'notifications', element: <NotificationsPage /> },
-        { path: 'messages', element: <MessagesPage /> },
+        { path: 'messages', element: <NotificationsHubPage /> },
         { path: 'messages/:id', element: <ChatPage /> },
         { path: 'compose', element: <ComposePage /> },
         { path: 'groups', element: <GroupsPage /> },

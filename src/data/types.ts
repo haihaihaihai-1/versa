@@ -395,6 +395,26 @@ export interface AppState {
   signInDays: SignInDay[]
   tasks: TaskItem[]
   redeemedRewards: string[]
+  messages: AppMessage[]
+}
+
+export type MessageCategory = 'shipping' | 'promo' | 'interact' | 'system'
+export type MessageType = 'order_shipped' | 'order_delivered' | 'order_paid' | 'order_refunded' | 'coupon_received' | 'flash_sale' | 'price_drop' | 'member_upgrade' | 'comment_reply' | 'follow_post' | 'live_start' | 'system_announce' | 'security_alert' | 'task_reward'
+
+export interface AppMessage {
+  id: string
+  category: MessageCategory
+  type: MessageType
+  title: string
+  preview: string
+  content: string
+  icon: string
+  gradient: string
+  unread: boolean
+  pinned: boolean
+  link?: string
+  meta?: { orderId?: string; amount?: number; productId?: string; creatorId?: string }
+  at: string
 }
 
 export type ChatRole = 'user' | 'bot' | 'agent' | 'system'

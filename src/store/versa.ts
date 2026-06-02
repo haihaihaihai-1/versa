@@ -3,11 +3,12 @@ import type { AppState, CartItem, Order, UserProfile, Activity, ModuleKey, After
 import { seedShortVideos, seedShortVideoComments } from '../data/shortVideos'
 import { seedFAQs, seedTickets, seedChatMessages, BOT_INTENTS } from '../data/support'
 import { seedSignInDays, seedTasks, seedRewards } from '../data/member'
+import { seedMessages } from '../data/messages'
 import { seedUser } from '../data/users'
 import { uid } from '../lib/utils'
-const STORAGE_KEY = 'versa:state:v5'
+const STORAGE_KEY = 'versa:state:v6'
 
-const STATE_VERSION = 5
+const STATE_VERSION = 6
 
 const POINTS = {
   READ_ARTICLE: 5,
@@ -67,6 +68,7 @@ function defaultState(): AppState {
     signInDays: seedSignInDays,
     tasks: seedTasks,
     redeemedRewards: [],
+    messages: seedMessages,
   }
 }
 
@@ -649,6 +651,23 @@ export const versa = {
         pointsRecords: [record, ...s.pointsRecords],
       }
     })
+  },
+
+  // messages
+  markMessageRead(id: string) {
+    setState((s) => ({ ...s, messages: s.messages.map((m) => (m.id === id ? { ...m, unread: false } : m)) }))
+  },
+  markAllMessagesRead(category?: string) {
+    setState((s) => ({
+      ...s,
+      messages: s.messages.map((m) => (category && m.category !== category ? m : { ...m, unread: false })),
+    }))
+  },
+  deleteMessage(id: string) {
+    setState((s) => ({ ...s, messages: s.messages.filter((m) => m.id !== id) }))
+  },
+  togglePinMessage(id: string) {
+    setState((s) => ({ ...s, messages: s.messages.map((m) => (m.id === id ? { ...m, pinned: !m.pinned } : m)) }))
   },
 
   // reset

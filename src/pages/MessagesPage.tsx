@@ -1,15 +1,13 @@
-// ============== 消息列表 ==============
+// ============== 消息列表 (v2 社交私信) ==============
 
-import { useState, useEffect } from 'react'
-import { useParams, useNavigate, Link } from 'react-router-dom'
-import { ArrowLeft, Search, MessageCircle, Edit } from 'lucide-react'
+import { useState } from 'react'
+import { useNavigate, Link } from 'react-router-dom'
+import { Search, MessageCircle } from 'lucide-react'
 import { UserAvatar } from '../components/social/UserAvatar'
 import { useAuth } from '../api/AuthContext'
 import { useConversations, useApi } from '../api/hooks'
 import api from '../api'
 import { cn } from '../lib/utils'
-import { formatDistanceToNow } from 'date-fns'
-import { zhCN } from 'date-fns/locale'
 
 export function MessagesPage() {
   const { user: me } = useAuth()
@@ -37,7 +35,6 @@ export function MessagesPage() {
   return (
     <div className="max-w-3xl mx-auto px-4 py-6">
       <div className="bg-white dark:bg-ink-900 border border-ink-200 dark:border-ink-800 rounded-2xl overflow-hidden">
-        {/* Header */}
         <div className="p-4 border-b border-ink-200 dark:border-ink-800">
           <h2 className="font-bold text-xl mb-3">消息</h2>
           <div className="relative">
@@ -52,7 +49,6 @@ export function MessagesPage() {
           </div>
         </div>
 
-        {/* List */}
         {filtered.length === 0 ? (
           <div className="p-12 text-center">
             <MessageCircle className="w-12 h-12 mx-auto mb-3 text-ink-300" />
@@ -76,9 +72,7 @@ export function MessagesPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
                       <span className="font-semibold truncate">{other.displayName}</span>
-                      <span className="text-xs text-ink-400 flex-shrink-0">
-                        {formatDistanceToNow(new Date(c.lastMessageAt), { addSuffix: false, locale: zhCN })}
-                      </span>
+                      <span className="text-xs text-ink-400 flex-shrink-0">{c.lastMessagePreview || '开始对话'}</span>
                     </div>
                     <div className="flex items-center justify-between gap-2 mt-0.5">
                       <p className={cn('text-sm truncate', unread > 0 ? 'text-ink-900 dark:text-white font-medium' : 'text-ink-500')}>
