@@ -92,6 +92,7 @@ const SmartWishlistPage = lazy(() => import('./pages/WishlistDetailPage').then(m
 const ServerErrorPage = lazy(() => import('./pages/NotFoundPage').then(m => ({ default: m.ServerErrorPage })))
 const MaintenancePage = lazy(() => import('./pages/NotFoundPage').then(m => ({ default: m.MaintenancePage })))
 const OfflinePage = lazy(() => import('./pages/NotFoundPage').then(m => ({ default: m.OfflinePage })))
+const AISearchPage = lazy(() => import('./pages/AISearchPage').then(m => ({ default: m.AISearchPage })))
 
 export const router = createBrowserRouter(
   [
@@ -143,6 +144,7 @@ export const router = createBrowserRouter(
         { path: 'demo/500', element: withSuspense(<ServerErrorPage />) },
         { path: 'demo/maintenance', element: withSuspense(<MaintenancePage />) },
         { path: 'demo/offline', element: withSuspense(<OfflinePage />) },
+        { path: 'discover/ai', element: withSuspense(<AISearchPage />) },
         { path: 'shop/shorts', element: withSuspense(<ShortVideoPage />) },
         { path: 'shop/shorts/:id', element: withSuspense(<ShortVideoDetailPage />) },
         { path: 'shop/shorts/creator/:creatorId', element: withSuspense(<ShortVideoCreatorPage />) },

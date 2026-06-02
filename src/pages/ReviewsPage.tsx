@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useVersa, versa } from '../store/versa'
 import { products } from '../data'
 import { Button } from '../components/ui/Button'
@@ -8,9 +9,22 @@ import { formatTimeAgo } from '../lib/utils'
 import { toast } from '../components/ui/Toaster'
 import {
   ArrowLeft, Star, ThumbsUp, MessageCircle, Image as ImageIcon,
-  Filter, CheckCircle2, Reply, Plus, ShieldCheck, X, Camera
+  Filter, CheckCircle2, Reply, Plus, ShieldCheck, X, Camera, Wand2, Loader2
 } from 'lucide-react'
 import type { ProductReview } from '../data/types'
+import { useAI } from '../hooks/useAI'
+import { PROMPTS } from '../data/prompts'
+import { AIBadge, AIErrorBanner, AIIndicator } from '../components/ai/AIIndicator'
+
+interface AIReviewAnalysis {
+  overall: 'positive' | 'mixed' | 'negative'
+  score: number
+  pros: string[]
+  cons: string[]
+  themes: Record<string, number>
+  summary: string
+  recommendation: string
+}
 
 type TabKey = 'all' | 'good' | 'mid' | 'bad' | 'image' | 'tags'
 
@@ -27,6 +41,9 @@ export function ReviewsPage() {
   const [appendTo, setAppendTo] = useState<string | null>(null)
   const [appendText, setAppendText] = useState('')
   const [helpfulIds, setHelpfulIds] = useState<Set<string>>(new Set())
+  const [aiAnalysis, setAiAnalysis] = useState<AIReviewAnalysis | null>(null)
+  const [showAI, setShowAI] = useState(false)
+  const ai = useAI()
 
   const product = products.find((p) => p.id === productId)
 
@@ -131,7 +148,119 @@ export function ReviewsPage() {
             </div>
           )}
         </div>
+        <div className="relative mt-4 flex items-center gap-2 flex-wrap">
+          <button
+            onClick={async () => {
+              setShowAI(!showAI)
+              if (!aiAnalysis && !ai.loading && filtered.length >= 3) {
+                const sample = filtered
+                  .slice(0, 30)
+                  .map((r) => `评分${r.rating}★ ${r.content}`)
+                  .join('\n')
+                const r = await ai.run(
+                  `商品：${product?.name || '综合'}\n\n评价样本：\n${sample}\n\n请分析输出 JSON。`,
+                  PROMPTS.reviewAnalysis,
+                  { temperature: 0.3, maxTokens: 800 }
+                )
+                if (r) {
+                  try {
+                    const cleaned = r.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim()
+                    setAiAnalysis(JSON.parse(cleaned))
+                  } catch {
+                    toast('AI 返回格式有误', 'error')
+                  }
+                }
+              }
+            }}
+            disabled={ai.loading || filtered.length < 3}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-white/20 hover:bg-white/30 text-white backdrop-blur transition disabled:opacity-50"
+          >
+            {ai.loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Wand2 className="w-3.5 h-3.5" />}
+            AI 综合分析
+            <AIBadge className="ml-0.5" />
+          </button>
+        </div>
       </div>
+
+      {/* AI Analysis Card */}
+      <AnimatePresence>
+        {showAI && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="rounded-2xl bg-gradient-to-br from-nova-50 via-purple-50 to-pink-50 dark:from-nova-950/30 dark:via-purple-950/30 dark:to-pink-950/30 border border-nova-200/50 dark:border-nova-800/50 p-5 overflow-hidden relative"
+          >
+            <div className="absolute -top-8 -right-8 w-40 h-40 rounded-full bg-nova-500/10 blur-3xl" />
+            <div className="relative">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <AIBadge />
+                  <h3 className="font-bold text-sm">AI 评价分析</h3>
+                </div>
+                <button onClick={() => setShowAI(false)} className="p-1 rounded-full hover:bg-white/40">
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              {ai.error && <AIErrorBanner message={ai.error} />}
+
+              {ai.loading && !aiAnalysis && (
+                <AIIndicator loading text="AI 正在分析所有评价…" />
+              )}
+
+              {aiAnalysis && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="md:col-span-1">
+                    <div className="text-center py-4 rounded-2xl bg-white/60 dark:bg-ink-900/40">
+                      <div className="text-5xl font-black bg-gradient-to-br from-nova-500 to-pink-500 bg-clip-text text-transparent">
+                        {aiAnalysis.score}
+                      </div>
+                      <p className="text-[10px] text-ink-500 mt-1">综合评分</p>
+                      <span className={cn(
+                        'inline-block mt-2 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase',
+                        aiAnalysis.overall === 'positive' && 'bg-emerald-100 text-emerald-700',
+                        aiAnalysis.overall === 'mixed' && 'bg-amber-100 text-amber-700',
+                        aiAnalysis.overall === 'negative' && 'bg-rose-100 text-rose-700'
+                      )}>
+                        {aiAnalysis.overall === 'positive' ? '好评' : aiAnalysis.overall === 'mixed' ? '中评' : '差评'}
+                      </span>
+                    </div>
+                    <div className="mt-3 rounded-2xl bg-white/60 dark:bg-ink-900/40 p-3">
+                      <p className="text-[10px] text-ink-500 mb-1">购买建议</p>
+                      <p className="text-xs font-medium">{aiAnalysis.recommendation}</p>
+                    </div>
+                  </div>
+                  <div className="md:col-span-2 space-y-3">
+                    <div className="rounded-2xl bg-white/60 dark:bg-ink-900/40 p-3">
+                      <p className="text-[10px] text-emerald-600 mb-1 font-semibold">✓ 优点</p>
+                      <ul className="text-xs space-y-0.5">
+                        {aiAnalysis.pros?.slice(0, 4).map((p, i) => (
+                          <li key={i}>• {p}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    {aiAnalysis.cons?.length > 0 && (
+                      <div className="rounded-2xl bg-white/60 dark:bg-ink-900/40 p-3">
+                        <p className="text-[10px] text-rose-600 mb-1 font-semibold">✗ 不足</p>
+                        <ul className="text-xs space-y-0.5">
+                          {aiAnalysis.cons?.slice(0, 4).map((c, i) => (
+                            <li key={i}>• {c}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    <div className="rounded-2xl bg-white/60 dark:bg-ink-900/40 p-3">
+                      <p className="text-[10px] text-ink-500 mb-1">综合评述</p>
+                      <p className="text-xs leading-relaxed">{aiAnalysis.summary}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Stats grid */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Sparkles, TrendingUp, Heart, Star, Zap, ShoppingBag, Scale, Newspaper, ChevronRight, RefreshCw } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Sparkles, TrendingUp, Heart, Star, Zap, ShoppingBag, Scale, Newspaper, ChevronRight, RefreshCw, Wand2, Loader2, X } from 'lucide-react'
 import { products } from '../data/products'
 import { debates } from '../data/debates'
 import { news } from '../data/news'
@@ -8,6 +9,14 @@ import { useVersa } from '../store/versa'
 import { useAuth } from '../api/AuthContext'
 import { formatCurrency } from '../lib/utils'
 import { cn } from '../lib/utils'
+import { useAI } from '../hooks/useAI'
+import { PROMPTS } from '../data/prompts'
+import { AIBadge, AIErrorBanner, AIIndicator } from '../components/ai/AIIndicator'
+
+interface AIRecommendation {
+  reasoning: string
+  items: { title: string; type: string; score: number; reason: string }[]
+}
 
 const REASONS = [
   { type: 'history', label: '基于你的浏览', icon: TrendingUp, color: 'text-rose-500' },
@@ -31,6 +40,9 @@ export function ForYouPage() {
   const { user: me } = useAuth()
   const { cart, wishlist, votedDebates } = useVersa()
   const [seed, setSeed] = useState(0)
+  const ai = useAI()
+  const [aiRec, setAiRec] = useState<AIRecommendation | null>(null)
+  const [showAIRec, setShowAIRec] = useState(false)
 
   const recommendations = useMemo(() => {
     const arr: Item[] = []
@@ -115,7 +127,90 @@ export function ForYouPage() {
             <RefreshCw className="w-3.5 h-3.5" />换一批
           </button>
         </div>
+        <div className="relative mt-3 flex items-center gap-2">
+          <button
+            onClick={async () => {
+              setShowAIRec(!showAIRec)
+              if (!aiRec && !ai.loading) {
+                const wishNames = products.filter(p => wishlist.includes(p.id)).slice(0, 5).map(p => p.name)
+                const cartNames = products.filter(p => cart.find(c => c.productId === p.id)).slice(0, 5).map(p => p.name)
+                const r = await ai.run(
+                  `用户兴趣标签：${wishNames.join('、') || '暂无'}\n浏览/加购：${cartNames.join('、') || '暂无'}\n\n请基于这些数据推荐 5 个商品/帖子/辩论主题，输出 JSON。`,
+                  PROMPTS.recommendation,
+                  { temperature: 0.6, maxTokens: 700 }
+                )
+                if (r) {
+                  try {
+                    const cleaned = r.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim()
+                    setAiRec(JSON.parse(cleaned))
+                  } catch {
+                    // ignore
+                  }
+                }
+              }
+            }}
+            disabled={ai.loading}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-white/20 hover:bg-white/30 text-white backdrop-blur border border-white/30 transition"
+          >
+            {ai.loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Wand2 className="w-3.5 h-3.5" />}
+            AI 智能推荐
+            <AIBadge className="ml-0.5" />
+          </button>
+        </div>
       </div>
+
+      {/* AI Rec Card */}
+      <AnimatePresence>
+        {showAIRec && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="mb-4 rounded-2xl bg-gradient-to-br from-nova-50 via-purple-50 to-pink-50 dark:from-nova-950/30 dark:via-purple-950/30 dark:to-pink-950/30 border border-nova-200/50 dark:border-nova-800/50 p-5 relative overflow-hidden"
+          >
+            <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-nova-500/10 blur-2xl" />
+            <div className="relative">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <AIBadge />
+                  <h3 className="font-bold text-sm">AI 个性化推荐</h3>
+                </div>
+                <button onClick={() => setShowAIRec(false)} className="p-1 rounded-full hover:bg-white/40">
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+              {ai.error && <AIErrorBanner message={ai.error} />}
+              {ai.loading && !aiRec && <AIIndicator loading text="AI 正在分析你的喜好…" />}
+              {aiRec && (
+                <div className="space-y-3">
+                  {aiRec.reasoning && (
+                    <div className="rounded-2xl bg-white/60 dark:bg-ink-900/40 p-3 text-xs text-ink-600 dark:text-ink-300">
+                      💡 {aiRec.reasoning}
+                    </div>
+                  )}
+                  <div className="space-y-2">
+                    {aiRec.items?.map((it, i) => (
+                      <div key={i} className="flex items-center gap-3 p-3 rounded-2xl bg-white/60 dark:bg-ink-900/40 hover:bg-white dark:hover:bg-ink-800 transition">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-nova-500 to-pink-500 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">
+                          {i + 1}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-sm">{it.title}</p>
+                          <p className="text-[10px] text-ink-500 mt-0.5">{it.reason}</p>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-sm font-bold text-nova-500">{(it.score * 100).toFixed(0)}</div>
+                          <div className="text-[9px] text-ink-400">匹配度</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* 个性化标签 (mock 兴趣) */}
       <div className="mb-6 flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">

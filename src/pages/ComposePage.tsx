@@ -2,11 +2,14 @@
 
 import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Image as ImageIcon, BarChart3, X, Hash, AtSign, Newspaper, Scale, ShoppingBag, Sparkles } from 'lucide-react'
+import { Image as ImageIcon, BarChart3, X, Hash, AtSign, Newspaper, Scale, ShoppingBag, Sparkles, Wand2, Loader2, Check } from 'lucide-react'
 import { useAuth } from '../api/AuthContext'
 import { UserAvatar } from '../components/social/UserAvatar'
 import api from '../api'
 import { cn } from '../lib/utils'
+import { useAI } from '../hooks/useAI'
+import { PROMPTS } from '../data/prompts'
+import { AIBadge, AIErrorBanner, AIIndicator } from '../components/ai/AIIndicator'
 import type { Post } from '../api/types'
 
 const TYPES = [
@@ -34,6 +37,9 @@ export function ComposePage() {
   const [poll, setPoll] = useState({ question: '', options: ['', ''] })
   const [submitting, setSubmitting] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const ai = useAI()
+  const [aiSuggest, setAiSuggest] = useState<{ style: string; text: string }[]>([])
+  const [showAiModal, setShowAiModal] = useState(false)
 
   if (!me) {
     return (
@@ -140,7 +146,34 @@ export function ComposePage() {
             rows={6}
             className="w-full text-lg outline-none resize-none bg-transparent placeholder:text-ink-400"
           />
-          <div className="text-right text-xs text-ink-400">{content.length} / 2000</div>
+          <div className="flex items-center justify-between">
+            <button
+              onClick={async () => {
+                if (!content.trim() || ai.loading) return
+                setShowAiModal(true)
+                setAiSuggest([])
+                const result = await ai.stream(`主题/草稿：${content}`, PROMPTS.composeAssistant, { temperature: 0.8 })
+                if (result) {
+                  // Parse 3 styles
+                  const sections = result.split(/===\s*([^=]+)\s*===/).filter((s) => s.trim())
+                  const parsed: { style: string; text: string }[] = []
+                  for (let i = 0; i < sections.length; i += 2) {
+                    const style = sections[i]?.trim()
+                    const text = sections[i + 1]?.trim()
+                    if (style && text) parsed.push({ style, text })
+                  }
+                  setAiSuggest(parsed.length ? parsed : [{ style: 'AI 润色', text: result }])
+                }
+              }}
+              disabled={!content.trim() || ai.loading}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-gradient-to-r from-nova-500/15 to-purple-500/15 text-nova-600 dark:text-nova-300 hover:from-nova-500/25 hover:to-purple-500/25 disabled:opacity-50 transition"
+            >
+              {ai.loading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Wand2 className="w-3 h-3" />}
+              AI 帮我润色
+              <AIBadge className="ml-1" />
+            </button>
+            <div className="text-xs text-ink-400">{content.length} / 2000</div>
+          </div>
 
           {/* Images */}
           {type === 'image' && (
@@ -264,6 +297,72 @@ export function ComposePage() {
           </div>
         </div>
       </div>
+
+      {/* AI Assist Modal */}
+      {showAiModal && (
+        <div
+          className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={() => setShowAiModal(false)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-2xl max-h-[85vh] overflow-y-auto rounded-3xl bg-white dark:bg-ink-900 shadow-2xl"
+          >
+            <div className="sticky top-0 bg-gradient-to-r from-nova-500 to-purple-500 text-white p-5 flex items-center justify-between rounded-t-3xl">
+              <div className="flex items-center gap-2">
+                <Wand2 className="w-5 h-5" />
+                <div>
+                  <h3 className="font-bold">AI 润色建议</h3>
+                  <p className="text-[10px] text-white/80">3 种风格任你选</p>
+                </div>
+              </div>
+              <button onClick={() => setShowAiModal(false)} className="p-1 rounded-full hover:bg-white/20">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-5 space-y-3">
+              {ai.error && <AIErrorBanner message={ai.error} />}
+
+              {aiSuggest.length === 0 ? (
+                <div className="py-12 text-center">
+                  <AIIndicator loading text="AI 正在创作 3 个版本…" className="mx-auto" />
+                </div>
+              ) : (
+                aiSuggest.map((s, i) => (
+                  <div
+                    key={i}
+                    className="rounded-2xl border border-ink-200 dark:border-ink-800 p-4 hover:border-nova-500 transition group"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-gradient-to-r from-nova-500 to-purple-500 text-white">
+                        {s.style}
+                      </span>
+                      <button
+                        onClick={() => {
+                          setContent(s.text)
+                          setShowAiModal(false)
+                        }}
+                        className="text-xs text-nova-500 hover:underline inline-flex items-center gap-1 opacity-0 group-hover:opacity-100 transition"
+                      >
+                        <Check className="w-3 h-3" />
+                        采用此版本
+                      </button>
+                    </div>
+                    <p className="text-sm whitespace-pre-wrap leading-relaxed">{s.text}</p>
+                    <button
+                      onClick={() => navigator.clipboard.writeText(s.text)}
+                      className="mt-2 text-[10px] text-ink-400 hover:text-nova-500"
+                    >
+                      复制
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

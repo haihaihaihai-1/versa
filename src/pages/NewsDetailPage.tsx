@@ -1,8 +1,10 @@
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   Clock, Eye, ArrowLeft, Heart, Lightbulb, ThumbsDown, Share2, Bookmark,
   Scale, ShoppingBag, Sparkles, ChevronRight, FileText, MessageSquare,
+  Wand2, Loader2, Languages, X
 } from 'lucide-react'
 import { news, debates, products } from '../data'
 import { useVersa, versa } from '../store/versa'
@@ -16,6 +18,9 @@ import { TableOfContents } from '../components/news/TableOfContents'
 import { AuthorBio } from '../components/news/AuthorBio'
 import { cn, formatNumber, formatTimeAgo } from '../lib/utils'
 import { toast } from '../components/ui/Toaster'
+import { useAI } from '../hooks/useAI'
+import { PROMPTS } from '../data/prompts'
+import { AIBadge, AIErrorBanner, AIIndicator } from '../components/ai/AIIndicator'
 
 export function NewsDetailPage() {
   const { id } = useParams()
@@ -23,6 +28,11 @@ export function NewsDetailPage() {
   const article = news.find((n) => n.id === id)
   const { reactedArticles, readArticles } = useVersa()
   const contentRef = useRef<HTMLDivElement>(null)
+  const ai = useAI()
+  const [summary, setSummary] = useState<string | null>(null)
+  const [showSummary, setShowSummary] = useState(false)
+  const [showTranslation, setShowTranslation] = useState(false)
+  const [translation, setTranslation] = useState<string | null>(null)
 
   useEffect(() => {
     versa.visitModule('news')
@@ -201,6 +211,99 @@ export function NewsDetailPage() {
             <p className="text-lg sm:text-xl text-ink-600 dark:text-ink-300 mt-5 leading-relaxed text-balance">
               {article.subtitle}
             </p>
+
+            {/* AI Action bar */}
+            <div className="mt-5 flex items-center gap-2 flex-wrap">
+              <button
+                onClick={async () => {
+                  setShowSummary(!showSummary)
+                  if (!summary && !ai.loading) {
+                    const plain = (article.content || '').slice(0, 3000)
+                    const r = await ai.stream(`标题：${article.title}\n副标题：${article.subtitle || ''}\n\n正文：\n${plain}`, PROMPTS.newsSummary, { maxTokens: 600 })
+                    if (r) setSummary(r)
+                  }
+                }}
+                disabled={ai.loading}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-gradient-to-r from-nova-500/15 to-purple-500/15 text-nova-600 dark:text-nova-300 hover:from-nova-500/25 hover:to-purple-500/25 transition"
+              >
+                <Wand2 className="w-3.5 h-3.5" />
+                AI 一键摘要
+                <AIBadge className="ml-0.5" />
+              </button>
+              <button
+                onClick={async () => {
+                  setShowTranslation(!showTranslation)
+                  if (!translation && !ai.loading) {
+                    const r = await ai.run(`请将以下文章标题和副标题翻译成英文：\n\n标题：${article.title}\n副标题：${article.subtitle || ''}`, PROMPTS.translation, { temperature: 0.3 })
+                    if (r) setTranslation(r)
+                  }
+                }}
+                disabled={ai.loading}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-ink-100 dark:bg-ink-800 hover:bg-ink-200 dark:hover:bg-ink-700 text-ink-700 dark:text-ink-200 transition"
+              >
+                <Languages className="w-3.5 h-3.5" />
+                译为英文
+              </button>
+            </div>
+
+            {/* AI Summary Card */}
+            <AnimatePresence>
+              {showSummary && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="mt-5 rounded-2xl bg-gradient-to-br from-nova-50 via-purple-50 to-pink-50 dark:from-nova-950/30 dark:via-purple-950/30 dark:to-pink-950/30 border border-nova-200/50 dark:border-nova-800/50 p-5 relative overflow-hidden"
+                >
+                  <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-nova-500/10 blur-2xl" />
+                  <div className="relative">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <AIBadge />
+                        <h3 className="font-bold text-sm">AI 摘要</h3>
+                      </div>
+                      <button onClick={() => setShowSummary(false)} className="p-1 rounded-full hover:bg-white/40">
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                    {ai.loading && !summary && (
+                      <AIIndicator loading text="AI 正在提炼要点…" />
+                    )}
+                    {ai.error && <AIErrorBanner message={ai.error} />}
+                    {summary && (
+                      <div className="text-sm whitespace-pre-wrap leading-relaxed text-ink-800 dark:text-ink-100">
+                        {summary}
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* AI Translation Card */}
+            <AnimatePresence>
+              {showTranslation && translation && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="mt-3 rounded-2xl bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200/50 dark:border-blue-800/50 p-4"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-300 flex items-center gap-1">
+                      <Languages className="w-3 h-3" />
+                      English
+                    </span>
+                    <button onClick={() => setShowTranslation(false)} className="p-1 rounded-full hover:bg-white/40">
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                  <p className="text-sm text-ink-700 dark:text-ink-200 whitespace-pre-wrap leading-relaxed">
+                    {translation}
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Author byline */}
             <div className="flex items-center justify-between py-5 border-y border-ink-200/60 dark:border-ink-800/60 my-8">
