@@ -23,6 +23,7 @@ import { ConfettiHost } from '../Confetti'
 import { GiftToastHost } from '../live/GiftPanel'
 import { LoadingBarHost } from '../LoadingBar'
 import { OnboardingTour, useOnboardingTour } from '../OnboardingTour'
+import { VersaAssistant } from '../VersaAssistant'
 
 export function Layout() {
   useTheme()
@@ -53,6 +54,7 @@ export function Layout() {
       <GiftToastHost />
       <LoadingBarHost />
       <OnboardingTour open={tour.open} onClose={() => tour.setOpen(false)} />
+      <VersaAssistant />
       <Toaster />
       <KeyboardShortcutsHelp open={helpOpen} onClose={() => setHelpOpen(false)} />
       <ScrollRestoration />

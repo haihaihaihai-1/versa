@@ -113,6 +113,12 @@ const ForumPage = lazy(() => import('./pages/ForumPage').then(m => ({ default: m
 const InboxPageRoute = lazy(() => import('./pages/InboxPageRoute').then(m => ({ default: m.InboxPageRoute })))
 const AIWriterPage = lazy(() => import('./pages/AIWriterPage').then(m => ({ default: m.AIWriterPage })))
 const OrderTrackerPage = lazy(() => import('./pages/OrderTrackerPage').then(m => ({ default: m.OrderTrackerPage })))
+const ProductComparePage = lazy(() => import('./pages/ProductComparePage').then(m => ({ default: m.ProductComparePage })))
+const CreatorStudioPage = lazy(() => import('./pages/CreatorStudioPage').then(m => ({ default: m.CreatorStudioPage })))
+const GiftLeaderboardPage = lazy(() => import('./pages/GiftLeaderboardPage').then(m => ({ default: m.GiftLeaderboardPage })))
+const RedPacketPage = lazy(() => import('./pages/RedPacketPage').then(m => ({ default: m.RedPacketPage })))
+const GroupBuyPage = lazy(() => import('./pages/GroupBuyPage').then(m => ({ default: m.GroupBuyPage })))
+const DebateLeaderboardPage = lazy(() => import('./pages/DebateLeaderboardPage').then(m => ({ default: m.DebateLeaderboardPage })))
 
 export const router = createBrowserRouter(
   [
@@ -186,6 +192,12 @@ export const router = createBrowserRouter(
         { path: 'inbox', element: withSuspense(<InboxPageRoute />) },
         { path: 'ai-writer', element: withSuspense(<AIWriterPage />) },
         { path: 'tracker', element: withSuspense(<OrderTrackerPage />) },
+        { path: 'compare', element: withSuspense(<ProductComparePage />) },
+        { path: 'creator-studio', element: withSuspense(<CreatorStudioPage />) },
+        { path: 'gift-leaderboard', element: withSuspense(<GiftLeaderboardPage />) },
+        { path: 'redpacket', element: withSuspense(<RedPacketPage />) },
+        { path: 'groupbuy', element: withSuspense(<GroupBuyPage />) },
+        { path: 'debate-leaderboard', element: withSuspense(<DebateLeaderboardPage />) },
         { path: 'shop/shorts', element: withSuspense(<ShortVideoPage />) },
         { path: 'shop/shorts/:id', element: withSuspense(<ShortVideoDetailPage />) },
         { path: 'shop/shorts/creator/:creatorId', element: withSuspense(<ShortVideoCreatorPage />) },

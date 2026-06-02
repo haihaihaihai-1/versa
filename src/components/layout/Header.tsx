@@ -5,7 +5,7 @@ import {
   ShoppingCart, User, Bell, LogOut, Settings, ChevronDown, Sparkles,
   Search, Plus, MessageCircle, Users, Shield, Calendar, FileText,
   StickyNote, Video, Palette, LayoutDashboard, Inbox, Vote, Hash, Heart, Ticket,
-  Package, Mail, MessageSquare, Truck,
+  Package, Mail, MessageSquare, Truck, GitCompare, BarChart3, Trophy, Gift,
 } from 'lucide-react'
 import { versa, useVersa, useCartTotals } from '../../store/versa'
 import { useScrollPosition } from '../../hooks/useScrollPosition'
@@ -232,6 +232,13 @@ export function Header() {
                         { to: '/users', label: '发现用户', icon: Users },
                         { to: '/wishlist-folders', label: '收藏夹', icon: Heart },
                         { to: '/coupons', label: '优惠券', icon: Ticket },
+                        { to: '/discover', label: '全局搜索', icon: Search },
+                        { to: '/compare', label: '商品对比', icon: GitCompare },
+                        { to: '/creator-studio', label: '创作中心', icon: BarChart3 },
+                        { to: '/gift-leaderboard', label: '礼物榜', icon: Trophy },
+                        { to: '/debate-leaderboard', label: '辩论榜', icon: Scale },
+                        { to: '/redpacket', label: '直播红包', icon: Gift },
+                        { to: '/groupbuy', label: '超级拼团', icon: Users },
                       ].map((item) => (
                         <Link
                           key={item.to}
