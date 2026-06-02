@@ -147,7 +147,7 @@ export function ShopHomePage() {
       )}
 
       {/* 限时秒杀 */}
-      <FlashSale products={products} />
+      <FlashSale />
 
       {/* 品牌专区 */}
       <BrandZone />

@@ -3,9 +3,10 @@ import { Sparkles, Flame, Star, type LucideIcon } from 'lucide-react'
 
 interface ProgressBarProps {
   value: number
+  max?: number
   variant?: 'nova' | 'debate' | 'success' | 'gradient'
   showLabel?: boolean
-  height?: 'sm' | 'md' | 'lg'
+  height?: 'sm' | 'md' | 'lg' | 'xs'
   className?: string
 }
 
@@ -16,13 +17,14 @@ const variants = {
   gradient: 'bg-gradient-to-r from-nova-500 via-debate-500 to-shop-500',
 }
 
-export function ProgressBar({ value, variant = 'nova', showLabel, height = 'md', className }: ProgressBarProps) {
-  const heights = { sm: 'h-1', md: 'h-2', lg: 'h-3' }
+export function ProgressBar({ value, max = 100, variant = 'nova', showLabel, height = 'md', className }: ProgressBarProps) {
+  const heights = { xs: 'h-0.5', sm: 'h-1', md: 'h-2', lg: 'h-3' }
+  const pct = Math.min(100, Math.max(0, (value / max) * 100))
   return (
     <div className={cn('w-full bg-ink-100 dark:bg-ink-800 rounded-full overflow-hidden', heights[height], className)}>
       <div
         className={cn('h-full rounded-full transition-all duration-700 ease-out', variants[variant])}
-        style={{ width: `${Math.min(100, Math.max(0, value))}%` }}
+        style={{ width: `${pct}%` }}
       />
     </div>
   )

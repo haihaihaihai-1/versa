@@ -16,6 +16,7 @@ import { SkuSelector } from '../components/shop/SkuSelector'
 import { ServiceGuarantees } from '../components/shop/ServiceGuarantees'
 import { ReviewList } from '../components/shop/ReviewList'
 import { Lightbox } from '../components/Lightbox'
+import { ShareCard } from '../components/ShareCard'
 import { cn, formatCurrency, formatNumber } from '../lib/utils'
 import { toast } from '../components/ui/Toaster'
 import type { SkuSelection } from '../data/types'
@@ -30,6 +31,7 @@ export function ProductDetailV2() {
   const [tab, setTab] = useState('description')
   const [showSkuPanel, setShowSkuPanel] = useState(false)
   const [lightboxOpen, setLightboxOpen] = useState(false)
+  const [shareOpen, setShareOpen] = useState(false)
   const [skuAction, setSkuAction] = useState<'cart' | 'buy'>('cart')
   const [sku, setSku] = useState<SkuSelection>({})
   const [showQnaPreview, setShowQnaPreview] = useState(true)
@@ -121,7 +123,7 @@ export function ProductDetailV2() {
             <ArrowLeft className="w-4 h-4" /> 返回
           </button>
           <div className="flex items-center gap-2">
-            <button className="w-9 h-9 rounded-full bg-white/80 dark:bg-ink-900/80 backdrop-blur-md flex items-center justify-center hover:bg-white shadow-lg" onClick={() => navigator.share?.({ title: product.name, url: window.location.href }).catch(() => toast('已复制链接', 'success'))}>
+            <button className="w-9 h-9 rounded-full bg-white/80 dark:bg-ink-900/80 backdrop-blur-md flex items-center justify-center hover:bg-white shadow-lg" onClick={() => setShareOpen(true)}>
               <Share2 className="w-4 h-4" />
             </button>
           </div>
@@ -526,6 +528,19 @@ export function ProductDetailV2() {
         initialIndex={activeImage}
         open={lightboxOpen}
         onClose={() => setLightboxOpen(false)}
+      />
+      <ShareCard
+        item={shareOpen ? {
+          type: 'product',
+          id: product.id,
+          title: product.name,
+          subtitle: product.tagline,
+          image: product.images[0],
+          price: product.price,
+          originalPrice: product.originalPrice,
+          rating: product.rating,
+        } : null}
+        onClose={() => setShareOpen(false)}
       />
       {showSkuPanel && (
         <div className="fixed inset-0 z-50 flex items-end" onClick={() => setShowSkuPanel(false)}>
