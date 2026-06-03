@@ -156,6 +156,8 @@ const FamilyHubPage = lazy(() => import('./pages/FamilyHub').then(m => ({ defaul
 const PetHubPage = lazy(() => import('./pages/PetHub').then(m => ({ default: m.PetHub })))
 const AIHubPage = lazy(() => import('./pages/AIHub').then(m => ({ default: m.AIHub })))
 const PhotographyHubPage = lazy(() => import('./pages/PhotographyHub').then(m => ({ default: m.PhotographyHub })))
+const MathHubPage = lazy(() => import('./pages/MathHub').then(m => ({ default: m.MathHub })))
+const CarHubPage = lazy(() => import('./pages/CarHub').then(m => ({ default: m.CarHub })))
 
 export const router = createBrowserRouter(
   [
@@ -273,6 +275,8 @@ export const router = createBrowserRouter(
         { path: 'tools/pets', element: withSuspense(<PetHubPage />) },
         { path: 'tools/ai', element: withSuspense(<AIHubPage />) },
         { path: 'tools/photo', element: withSuspense(<PhotographyHubPage />) },
+        { path: 'tools/math', element: withSuspense(<MathHubPage />) },
+        { path: 'tools/car', element: withSuspense(<CarHubPage />) },
         { path: 'shop/shorts', element: withSuspense(<ShortVideoPage />) },
         { path: 'shop/shorts/:id', element: withSuspense(<ShortVideoDetailPage />) },
         { path: 'shop/shorts/creator/:creatorId', element: withSuspense(<ShortVideoCreatorPage />) },
