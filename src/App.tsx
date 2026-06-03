@@ -148,6 +148,7 @@ const LifeHub2Page = lazy(() => import('./pages/LifeHub2').then(m => ({ default:
 const FinanceHubPage = lazy(() => import('./pages/FinanceHub').then(m => ({ default: m.FinanceHub })))
 const HealthHubPage = lazy(() => import('./pages/HealthHub').then(m => ({ default: m.HealthHub })))
 const TravelHubPage = lazy(() => import('./pages/TravelHub').then(m => ({ default: m.TravelHub })))
+const InvestHubPage = lazy(() => import('./pages/InvestHub').then(m => ({ default: m.InvestHub })))
 
 export const router = createBrowserRouter(
   [
@@ -257,6 +258,7 @@ export const router = createBrowserRouter(
         { path: 'tools/finance', element: withSuspense(<FinanceHubPage />) },
         { path: 'tools/health', element: withSuspense(<HealthHubPage />) },
         { path: 'tools/travel', element: withSuspense(<TravelHubPage />) },
+        { path: 'tools/invest', element: withSuspense(<InvestHubPage />) },
         { path: 'shop/shorts', element: withSuspense(<ShortVideoPage />) },
         { path: 'shop/shorts/:id', element: withSuspense(<ShortVideoDetailPage />) },
         { path: 'shop/shorts/creator/:creatorId', element: withSuspense(<ShortVideoCreatorPage />) },
