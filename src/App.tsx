@@ -162,6 +162,7 @@ const AstrologyHubPage = lazy(() => import('./pages/AstrologyHub').then(m => ({ 
 const GardeningHubPage = lazy(() => import('./pages/GardeningHub').then(m => ({ default: m.GardeningHub })))
 const AIAssistantPage = lazy(() => import('./pages/AIAssistantPage').then(m => ({ default: m.AIAssistantPage })))
 const PerformancePage = lazy(() => import('./pages/PerformancePage').then(m => ({ default: m.PerformancePage })))
+const CreatorDashboardPage = lazy(() => import('./pages/CreatorDashboardPage').then(m => ({ default: m.CreatorDashboardPage })))
 
 export const router = createBrowserRouter(
   [
@@ -285,6 +286,7 @@ export const router = createBrowserRouter(
         { path: 'tools/garden', element: withSuspense(<GardeningHubPage />) },
         { path: 'ai-assistant', element: withSuspense(<AIAssistantPage />) },
         { path: 'performance', element: withSuspense(<PerformancePage />) },
+        { path: 'creator-dashboard', element: withSuspense(<CreatorDashboardPage />) },
         { path: 'shop/shorts', element: withSuspense(<ShortVideoPage />) },
         { path: 'shop/shorts/:id', element: withSuspense(<ShortVideoDetailPage />) },
         { path: 'shop/shorts/creator/:creatorId', element: withSuspense(<ShortVideoCreatorPage />) },
