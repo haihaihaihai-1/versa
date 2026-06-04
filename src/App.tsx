@@ -160,6 +160,7 @@ const MathHubPage = lazy(() => import('./pages/MathHub').then(m => ({ default: m
 const CarHubPage = lazy(() => import('./pages/CarHub').then(m => ({ default: m.CarHub })))
 const AstrologyHubPage = lazy(() => import('./pages/AstrologyHub').then(m => ({ default: m.AstrologyHub })))
 const GardeningHubPage = lazy(() => import('./pages/GardeningHub').then(m => ({ default: m.GardeningHub })))
+const AIAssistantPage = lazy(() => import('./pages/AIAssistantPage').then(m => ({ default: m.AIAssistantPage })))
 
 export const router = createBrowserRouter(
   [
@@ -281,6 +282,7 @@ export const router = createBrowserRouter(
         { path: 'tools/car', element: withSuspense(<CarHubPage />) },
         { path: 'tools/astro', element: withSuspense(<AstrologyHubPage />) },
         { path: 'tools/garden', element: withSuspense(<GardeningHubPage />) },
+        { path: 'ai-assistant', element: withSuspense(<AIAssistantPage />) },
         { path: 'shop/shorts', element: withSuspense(<ShortVideoPage />) },
         { path: 'shop/shorts/:id', element: withSuspense(<ShortVideoDetailPage />) },
         { path: 'shop/shorts/creator/:creatorId', element: withSuspense(<ShortVideoCreatorPage />) },
