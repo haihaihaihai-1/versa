@@ -28,6 +28,7 @@
 | v28.0 | Workflow 引擎 | ✅ 完成 | DAG + Step/Handler/EventBus/Saga/Scheduler/Metrics + 30 单测 |
 | v29.0 | Multi-tenancy 多租户 | ✅ 完成 | TenantRegistry + Quota(5 指标) + Billing(阶梯计价/折扣/发票) + TenantRouter(5 源) + AuditTrail(哈希链) + FeatureFlag + 4 种隔离 + withTenant 上下文 + 40 单测 |
 | v30.0 | Privacy / GDPR 合规 | ✅ 完成 | ConsentManager(5 类用途) + DataClassifier(10 种 PII) + Anonymizer(5 方法 + K-anonymity) + 数据导出 Art.20 + Eraser Art.17 + Retention 6 类 + DSRService(7 种) + CookieConsent + 39 单测 |
+| v31.0 | Notification 平台 | ✅ 完成 | ChannelRegistry(7 通道) + TemplateEngine(条件/循环/部分 + locale) + Queue(优先级+退避重试) + Preference(DND+类目) + ThrottleLimiter + DigestEngine + 4 mock Provider + Metrics + 54 单测 |
 
 ---
 
@@ -40,6 +41,7 @@
 | v28.0 | Workflow 引擎 | ✅ 完成 | DAG + Step 8 种 + Handler/Condition/Compensate 注册表 + EventBus + Saga 反序补偿 + Scheduler(cron/interval/once) + Persistence + Metrics + 30 单测 |
 | v29.0 | Multi-tenancy 多租户 | ✅ 完成 | TenantRegistry + Quota(5 指标) + Billing(阶梯计价/折扣/发票) + TenantRouter(5 源) + AuditTrail(哈希链) + FeatureFlag + 4 种隔离 + withTenant 上下文 + 40 单测 |
 | v30.0 | Privacy / GDPR 合规 | ✅ 完成 | ConsentManager(5 类用途) + DataClassifier(10 种 PII) + Anonymizer(5 方法 + K-anonymity) + 数据导出 Art.20 + Eraser Art.17 + Retention 6 类 + DSRService(7 种) + CookieConsent + 39 单测 |
+| v31.0 | Notification 平台 | ✅ 完成 | ChannelRegistry(7 通道) + TemplateEngine(条件/循环/部分 + locale) + Queue(优先级+退避重试) + Preference(DND+类目) + ThrottleLimiter + DigestEngine + 4 mock Provider + Metrics + 54 单测 |
 
 ### 设计原则（沿用 v10 时代）
 
