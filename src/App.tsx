@@ -168,6 +168,7 @@ const AnalyticsDashboard = lazy(() => import('./observability/components').then(
 const AdminDashboard = lazy(() => import('./admin/components').then(m => ({ default: m.AdminDashboard })))
 const DesignSystemPage = lazy(() => import('./design-system/page').then(m => ({ default: m.DesignSystemPage })))
 const RealtimePage = lazy(() => import('./realtime/page').then(m => ({ default: m.RealtimePage })))
+const MLPipelinePage = lazy(() => import('./ml/page').then(m => ({ default: m.MLPipelinePage })))
 
 export const router = createBrowserRouter(
   [
@@ -297,6 +298,7 @@ export const router = createBrowserRouter(
         { path: 'admin-panel', element: withSuspense(<AdminDashboard />) },
         { path: 'design-system', element: withSuspense(<DesignSystemPage />) },
         { path: 'realtime', element: withSuspense(<RealtimePage />) },
+        { path: 'ml', element: withSuspense(<MLPipelinePage />) },
         { path: 'shop/shorts', element: withSuspense(<ShortVideoPage />) },
         { path: 'shop/shorts/:id', element: withSuspense(<ShortVideoDetailPage />) },
         { path: 'shop/shorts/creator/:creatorId', element: withSuspense(<ShortVideoCreatorPage />) },
