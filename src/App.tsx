@@ -189,6 +189,7 @@ const ConfigPage = lazy(() => import('./config/page'))
 const IamPage = lazy(() => import('./iam/page'))
 const SearchEnginePage = lazy(() => import('./search/page'))
 const ApiMockPage = lazy(() => import('./apimock/page'))
+const RateLimitPage = lazy(() => import('./ratelimit/page'))
 
 export const router = createBrowserRouter(
   [
@@ -202,6 +203,7 @@ export const router = createBrowserRouter(
         { path: 'search', element: withSuspense(<SearchPage />) },
         { path: 'search-engine', element: withSuspense(<SearchEnginePage />) },
         { path: 'apimock', element: withSuspense(<ApiMockPage />) },
+        { path: 'ratelimit', element: withSuspense(<RateLimitPage />) },
         { path: 'discover', element: withSuspense(<GlobalSearchPage />) },
         { path: 'notifications', element: withSuspense(<NotificationsPage />) },
         { path: 'messages', element: withSuspense(<NotificationsHubPage />) },
