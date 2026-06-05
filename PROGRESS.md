@@ -23,15 +23,15 @@ gh pr list --repo haihaihaihai-1/versa
 
 ## 当前状态（2026-06-05 抓取）
 
-- **HEAD**：本地 HEAD — v39.0 Config Service（待推送）
+- **HEAD**：本地 HEAD — v40.0 IAM（待推送）
 - **作者**：ErnestRayleign（ernestrayleign@stu.xhu.edu.cn）
 - **最新推送**：2026-06-05 21:00 CST
 - **分支**：仅 `main`（无其他活跃分支）
 - **Issues / PRs / Releases**：均无
-- **本地工作区**：即将推送 v39.0 Config Service
+- **本地工作区**：即将推送 v40.0 IAM
 - **总提交数**：约 135+ 条（v10.0 起大幅推进）
 - **代码量**：610+ 个 TS/TSX 文件
-- **测试**：1105 通过 / 36 文件
+- **测试**：1151 通过 / 37 文件
 
 ## 里程碑（按时间倒序）
 
@@ -44,6 +44,7 @@ gh pr list --repo haihaihaihai-1/versa
 | v37.0 | File Storage（S3 兼容：桶/分片/策略/生命周期/预签名 URL/版本） | 42 |
 | v38.0 | Stream Processing（Kafka 风格：topic/分区/消费组/rebalance/offset/窗口） | 34 |
 | v39.0 | Config Service（集中配置/版本历史/watchers/灰度/校验） | 41 |
+| v40.0 | IAM（用户/组/角色/策略/会话/MFA/条件授权/资源 ACL） | 46 |
 | v33.0 | Secrets/Vault（SecretStore/Encryption/Versioning/Policies/Audit/Rotation/Scanner/Resolver） | 58 |
 | v32.0 | Job Queue（JobQueueSystem/Registry/Worker/Scheduler/Retry/DLQ/Events/Metrics） | 54 |
 | v31.0 | Notification（Channel/Template/Queue/Preference/Throttle/Digest/Provider/Metrics） | 54 |

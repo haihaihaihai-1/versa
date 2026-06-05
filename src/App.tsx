@@ -186,6 +186,7 @@ const DistlockPage = lazy(() => import('./distlock/page'))
 const FilestorePage = lazy(() => import('./filestore/page'))
 const StreamPage = lazy(() => import('./stream/page'))
 const ConfigPage = lazy(() => import('./config/page'))
+const IamPage = lazy(() => import('./iam/page'))
 
 export const router = createBrowserRouter(
   [
@@ -333,6 +334,7 @@ export const router = createBrowserRouter(
         { path: 'filestore', element: withSuspense(<FilestorePage />) },
         { path: 'stream', element: withSuspense(<StreamPage />) },
         { path: 'config', element: withSuspense(<ConfigPage />) },
+        { path: 'iam', element: withSuspense(<IamPage />) },
         { path: 'shop/shorts', element: withSuspense(<ShortVideoPage />) },
         { path: 'shop/shorts/:id', element: withSuspense(<ShortVideoDetailPage />) },
         { path: 'shop/shorts/creator/:creatorId', element: withSuspense(<ShortVideoCreatorPage />) },
