@@ -43,6 +43,7 @@
 | v30.0 | Privacy / GDPR 合规 | ✅ 完成 | ConsentManager(5 类用途) + DataClassifier(10 种 PII) + Anonymizer(5 方法 + K-anonymity) + 数据导出 Art.20 + Eraser Art.17 + Retention 6 类 + DSRService(7 种) + CookieConsent + 39 单测 |
 | v31.0 | Notification 平台 | ✅ 完成 | ChannelRegistry(7 通道) + TemplateEngine(条件/循环/部分 + locale) + Queue(优先级+退避重试) + Preference(DND+类目) + ThrottleLimiter + DigestEngine + 4 mock Provider + Metrics + 54 单测 |
 | v32.0 | Job Queue 任务队列 | ✅ 完成 | JobQueueSystem(优先级/延迟/重试/DLQ/stuck/重复任务) + JobRegistry + Worker(并发) + Scheduler(stuck 检测) + RateLimiter + Metrics + 4 种 backoff + 54 单测 |
+| v33.0 | Secrets / Vault 密钥管理 | ✅ 完成 | SecretStore(CRUD + 9 类型) + 加密(XOR/Identity) + 版本链 + RBAC Policies + 审计链(哈希) + 自动轮换 + 13 种密钥扫描 + 引用解析器 + 58 单测 |
 
 ### 设计原则（沿用 v10 时代）
 

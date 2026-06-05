@@ -179,6 +179,7 @@ const TenantPage = lazy(() => import('./tenant/page').then(m => ({ default: m.Te
 const PrivacyPage = lazy(() => import('./privacy/page').then(m => ({ default: m.PrivacyPage })))
 const NotifPage = lazy(() => import('./notif/page'))
 const QueuePage = lazy(() => import('./queue/page'))
+const SecretsPage = lazy(() => import('./secrets/page'))
 
 export const router = createBrowserRouter(
   [
@@ -319,6 +320,7 @@ export const router = createBrowserRouter(
         { path: 'privacy', element: withSuspense(<PrivacyPage />) },
         { path: 'notif', element: withSuspense(<NotifPage />) },
         { path: 'queue', element: withSuspense(<QueuePage />) },
+        { path: 'secrets', element: withSuspense(<SecretsPage />) },
         { path: 'shop/shorts', element: withSuspense(<ShortVideoPage />) },
         { path: 'shop/shorts/:id', element: withSuspense(<ShortVideoDetailPage />) },
         { path: 'shop/shorts/creator/:creatorId', element: withSuspense(<ShortVideoCreatorPage />) },

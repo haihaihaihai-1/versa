@@ -23,21 +23,22 @@ gh pr list --repo haihaihaihai-1/versa
 
 ## 当前状态（2026-06-05 抓取）
 
-- **HEAD**：本地 HEAD — v32.0 Job Queue（待推送）
+- **HEAD**：本地 HEAD — v33.0 Secrets/Vault（待推送）
 - **作者**：ErnestRayleign（ernestrayleign@stu.xhu.edu.cn）
-- **最新推送**：2026-06-05 20:30 CST
+- **最新推送**：2026-06-05 20:40 CST
 - **分支**：仅 `main`（无其他活跃分支）
 - **Issues / PRs / Releases**：均无
-- **本地工作区**：即将推送 v32.0
-- **总提交数**：约 125+ 条（v10.0 起大幅推进）
-- **代码量**：590+ 个 TS/TSX 文件
-- **测试**：782 通过 / 29 文件
+- **本地工作区**：即将推送 v33.0
+- **总提交数**：约 130+ 条（v10.0 起大幅推进）
+- **代码量**：600+ 个 TS/TSX 文件
+- **测试**：840 通过 / 30 文件
 
 ## 里程碑（按时间倒序）
 
 ### 阶段 A：v10–v30 平台能力（2026-06-04 → 06-05）
 | 版本 | 主题 | 单测 |
 |---|---|---|
+| v33.0 | Secrets/Vault（SecretStore/Encryption/Versioning/Policies/Audit/Rotation/Scanner/Resolver） | 58 |
 | v32.0 | Job Queue（JobQueueSystem/Registry/Worker/Scheduler/Retry/DLQ/Events/Metrics） | 54 |
 | v31.0 | Notification（Channel/Template/Queue/Preference/Throttle/Digest/Provider/Metrics） | 54 |
 | v30.0 | Privacy/GDPR（Consent/PII 分类/匿名化/数据导出/被遗忘权/保留/DSR/Cookie） | 39 |
