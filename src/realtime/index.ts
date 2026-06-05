@@ -1,519 +1,332 @@
 /**
- * Versa · 实时层 (v21.0)
- *
- * 能力:
- * - WebSocket 客户端 (自动重连 / 指数退避 / 心跳 / 离线队列)
- * - SSE 客户端 (EventSource 封装 / 自动重连)
- * - Pub/Sub 频道广播
- * - 消息序列化 (JSON + protobuf-style 二进制)
- * - Mock 适配器 (无后端时本地模拟)
+ * Versa · Realtime Manager (v48.0)
+ * - WebSocket-style connection management (in-memory)
+ * - Rooms / channels with publish/subscribe
+ * - Presence (join/leave/heartbeat)
+ * - Direct messages (peer to peer)
+ * - Message routing with pattern matching (channel:event)
+ * - Backpressure (per-connection buffer + overflow)
+ * - Heartbeat / ping-pong
+ * - Auth token per connection
+ * - Broadcast stats
+ * - Hooks (onMessage/onConnect/onDisconnect/onJoin/onLeave)
+ * - Metrics
  */
+import { withRetry } from '../federation'
 
-export type RealtimeState = 'idle' | 'connecting' | 'open' | 'closing' | 'closed' | 'error'
+export interface Connection {
+  id: string
+  userId?: string
+  scopes?: string[]
+  ip?: string
+  connectedAt: number
+  lastSeen: number
+  channels: Set<string>
+  status: 'connected' | 'idle' | 'disconnected'
+  buffer: Message[]
+  metadata: Record<string, unknown>
+  token?: string
+}
 
-export interface RealtimeMessage<T = any> {
+export interface Message {
   id: string
   channel: string
-  type: string
-  data: T
-  ts: number
+  event: string
+  data: unknown
   from?: string
-  seq?: number
+  ts: number
 }
 
-export interface RealtimeAdapter {
-  id: string
-  state: RealtimeState
-  connect(): Promise<void>
-  close(): void
-  send(msg: RealtimeMessage): void
-  onMessage(fn: (m: RealtimeMessage) => void): () => void
-  onStateChange(fn: (s: RealtimeState) => void): () => void
-  /** 测试/演示用: 直接投递消息 */
-  __inject(m: RealtimeMessage): void
-}
-
-// ============== 通用事件总线 ==============
-
-class EventEmitter {
-  private listeners: Map<string, Set<Function>> = new Map()
-  on(event: string, fn: Function) {
-    if (!this.listeners.has(event)) this.listeners.set(event, new Set())
-    this.listeners.get(event)!.add(fn)
-    return () => this.off(event, fn)
-  }
-  off(event: string, fn: Function) {
-    this.listeners.get(event)?.delete(fn)
-  }
-  emit(event: string, ...args: any[]) {
-    this.listeners.get(event)?.forEach((fn) => {
-      try { fn(...args) } catch (e) { console.error('[realtime] listener error', e) }
-    })
-  }
-}
-
-// ============== Mock 适配器 (本地演示) ==============
-
-class MockAdapter implements RealtimeAdapter {
-  id: string
-  state: RealtimeState = 'idle'
-  private msgEmitter = new EventEmitter()
-  private stateEmitter = new EventEmitter()
-  private echoSelf = true
-  private pingTimer: any = null
-
-  constructor(id: string) {
-    this.id = id
-  }
-
-  async connect() {
-    this.setState('connecting')
-    await new Promise((r) => setTimeout(r, 50))
-    this.setState('open')
-    this.pingTimer = setInterval(() => {
-      this.msgEmitter.emit('message', { id: 'ping_' + Date.now(), channel: '_system', type: 'ping', data: { ts: Date.now() }, ts: Date.now() })
-    }, 30000)
-  }
-
-  close() {
-    this.setState('closing')
-    clearInterval(this.pingTimer)
-    this.setState('closed')
-  }
-
-  send(msg: RealtimeMessage) {
-    if (this.state !== 'open') {
-      throw new Error(`[realtime] send while not open (state=${this.state})`)
-    }
-    // Mock: 回环到自身 (测试用)
-    if (this.echoSelf) {
-      setTimeout(() => this.msgEmitter.emit('message', { ...msg, ts: Date.now(), from: this.id }), 5)
-    }
-  }
-
-  onMessage(fn: (m: RealtimeMessage) => void) {
-    return this.msgEmitter.on('message', fn)
-  }
-
-  onStateChange(fn: (s: RealtimeState) => void) {
-    return this.stateEmitter.on('state', fn)
-  }
-
-  __inject(m: RealtimeMessage) {
-    this.msgEmitter.emit('message', m)
-  }
-
-  private setState(s: RealtimeState) {
-    this.state = s
-    this.stateEmitter.emit('state', s)
-  }
-}
-
-// ============== WebSocket 适配器 ==============
-
-export interface WebSocketAdapterOptions {
-  url: string
-  protocols?: string | string[]
-  reconnect?: boolean
-  maxRetries?: number
-  heartbeatMs?: number
-  onAuth?: () => Promise<string> | string
-}
-
-class WebSocketAdapter implements RealtimeAdapter {
-  id: string
-  state: RealtimeState = 'idle'
-  private opts: Required<Omit<WebSocketAdapterOptions, 'protocols' | 'onAuth'>> & Pick<WebSocketAdapterOptions, 'protocols' | 'onAuth'>
-  private ws: WebSocket | null = null
-  private msgEmitter = new EventEmitter()
-  private stateEmitter = new EventEmitter()
-  private retry = 0
-  private manualClose = false
-  private heartbeat: any = null
-  private pendingQueue: RealtimeMessage[] = []
-
-  constructor(id: string, opts: WebSocketAdapterOptions) {
-    this.id = id
-    this.opts = {
-      url: opts.url,
-      reconnect: opts.reconnect ?? true,
-      maxRetries: opts.maxRetries ?? 10,
-      heartbeatMs: opts.heartbeatMs ?? 30000,
-      protocols: opts.protocols,
-      onAuth: opts.onAuth,
-    }
-  }
-
-  async connect() {
-    if (this.state === 'open' || this.state === 'connecting') return
-    this.manualClose = false
-    this.setState('connecting')
-    try {
-      let url = this.opts.url
-      if (this.opts.onAuth) {
-        const token = await this.opts.onAuth()
-        if (token) {
-          url += (url.includes('?') ? '&' : '?') + 'token=' + encodeURIComponent(token)
-        }
-      }
-      this.ws = new WebSocket(url, this.opts.protocols)
-      this.ws.onopen = () => {
-        this.retry = 0
-        this.setState('open')
-        // flush queue
-        for (const m of this.pendingQueue) this.rawSend(m)
-        this.pendingQueue = []
-        // heartbeat
-        this.heartbeat = setInterval(() => {
-          if (this.ws?.readyState === WebSocket.OPEN) {
-            this.ws.send(JSON.stringify({ type: '_ping', ts: Date.now() }))
-          }
-        }, this.opts.heartbeatMs)
-      }
-      this.ws.onmessage = (ev) => {
-        try {
-          const m = JSON.parse(ev.data) as RealtimeMessage
-          this.msgEmitter.emit('message', m)
-        } catch {
-          this.msgEmitter.emit('message', { id: 'bin_' + Date.now(), channel: '_raw', type: 'raw', data: ev.data, ts: Date.now() })
-        }
-      }
-      this.ws.onerror = () => this.setState('error')
-      this.ws.onclose = () => {
-        clearInterval(this.heartbeat)
-        if (!this.manualClose && this.opts.reconnect && this.retry < this.opts.maxRetries) {
-          const delay = Math.min(30000, 1000 * Math.pow(2, this.retry))
-          this.retry++
-          setTimeout(() => this.connect(), delay)
-        } else {
-          this.setState('closed')
-        }
-      }
-    } catch (e) {
-      this.setState('error')
-    }
-  }
-
-  close() {
-    this.manualClose = true
-    clearInterval(this.heartbeat)
-    this.setState('closing')
-    this.ws?.close()
-  }
-
-  send(msg: RealtimeMessage) {
-    if (this.state !== 'open' || !this.ws || this.ws.readyState !== WebSocket.OPEN) {
-      this.pendingQueue.push(msg)
-      return
-    }
-    this.rawSend(msg)
-  }
-
-  onMessage(fn: (m: RealtimeMessage) => void) {
-    return this.msgEmitter.on('message', fn)
-  }
-
-  onStateChange(fn: (s: RealtimeState) => void) {
-    return this.stateEmitter.on('state', fn)
-  }
-
-  __inject(m: RealtimeMessage) {
-    this.msgEmitter.emit('message', m)
-  }
-
-  private rawSend(msg: RealtimeMessage) {
-    this.ws?.send(JSON.stringify(msg))
-  }
-
-  private setState(s: RealtimeState) {
-    this.state = s
-    this.stateEmitter.emit('state', s)
-  }
-}
-
-// ============== SSE 适配器 (单向) ==============
-
-class SseAdapter implements RealtimeAdapter {
-  id: string
-  state: RealtimeState = 'idle'
-  private es: EventSource | null = null
-  private msgEmitter = new EventEmitter()
-  private stateEmitter = new EventEmitter()
-  private url: string
-
-  constructor(id: string, url: string) {
-    this.id = id
-    this.url = url
-  }
-
-  connect() {
-    if (typeof EventSource === 'undefined') {
-      this.setState('error')
-      return Promise.reject(new Error('EventSource not available'))
-    }
-    this.setState('connecting')
-    this.es = new EventSource(this.url)
-    this.es.onopen = () => this.setState('open')
-    this.es.onerror = () => {
-      this.setState('error')
-      this.es?.close()
-      this.setState('closed')
-    }
-    this.es.onmessage = (ev) => {
-      try {
-        const m = JSON.parse(ev.data) as RealtimeMessage
-        this.msgEmitter.emit('message', m)
-      } catch {
-        this.msgEmitter.emit('message', { id: 'raw_' + Date.now(), channel: '_sse', type: 'raw', data: ev.data, ts: Date.now() })
-      }
-    }
-    return Promise.resolve()
-  }
-
-  close() {
-    this.es?.close()
-    this.setState('closed')
-  }
-
-  send(_msg: RealtimeMessage) {
-    // SSE 单向,发送需另起 POST 通道
-    throw new Error('[sse] SSE is one-way, use POST to publish')
-  }
-
-  onMessage(fn: (m: RealtimeMessage) => void) {
-    return this.msgEmitter.on('message', fn)
-  }
-
-  onStateChange(fn: (s: RealtimeState) => void) {
-    return this.stateEmitter.on('state', fn)
-  }
-
-  __inject(m: RealtimeMessage) {
-    this.msgEmitter.emit('message', m)
-  }
-
-  private setState(s: RealtimeState) {
-    this.state = s
-    this.stateEmitter.emit('state', s)
-  }
-}
-
-// ============== Realtime Client (主入口) ==============
-
-export interface RealtimeClientOptions {
-  adapter?: 'mock' | 'websocket' | 'sse'
-  ws?: WebSocketAdapterOptions
-  sseUrl?: string
-}
-
-class RealtimeClient {
-  private adapter: RealtimeAdapter | null = null
-  private channels: Map<string, Channel> = new Map()
-  private msgEmitter = new EventEmitter()
-  private stateEmitter = new EventEmitter()
-  private connected = false
-  private _myId: string
-
-  constructor() {
-    this._myId = 'user_' + Math.random().toString(36).slice(2, 10)
-  }
-
-  get myId() { return this._myId }
-
-  async connect(opts: RealtimeClientOptions = { adapter: 'mock' }) {
-    if (this.connected) return
-    if (opts.adapter === 'websocket' && opts.ws) {
-      this.adapter = new WebSocketAdapter(this._myId, opts.ws)
-    } else if (opts.adapter === 'sse' && opts.sseUrl) {
-      this.adapter = new SseAdapter(this._myId, opts.sseUrl)
-    } else {
-      this.adapter = new MockAdapter(this._myId)
-    }
-    this.adapter.onMessage((m) => {
-      const ch = this.channels.get(m.channel)
-      ch?.__deliver(m)
-      this.msgEmitter.emit(m.channel, m)
-      this.msgEmitter.emit('*', m)
-    })
-    this.adapter.onStateChange((s) => {
-      this.connected = s === 'open'
-      this.stateEmitter.emit('state', s)
-    })
-    await this.adapter.connect()
-  }
-
-  disconnect() {
-    this.adapter?.close()
-    this.adapter = null
-    this.connected = false
-  }
-
-  channel(name: string): Channel {
-    let ch = this.channels.get(name)
-    if (!ch) {
-      ch = new Channel(name, this)
-      this.channels.set(name, ch)
-    }
-    return ch
-  }
-
-  /** 全局订阅 */
-  onAny(fn: (m: RealtimeMessage) => void) {
-    return this.msgEmitter.on('*', fn)
-  }
-
-  onState(fn: (s: RealtimeState) => void) {
-    return this.stateEmitter.on('state', fn)
-  }
-
-  isConnected() { return this.connected }
-
-  /** 内部: 发送 */
-  __send(msg: RealtimeMessage) {
-    this.adapter?.send(msg)
-  }
-
-  /** 测试: 注入消息 */
-  __inject(m: RealtimeMessage) {
-    this.adapter?.__inject(m)
-  }
-
-  /** 统计 */
-  stats() {
-    return {
-      channels: this.channels.size,
-      state: this.adapter?.state || 'idle',
-      myId: this._myId,
-    }
-  }
-}
-
-// ============== Channel ==============
-
-type ChannelHandler = (m: RealtimeMessage) => void
-
-export class Channel {
-  name: string
-  private handlers: Set<ChannelHandler> = new Set()
-  private presence: Map<string, PresenceInfo> = new Map()
-  private messageHistory: RealtimeMessage[] = []
-  private historyLimit = 100
-  private client: RealtimeClient
-
-  constructor(name: string, client: RealtimeClient) {
-    this.name = name
-    this.client = client
-  }
-
-  subscribe(fn: ChannelHandler) {
-    this.handlers.add(fn)
-    // 重放历史
-    for (const h of this.messageHistory) {
-      try { fn(h) } catch (e) { console.error('[channel] handler error', e) }
-    }
-    return () => { this.handlers.delete(fn) }
-  }
-
-  publish<T = any>(type: string, data: T) {
-    const msg: RealtimeMessage<T> = {
-      id: 'msg_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
-      channel: this.name,
-      type,
-      data,
-      ts: Date.now(),
-      from: this.client.myId,
-    }
-    this.client.__send(msg)
-    return msg
-  }
-
-  /** Presence (在线状态) */
-  setPresence(info: PresenceInfo) {
-    info.ts = Date.now()
-    this.presence.set(this.client.myId, info)
-    this.publish('presence:update', info)
-  }
-
-  getPresence(userId?: string): PresenceInfo[] | PresenceInfo | undefined {
-    if (userId) return this.presence.get(userId)
-    return Array.from(this.presence.values())
-  }
-
-  offPresence(userId: string) {
-    this.presence.delete(userId)
-    this.publish('presence:leave', { userId })
-  }
-
-  /** 内部: 投递消息 */
-  __deliver(m: RealtimeMessage) {
-    this.messageHistory.push(m)
-    if (this.messageHistory.length > this.historyLimit) this.messageHistory = this.messageHistory.slice(-this.historyLimit)
-
-    // 处理 presence
-    if (m.type === 'presence:update' && m.from) {
-      this.presence.set(m.from, { ...(m.data as PresenceInfo), ts: m.ts })
-    } else if (m.type === 'presence:leave' && m.data?.userId) {
-      this.presence.delete(m.data.userId)
-    }
-
-    this.handlers.forEach((fn) => {
-      try { fn(m) } catch (e) { console.error('[channel] handler error', e) }
-    })
-  }
-
-  history() { return this.messageHistory.slice() }
-}
-
-export interface PresenceInfo {
+export interface Presence {
+  connectionId: string
   userId?: string
-  name?: string
-  avatar?: string
-  status?: 'online' | 'away' | 'busy'
-  cursor?: { x: number; y: number; target?: string }
-  data?: any
-  ts?: number
+  status: 'online' | 'away' | 'offline'
+  joinedAt: number
+  lastSeen: number
+  data?: Record<string, unknown>
 }
 
-// ============== 默认实例 ==============
-
-export const realtime = new RealtimeClient()
-
-// ============== Helper Hooks ==============
-
-import { useEffect, useState, useRef } from 'react'
-export function useChannel<T = any>(channelName: string, handler?: (m: RealtimeMessage<T>) => void) {
-  const [messages, setMessages] = useState<RealtimeMessage<T>[]>([])
-  const handlerRef = useRef(handler)
-  handlerRef.current = handler
-  useEffect(() => {
-    const ch = realtime.channel(channelName)
-    const unsub = ch.subscribe((m) => {
-      handlerRef.current?.(m)
-      setMessages((xs) => [...xs, m].slice(-100))
-    })
-    return unsub
-  }, [channelName])
-  return { messages, publish: realtime.channel(channelName).publish.bind(realtime.channel(channelName)) }
+export interface Room {
+  name: string
+  createdAt: number
+  members: Set<string>
+  messages: number
+  privateRoom: boolean
+  metadata: Record<string, unknown>
 }
 
-export function usePresence(channelName: string) {
-  const [users, setUsers] = useState<PresenceInfo[]>([])
-  useEffect(() => {
-    const ch = realtime.channel(channelName)
-    const update = () => {
-      const list = ch.getPresence() as PresenceInfo[]
-      setUsers(list)
+export interface RouteRule {
+  pattern: string
+  handler: (msg: Message, conn: Connection) => void | Promise<void>
+  requiresScopes?: string[]
+  rateLimit?: number // msg/sec
+}
+
+export interface RealtimeMetrics {
+  totalConnections: number
+  totalDisconnects: number
+  totalMessages: number
+  totalBytes: number
+  totalRooms: number
+  totalChannels: number
+  totalRoutes: number
+  totalBroadcast: number
+  totalErrors: number
+  byEvent: Record<string, number>
+  byChannel: Record<string, number>
+  activeConnections: number
+}
+
+export type ConnHook = (conn: Connection) => void | Promise<void>
+export type MsgHook = (msg: Message, conn: Connection) => void | Promise<void>
+export type LeaveHook = (conn: Connection, channel: string) => void | Promise<void>
+
+export class RealtimeManager {
+  private connections = new Map<string, Connection>()
+  private rooms = new Map<string, Room>()
+  private presence = new Map<string, Presence>()
+  private routes: RouteRule[] = []
+  private rateBuckets = new Map<string, { tokens: number; lastRefill: number }>()
+  private hooks = { onConnect: [] as ConnHook[], onDisconnect: [] as ConnHook[], onMessage: [] as MsgHook[], onJoin: [] as ConnHook[], onLeave: [] as LeaveHook[] }
+  private metrics: RealtimeMetrics = { totalConnections: 0, totalDisconnects: 0, totalMessages: 0, totalBytes: 0, totalRooms: 0, totalChannels: 0, totalRoutes: 0, totalBroadcast: 0, totalErrors: 0, byEvent: {}, byChannel: {}, activeConnections: 0 }
+  private heartbeatMs = 30_000
+  private heartbeatTimer: ReturnType<typeof setInterval> | null = null
+  private maxBufferSize = 1000
+
+  // -------- Connection lifecycle --------
+  connect(opts: { id?: string; userId?: string; scopes?: string[]; ip?: string; token?: string; metadata?: Record<string, unknown> } = {}): Connection {
+    const id = opts.id ?? this.genId()
+    const conn: Connection = { id, userId: opts.userId, scopes: opts.scopes, ip: opts.ip, token: opts.token, connectedAt: Date.now(), lastSeen: Date.now(), channels: new Set(), status: 'connected', buffer: [], metadata: opts.metadata ?? {} }
+    this.connections.set(id, conn)
+    this.metrics.totalConnections++
+    this.metrics.activeConnections++
+    if (opts.userId) this.presence.set(id, { connectionId: id, userId: opts.userId, status: 'online', joinedAt: Date.now(), lastSeen: Date.now() })
+    for (const h of this.hooks.onConnect) try { void h(conn) } catch { /* ignore */ }
+    return conn
+  }
+  disconnect(id: string, reason = 'normal'): void {
+    const conn = this.connections.get(id)
+    if (!conn) return
+    // leave all channels
+    for (const ch of [...conn.channels]) this.leave(id, ch)
+    conn.status = 'disconnected'
+    this.connections.delete(id)
+    this.presence.delete(id)
+    this.metrics.totalDisconnects++
+    this.metrics.activeConnections = Math.max(0, this.metrics.activeConnections - 1)
+    void reason
+    for (const h of this.hooks.onDisconnect) try { void h(conn) } catch { /* ignore */ }
+  }
+  getConnection(id: string): Connection | undefined { return this.connections.get(id) }
+  listConnections(): Connection[] { return [...this.connections.values()] }
+  isConnected(id: string): boolean { return this.connections.has(id) }
+  countConnections(): number { return this.connections.size }
+
+  // -------- Heartbeat --------
+  startHeartbeat(intervalMs?: number): void {
+    if (this.heartbeatTimer) clearInterval(this.heartbeatTimer)
+    const ms = intervalMs ?? this.heartbeatMs
+    this.heartbeatTimer = setInterval(() => this.heartbeat(), ms)
+  }
+  stopHeartbeat(): void { if (this.heartbeatTimer) { clearInterval(this.heartbeatTimer); this.heartbeatTimer = null } }
+  private heartbeat(): void {
+    const now = Date.now()
+    const stale: string[] = []
+    for (const c of this.connections.values()) { if (now - c.lastSeen > this.heartbeatMs * 2) stale.push(c.id) }
+    for (const id of stale) this.disconnect(id, 'heartbeat_timeout')
+  }
+  ping(id: string): boolean {
+    const c = this.connections.get(id)
+    if (!c) return false
+    c.lastSeen = Date.now()
+    return true
+  }
+
+  // -------- Rooms --------
+  createRoom(name: string, opts: { private?: boolean; metadata?: Record<string, unknown> } = {}): Room {
+    if (this.rooms.has(name)) return this.rooms.get(name)!
+    const r: Room = { name, createdAt: Date.now(), members: new Set(), messages: 0, privateRoom: opts.private ?? false, metadata: opts.metadata ?? {} }
+    this.rooms.set(name, r)
+    this.metrics.totalRooms++
+    return r
+  }
+  destroyRoom(name: string): boolean { return this.rooms.delete(name) }
+  getRoom(name: string): Room | undefined { return this.rooms.get(name) }
+  listRooms(): Room[] { return [...this.rooms.values()] }
+
+  // -------- Channels --------
+  join(connId: string, channel: string): boolean {
+    const conn = this.connections.get(connId)
+    if (!conn) return false
+    if (conn.channels.has(channel)) return false
+    conn.channels.add(channel)
+    let room = this.rooms.get(channel)
+    if (!room) room = this.createRoom(channel)
+    room.members.add(connId)
+    this.metrics.totalChannels++
+    for (const h of this.hooks.onJoin) try { void h(conn) } catch { /* ignore */ }
+    return true
+  }
+  leave(connId: string, channel: string): boolean {
+    const conn = this.connections.get(connId)
+    if (!conn) return false
+    if (!conn.channels.has(channel)) return false
+    conn.channels.delete(channel)
+    const room = this.rooms.get(channel)
+    if (room) { room.members.delete(connId); if (room.members.size === 0) { this.rooms.delete(channel); this.metrics.totalChannels-- } }
+    for (const h of this.hooks.onLeave) try { void h(conn, channel) } catch { /* ignore */ }
+    return true
+  }
+  listChannels(): string[] { return [...this.rooms.keys()] }
+  membersOf(channel: string): string[] { return [...(this.rooms.get(channel)?.members ?? [])] }
+  channelCount(): number { return this.rooms.size }
+
+  // -------- Publish / Broadcast --------
+  publish(channel: string, event: string, data: unknown, from?: string): number {
+    const room = this.rooms.get(channel)
+    if (!room) return 0
+    const msg: Message = { id: this.genId(), channel, event, data, from, ts: Date.now() }
+    let sent = 0
+    for (const connId of room.members) {
+      const conn = this.connections.get(connId)
+      if (!conn) continue
+      if (!this.sendToBuffer(conn, msg)) continue
+      sent++
     }
-    const unsub = ch.subscribe(update)
-    update()
-    const t = setInterval(update, 5000)
-    return () => { unsub(); clearInterval(t) }
-  }, [channelName])
-  return users
+    room.messages++
+    this.metrics.totalMessages++
+    this.metrics.totalBroadcast += sent
+    this.metrics.byEvent[event] = (this.metrics.byEvent[event] ?? 0) + 1
+    this.metrics.byChannel[channel] = (this.metrics.byChannel[channel] ?? 0) + 1
+    this.metrics.totalBytes += JSON.stringify(msg).length
+    this.runRoutes(msg, this.connections.get(from ?? '') ?? this.synthesizeConn(from))
+    return sent
+  }
+  private sendToBuffer(conn: Connection, msg: Message): boolean {
+    if (conn.buffer.length >= this.maxBufferSize) {
+      // drop oldest
+      conn.buffer.shift()
+    }
+    conn.buffer.push(msg)
+    conn.lastSeen = Date.now()
+    return true
+  }
+  private synthesizeConn(fromId: string | undefined): Connection {
+    return { id: fromId ?? 'system', connectedAt: 0, lastSeen: 0, channels: new Set(), status: 'disconnected', buffer: [], metadata: {} }
+  }
+  sendDirect(connId: string, event: string, data: unknown): boolean {
+    const conn = this.connections.get(connId)
+    if (!conn) return false
+    const msg: Message = { id: this.genId(), channel: '@direct', event, data, ts: Date.now() }
+    return this.sendToBuffer(conn, msg)
+  }
+  readBuffer(connId: string, drain = false): Message[] {
+    const conn = this.connections.get(connId)
+    if (!conn) return []
+    const out = [...conn.buffer]
+    if (drain) conn.buffer = []
+    return out
+  }
+  bufferSize(connId: string): number { return this.connections.get(connId)?.buffer.length ?? 0 }
+
+  // -------- Presence --------
+  setPresence(connId: string, status: 'online' | 'away' | 'offline', data?: Record<string, unknown>): void {
+    const p = this.presence.get(connId) ?? { connectionId: connId, status: 'online', joinedAt: Date.now(), lastSeen: Date.now() }
+    p.status = status
+    p.lastSeen = Date.now()
+    if (data) p.data = data
+    this.presence.set(connId, p)
+  }
+  getPresence(connId: string): Presence | undefined { return this.presence.get(connId) }
+  listPresence(): Presence[] { return [...this.presence.values()] }
+  presenceByUser(userId: string): Presence[] { return [...this.presence.values()].filter(p => p.userId === userId) }
+  countOnline(): number { return this.presence.size }
+
+  // -------- Routing --------
+  route(pattern: string, handler: (msg: Message, conn: Connection) => void | Promise<void>, opts: { requiresScopes?: string[]; rateLimit?: number } = {}): void {
+    this.routes.push({ pattern, handler, requiresScopes: opts.requiresScopes, rateLimit: opts.rateLimit })
+    this.metrics.totalRoutes = this.routes.length
+  }
+  unroute(pattern: string): number {
+    const before = this.routes.length
+    this.routes = this.routes.filter(r => r.pattern !== pattern)
+    this.metrics.totalRoutes = this.routes.length
+    return before - this.routes.length
+  }
+  listRoutes(): string[] { return this.routes.map(r => r.pattern) }
+  private runRoutes(msg: Message, conn: Connection): void {
+    for (const r of this.routes) {
+      if (!this.matchRoute(r.pattern, msg.channel + ':' + msg.event) && !this.matchRoute(r.pattern, msg.channel)) continue
+      if (r.requiresScopes && (!conn.scopes || !r.requiresScopes.every(s => conn.scopes!.includes(s)))) continue
+      if (r.rateLimit !== undefined && !this.allowRoute(msg.channel + ':' + msg.event, r.rateLimit)) continue
+      try { void r.handler(msg, conn) } catch { this.metrics.totalErrors++ }
+    }
+  }
+  private matchRoute(pattern: string, target: string): boolean {
+    if (pattern === target) return true
+    if (pattern === '*') return true
+    if (pattern.endsWith(':*')) return target.startsWith(pattern.slice(0, -1))
+    if (pattern.includes('*')) {
+      const re = new RegExp('^' + pattern.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*') + '$')
+      return re.test(target)
+    }
+    return false
+  }
+  private allowRoute(key: string, rate: number): boolean {
+    const now = Date.now()
+    const b = this.rateBuckets.get(key) ?? { tokens: rate, lastRefill: now }
+    const elapsed = (now - b.lastRefill) / 1000
+    b.tokens = Math.min(rate, b.tokens + elapsed * rate)
+    b.lastRefill = now
+    if (b.tokens < 1) { this.rateBuckets.set(key, b); return false }
+    b.tokens -= 1
+    this.rateBuckets.set(key, b)
+    return true
+  }
+
+  // -------- Hooks --------
+  onConnect(fn: ConnHook): void { this.hooks.onConnect.push(fn) }
+  onDisconnect(fn: ConnHook): void { this.hooks.onDisconnect.push(fn) }
+  onMessage(fn: MsgHook): void { this.hooks.onMessage.push(fn) }
+  onJoin(fn: ConnHook): void { this.hooks.onJoin.push(fn) }
+  onLeave(fn: LeaveHook): void { this.hooks.onLeave.push(fn) }
+
+  // -------- Ingest (for testing) --------
+  ingest(connId: string, event: string, data: unknown, channel?: string): number {
+    const conn = this.connections.get(connId)
+    if (!conn) return 0
+    const ch = channel ?? [...conn.channels][0] ?? '@direct'
+    const msg: Message = { id: this.genId(), channel: ch, event, data, from: connId, ts: Date.now() }
+    this.sendToBuffer(conn, msg)
+    this.metrics.totalMessages++
+    this.metrics.byEvent[event] = (this.metrics.byEvent[event] ?? 0) + 1
+    this.runRoutes(msg, conn)
+    for (const h of this.hooks.onMessage) try { void h(msg, conn) } catch { /* ignore */ }
+    return 1
+  }
+
+  // -------- Settings --------
+  setHeartbeatMs(ms: number): void { this.heartbeatMs = ms }
+  setMaxBufferSize(n: number): void { this.maxBufferSize = n }
+
+  // -------- Metrics --------
+  getMetrics(): RealtimeMetrics { return JSON.parse(JSON.stringify(this.metrics)) }
+  resetMetrics(): void { this.metrics = { totalConnections: 0, totalDisconnects: 0, totalMessages: 0, totalBytes: 0, totalRooms: 0, totalChannels: 0, totalRoutes: 0, totalBroadcast: 0, totalErrors: 0, byEvent: {}, byChannel: {}, activeConnections: 0 } }
+
+  // -------- Federation --------
+  async sendDirectWithRetry(connId: string, event: string, data: unknown): Promise<boolean> {
+    return withRetry(async () => this.sendDirect(connId, event, data), { maxAttempts: 3, baseDelayMs: 50, maxDelayMs: 1000, jitter: true, retryOnStatus: [] })
+  }
+
+  // -------- helpers --------
+  private genId(): string {
+    let h = 0xa5a5a5a5
+    for (let i = 0; i < 8; i++) h = (h ^ Math.floor(Math.random() * 0xffffffff)) >>> 0
+    return h.toString(16)
+  }
 }
 
-export function useRealtimeState() {
-  const [state, setState] = useState<RealtimeState>(realtime.stats().state as RealtimeState)
-  useEffect(() => realtime.onState(setState), [])
-  return state
-}
+let _instance: RealtimeManager | null = null
+export function getRealtimeManager(): RealtimeManager { if (!_instance) _instance = new RealtimeManager(); return _instance }
+export function resetRealtimeManager(): void { _instance = null }
+export { RealtimeManager as default }

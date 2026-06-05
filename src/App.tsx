@@ -167,7 +167,6 @@ const SearchResultsPage = lazy(() => import('./search/components').then(m => ({ 
 const AnalyticsDashboard = lazy(() => import('./observability/components').then(m => ({ default: m.AnalyticsDashboard })))
 const AdminDashboard = lazy(() => import('./admin/components').then(m => ({ default: m.AdminDashboard })))
 const DesignSystemPage = lazy(() => import('./design-system/page').then(m => ({ default: m.DesignSystemPage })))
-const RealtimePage = lazy(() => import('./realtime/page').then(m => ({ default: m.RealtimePage })))
 const MLPipelinePage = lazy(() => import('./ml/page').then(m => ({ default: m.MLPipelinePage })))
 const PluginsPage = lazy(() => import('./plugins/page').then(m => ({ default: m.PluginsPage })))
 const GraphQLPage = lazy(() => import('./graphql/page').then(m => ({ default: m.GraphQLPage })))
@@ -194,6 +193,7 @@ const WebhookPage = lazy(() => import('./webhook/page'))
 const NotificationPage = lazy(() => import('./notification/page'))
 const GraphqlgwPage = lazy(() => import('./graphqlgw/page'))
 const EventsrcPage = lazy(() => import('./eventsrc/page'))
+const RealtimePage = lazy(() => import('./realtime/page'))
 
 export const router = createBrowserRouter(
   [
@@ -212,6 +212,7 @@ export const router = createBrowserRouter(
         { path: 'notification', element: withSuspense(<NotificationPage />) },
         { path: 'graphqlgw', element: withSuspense(<GraphqlgwPage />) },
         { path: 'eventsrc', element: withSuspense(<EventsrcPage />) },
+        { path: 'realtime', element: withSuspense(<RealtimePage />) },
         { path: 'discover', element: withSuspense(<GlobalSearchPage />) },
         { path: 'notifications', element: withSuspense(<NotificationsPage />) },
         { path: 'messages', element: withSuspense(<NotificationsHubPage />) },
