@@ -25,6 +25,7 @@
 | v25.0 | 向量检索 + RAG | ✅ 完成 | hash embedding + BM25/向量混合索引 + 重排 + RAG 组装 + 评估 + 33 单测 |
 | v26.0 | Edge Computing | ✅ 完成 | GeoIP + Cache(SWR/tag/LRU) + 沙箱 + KV + RateLimit + Router + Metrics + Prefetch + 74 单测 |
 | v27.0 | Federation 联邦 | ✅ 完成 | ServiceRegistry + HealthChecker + LoadBalancer(5 算法) + CircuitBreaker + Retry+Backoff + Router + GraphQLStitcher + Metrics + 57 单测 |
+| v28.0 | Workflow 引擎 | ✅ 完成 | DAG + Step/Handler/EventBus/Saga/Scheduler/Metrics + 30 单测 |
 
 ---
 
@@ -34,7 +35,7 @@
 |---|---|---|---|
 | v26.0 | Edge Computing | ✅ 完成 | 浏览器侧边缘层：GeoIP + Cache(SWR/tag/LRU) + 沙箱 + KV + RateLimit + Router + Metrics + Prefetch |
 | v27.0 | Federation 联邦 | ✅ 完成 | ServiceRegistry + HealthChecker + LoadBalancer(5 算法) + CircuitBreaker + Retry+Backoff + Router + GraphQLStitcher + Metrics |
-| v28.0 | Workflow 引擎 | 📅 待启动 | DAG 工作流 / 事件驱动 / Saga 补偿 |
+| v28.0 | Workflow 引擎 | ✅ 完成 | DAG + Step 8 种 + Handler/Condition/Compensate 注册表 + EventBus + Saga 反序补偿 + Scheduler(cron/interval/once) + Persistence + Metrics + 30 单测 |
 | v29.0 | Multi-tenancy 多租户 | 📅 待启动 | 租户路由 / 配额 / 隔离 / 计费 |
 | v30.0 | Privacy / GDPR 合规 | 📅 待启动 | 数据匿名化 / 同意管理 / 导出 / 删除 |
 
