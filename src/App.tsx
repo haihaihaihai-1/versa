@@ -194,6 +194,7 @@ const NotificationPage = lazy(() => import('./notification/page'))
 const GraphqlgwPage = lazy(() => import('./graphqlgw/page'))
 const EventsrcPage = lazy(() => import('./eventsrc/page'))
 const RealtimePage = lazy(() => import('./realtime/page'))
+const CachePage = lazy(() => import('./cache/page'))
 
 export const router = createBrowserRouter(
   [
@@ -334,6 +335,7 @@ export const router = createBrowserRouter(
         { path: 'ml', element: withSuspense(<MLPipelinePage />) },
         { path: 'plugins', element: withSuspense(<PluginsPage />) },
         { path: 'graphql', element: withSuspense(<GraphQLPage />) },
+        { path: 'cache', element: withSuspense(<CachePage />) },
         { path: 'vector', element: withSuspense(<VectorPage />) },
         { path: 'edge', element: withSuspense(<EdgePage />) },
         { path: 'federation', element: withSuspense(<FederationPage />) },
