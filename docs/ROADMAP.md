@@ -23,6 +23,8 @@
 | v23.0 | 插件系统 | ✅ 完成 | 注册表 + 沙箱 + 事件总线 + 权限 + 市场 + 34 单测 |
 | v24.0 | GraphQL 网关 | ✅ 完成 | Schema 构造器 + 解析器 + 执行器 + DataLoader + 订阅 + 29 单测 |
 | v25.0 | 向量检索 + RAG | ✅ 完成 | hash embedding + BM25/向量混合索引 + 重排 + RAG 组装 + 评估 + 33 单测 |
+| v26.0 | Edge Computing | ✅ 完成 | GeoIP + Cache(SWR/tag/LRU) + 沙箱 + KV + RateLimit + Router + Metrics + Prefetch + 74 单测 |
+| v27.0 | Federation 联邦 | ✅ 完成 | ServiceRegistry + HealthChecker + LoadBalancer(5 算法) + CircuitBreaker + Retry+Backoff + Router + GraphQLStitcher + Metrics + 57 单测 |
 
 ---
 
@@ -30,8 +32,8 @@
 
 | 版本 | 主题 | 状态 | 主要交付 |
 |---|---|---|---|
-| v26.0 | Edge Computing | 🚧 计划 | 浏览器侧边缘层：GeoIP + Cache(SWR/tag/LRU) + 沙箱 + KV + RateLimit + Router + Metrics + Prefetch |
-| v27.0 | Federation 联邦 | 📅 待启动 | 跨服务编排 / 服务网格 / 多源 GraphQL 聚合 |
+| v26.0 | Edge Computing | ✅ 完成 | 浏览器侧边缘层：GeoIP + Cache(SWR/tag/LRU) + 沙箱 + KV + RateLimit + Router + Metrics + Prefetch |
+| v27.0 | Federation 联邦 | ✅ 完成 | ServiceRegistry + HealthChecker + LoadBalancer(5 算法) + CircuitBreaker + Retry+Backoff + Router + GraphQLStitcher + Metrics |
 | v28.0 | Workflow 引擎 | 📅 待启动 | DAG 工作流 / 事件驱动 / Saga 补偿 |
 | v29.0 | Multi-tenancy 多租户 | 📅 待启动 | 租户路由 / 配额 / 隔离 / 计费 |
 | v30.0 | Privacy / GDPR 合规 | 📅 待启动 | 数据匿名化 / 同意管理 / 导出 / 删除 |

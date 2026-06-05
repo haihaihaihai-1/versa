@@ -173,6 +173,7 @@ const PluginsPage = lazy(() => import('./plugins/page').then(m => ({ default: m.
 const GraphQLPage = lazy(() => import('./graphql/page').then(m => ({ default: m.GraphQLPage })))
 const VectorPage = lazy(() => import('./vector/page').then(m => ({ default: m.VectorPage })))
 const EdgePage = lazy(() => import('./edge/page').then(m => ({ default: m.EdgePage })))
+const FederationPage = lazy(() => import('./federation/page').then(m => ({ default: m.FederationPage })))
 
 export const router = createBrowserRouter(
   [
@@ -307,6 +308,7 @@ export const router = createBrowserRouter(
         { path: 'graphql', element: withSuspense(<GraphQLPage />) },
         { path: 'vector', element: withSuspense(<VectorPage />) },
         { path: 'edge', element: withSuspense(<EdgePage />) },
+        { path: 'federation', element: withSuspense(<FederationPage />) },
         { path: 'shop/shorts', element: withSuspense(<ShortVideoPage />) },
         { path: 'shop/shorts/:id', element: withSuspense(<ShortVideoDetailPage />) },
         { path: 'shop/shorts/creator/:creatorId', element: withSuspense(<ShortVideoCreatorPage />) },

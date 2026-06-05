@@ -23,20 +23,23 @@ gh pr list --repo haihaihaihai-1/versa
 
 ## 当前状态（2026-06-05 抓取）
 
-- **HEAD**：`c12366b` — v25.0 向量检索 + RAG（hash embedding + 混合索引 + 重排 + 33 单测）
+- **HEAD**：本地 HEAD — v27.0 Federation（待推送）
 - **作者**：ErnestRayleign（ernestrayleign@stu.xhu.edu.cn）
-- **最新推送**：2026-06-05 13:10 CST
+- **最新推送**：2026-06-05 18:00 CST
 - **分支**：仅 `main`（无其他活跃分支）
 - **Issues / PRs / Releases**：均无
-- **本地工作区**：clean（与 origin/main 同步）
-- **总提交数**：约 113+ 条（v10.0 起大幅推进）
-- **代码量**：566+ 个 TS/TSX 文件
+- **本地工作区**：clean（即将推送 v27.0）
+- **总提交数**：约 115+ 条（v10.0 起大幅推进）
+- **代码量**：570+ 个 TS/TSX 文件
+- **测试**：565 通过 / 24 文件
 
 ## 里程碑（按时间倒序）
 
-### 阶段 A：v10–v25 平台能力（2026-06-04 → 06-05）
+### 阶段 A：v10–v27 平台能力（2026-06-04 → 06-05）
 | 版本 | 主题 | 单测 |
 |---|---|---|
+| v27.0 | Federation（Registry/Health/LB/CB/Retry/Router/Stitcher/Metrics） | 57 |
+| v26.0 | Edge Computing（GeoIP/Cache/Sandbox/KV/RateLimit/Router/Metrics/Prefetch） | 74 |
 | v25.0 | 向量检索 + RAG（hash embedding + BM25 混合 + 重排） | 33 |
 | v24.0 | GraphQL Gateway（自研 schema/parser/executor/DataLoader/订阅） | 29 |
 | v23.0 | 插件系统（注册表/沙箱/事件总线/权限/市场） | 34 |
