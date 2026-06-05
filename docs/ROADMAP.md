@@ -18,6 +18,7 @@
 | v18.0 | 管理后台 | ✅ 完成 | RBAC 7 级、审计链、关键词审核、UI 面板 |
 | v19.0 | 设计系统 | ✅ 完成 | 令牌 + 11 组件 + Demo 页面 + 32 单测 |
 | v20.0 | DevOps 部署 | ✅ 完成 | 多阶 Docker + nginx + docker-compose + 部署脚本 + CI/CD |
+| v21.0 | 实时协作 | ✅ 完成 | WebSocket/SSE/Mock 适配器 + Channel + Presence + Live Cursor |
 
 ---
 
