@@ -166,6 +166,7 @@ const CreatorDashboardPage = lazy(() => import('./pages/CreatorDashboardPage').t
 const SearchResultsPage = lazy(() => import('./search/components').then(m => ({ default: m.SearchResultsPage })))
 const AnalyticsDashboard = lazy(() => import('./observability/components').then(m => ({ default: m.AnalyticsDashboard })))
 const AdminDashboard = lazy(() => import('./admin/components').then(m => ({ default: m.AdminDashboard })))
+const DesignSystemPage = lazy(() => import('./design-system/page').then(m => ({ default: m.DesignSystemPage })))
 
 export const router = createBrowserRouter(
   [
@@ -293,6 +294,7 @@ export const router = createBrowserRouter(
         { path: 'search', element: withSuspense(<SearchResultsPage />) },
         { path: 'observability', element: withSuspense(<AnalyticsDashboard />) },
         { path: 'admin-panel', element: withSuspense(<AdminDashboard />) },
+        { path: 'design-system', element: withSuspense(<DesignSystemPage />) },
         { path: 'shop/shorts', element: withSuspense(<ShortVideoPage />) },
         { path: 'shop/shorts/:id', element: withSuspense(<ShortVideoDetailPage />) },
         { path: 'shop/shorts/creator/:creatorId', element: withSuspense(<ShortVideoCreatorPage />) },

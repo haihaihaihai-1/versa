@@ -16,7 +16,7 @@
 | v16.0 | 搜索与发现 | ✅ 完成 | BM25 倒排索引、Levenshtein 模糊、MMR 推荐 |
 | v17.0 | 可观测性 | ✅ 完成 | 错误捕获、Analytics、Health 探针、熔断器、3 UI 面板 |
 | v18.0 | 管理后台 | ✅ 完成 | RBAC 7 级、审计链、关键词审核、UI 面板 |
-| v19.0 | 设计系统 | 🚧 进行中 | 令牌 + 组件库 + Demo 页面 |
+| v19.0 | 设计系统 | ✅ 完成 | 令牌 + 11 组件 + Demo 页面 + 32 单测 |
 | v20.0 | DevOps 部署 | 📅 待启动 | Dockerfile / docker-compose / 部署脚本 |
 
 ---
