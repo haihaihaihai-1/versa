@@ -187,6 +187,7 @@ const FilestorePage = lazy(() => import('./filestore/page'))
 const StreamPage = lazy(() => import('./stream/page'))
 const ConfigPage = lazy(() => import('./config/page'))
 const IamPage = lazy(() => import('./iam/page'))
+const SearchEnginePage = lazy(() => import('./search/page'))
 
 export const router = createBrowserRouter(
   [
@@ -198,6 +199,7 @@ export const router = createBrowserRouter(
         { path: 'feed', element: withSuspense(<FeedPage />) },
         { path: 'explore', element: withSuspense(<FeedPage />) },
         { path: 'search', element: withSuspense(<SearchPage />) },
+        { path: 'search-engine', element: withSuspense(<SearchEnginePage />) },
         { path: 'discover', element: withSuspense(<GlobalSearchPage />) },
         { path: 'notifications', element: withSuspense(<NotificationsPage />) },
         { path: 'messages', element: withSuspense(<NotificationsHubPage />) },
@@ -335,6 +337,7 @@ export const router = createBrowserRouter(
         { path: 'stream', element: withSuspense(<StreamPage />) },
         { path: 'config', element: withSuspense(<ConfigPage />) },
         { path: 'iam', element: withSuspense(<IamPage />) },
+        { path: 'search', element: withSuspense(<SearchPage />) },
         { path: 'shop/shorts', element: withSuspense(<ShortVideoPage />) },
         { path: 'shop/shorts/:id', element: withSuspense(<ShortVideoDetailPage />) },
         { path: 'shop/shorts/creator/:creatorId', element: withSuspense(<ShortVideoCreatorPage />) },
