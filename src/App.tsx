@@ -175,6 +175,7 @@ const VectorPage = lazy(() => import('./vector/page').then(m => ({ default: m.Ve
 const EdgePage = lazy(() => import('./edge/page').then(m => ({ default: m.EdgePage })))
 const FederationPage = lazy(() => import('./federation/page').then(m => ({ default: m.FederationPage })))
 const WorkflowPage = lazy(() => import('./workflow/page').then(m => ({ default: m.WorkflowPage })))
+const TenantPage = lazy(() => import('./tenant/page').then(m => ({ default: m.TenantPage })))
 
 export const router = createBrowserRouter(
   [
@@ -311,6 +312,7 @@ export const router = createBrowserRouter(
         { path: 'edge', element: withSuspense(<EdgePage />) },
         { path: 'federation', element: withSuspense(<FederationPage />) },
         { path: 'workflow', element: withSuspense(<WorkflowPage />) },
+        { path: 'tenant', element: withSuspense(<TenantPage />) },
         { path: 'shop/shorts', element: withSuspense(<ShortVideoPage />) },
         { path: 'shop/shorts/:id', element: withSuspense(<ShortVideoDetailPage />) },
         { path: 'shop/shorts/creator/:creatorId', element: withSuspense(<ShortVideoCreatorPage />) },
