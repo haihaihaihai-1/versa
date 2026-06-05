@@ -164,6 +164,7 @@ const AIAssistantPage = lazy(() => import('./pages/AIAssistantPage').then(m => (
 const PerformancePage = lazy(() => import('./pages/PerformancePage').then(m => ({ default: m.PerformancePage })))
 const CreatorDashboardPage = lazy(() => import('./pages/CreatorDashboardPage').then(m => ({ default: m.CreatorDashboardPage })))
 const SearchResultsPage = lazy(() => import('./search/components').then(m => ({ default: m.SearchResultsPage })))
+const AnalyticsDashboard = lazy(() => import('./observability/components').then(m => ({ default: m.AnalyticsDashboard })))
 
 export const router = createBrowserRouter(
   [
@@ -289,6 +290,7 @@ export const router = createBrowserRouter(
         { path: 'performance', element: withSuspense(<PerformancePage />) },
         { path: 'creator-dashboard', element: withSuspense(<CreatorDashboardPage />) },
         { path: 'search', element: withSuspense(<SearchResultsPage />) },
+        { path: 'observability', element: withSuspense(<AnalyticsDashboard />) },
         { path: 'shop/shorts', element: withSuspense(<ShortVideoPage />) },
         { path: 'shop/shorts/:id', element: withSuspense(<ShortVideoDetailPage />) },
         { path: 'shop/shorts/creator/:creatorId', element: withSuspense(<ShortVideoCreatorPage />) },
