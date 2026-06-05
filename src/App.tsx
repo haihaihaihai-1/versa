@@ -165,6 +165,7 @@ const PerformancePage = lazy(() => import('./pages/PerformancePage').then(m => (
 const CreatorDashboardPage = lazy(() => import('./pages/CreatorDashboardPage').then(m => ({ default: m.CreatorDashboardPage })))
 const SearchResultsPage = lazy(() => import('./search/components').then(m => ({ default: m.SearchResultsPage })))
 const AnalyticsDashboard = lazy(() => import('./observability/components').then(m => ({ default: m.AnalyticsDashboard })))
+const AdminDashboard = lazy(() => import('./admin/components').then(m => ({ default: m.AdminDashboard })))
 
 export const router = createBrowserRouter(
   [
@@ -291,6 +292,7 @@ export const router = createBrowserRouter(
         { path: 'creator-dashboard', element: withSuspense(<CreatorDashboardPage />) },
         { path: 'search', element: withSuspense(<SearchResultsPage />) },
         { path: 'observability', element: withSuspense(<AnalyticsDashboard />) },
+        { path: 'admin-panel', element: withSuspense(<AdminDashboard />) },
         { path: 'shop/shorts', element: withSuspense(<ShortVideoPage />) },
         { path: 'shop/shorts/:id', element: withSuspense(<ShortVideoDetailPage />) },
         { path: 'shop/shorts/creator/:creatorId', element: withSuspense(<ShortVideoCreatorPage />) },

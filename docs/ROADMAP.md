@@ -12,6 +12,12 @@
 | v12.0 | 性能与体验 | ✅ 完成 | VirtualList/LazyImage/CWV 监控 + 预算门禁 |
 | v13.0 | 创作者经济 | ✅ 完成 | 打赏/分销/收益/提现/税务台账 (8 礼物/PL 抽成) |
 | v14.0 | 测试与质量 | ✅ 完成 | 144 单测 + 14 E2E + CI 流水线 + Perf 预算 |
+| v15.0 | PWA 离线优先 | ✅ 完成 | Service Worker、manifest、offline.html、4 UI 组件 |
+| v16.0 | 搜索与发现 | ✅ 完成 | BM25 倒排索引、Levenshtein 模糊、MMR 推荐 |
+| v17.0 | 可观测性 | ✅ 完成 | 错误捕获、Analytics、Health 探针、熔断器、3 UI 面板 |
+| v18.0 | 管理后台 | ✅ 完成 | RBAC 7 级、审计链、关键词审核、UI 面板 |
+| v19.0 | 设计系统 | 🚧 进行中 | 令牌 + 组件库 + Demo 页面 |
+| v20.0 | DevOps 部署 | 📅 待启动 | Dockerfile / docker-compose / 部署脚本 |
 
 ---
 
