@@ -193,6 +193,7 @@ const RateLimitPage = lazy(() => import('./ratelimit/page'))
 const WebhookPage = lazy(() => import('./webhook/page'))
 const NotificationPage = lazy(() => import('./notification/page'))
 const GraphqlgwPage = lazy(() => import('./graphqlgw/page'))
+const EventsrcPage = lazy(() => import('./eventsrc/page'))
 
 export const router = createBrowserRouter(
   [
@@ -210,6 +211,7 @@ export const router = createBrowserRouter(
         { path: 'webhook', element: withSuspense(<WebhookPage />) },
         { path: 'notification', element: withSuspense(<NotificationPage />) },
         { path: 'graphqlgw', element: withSuspense(<GraphqlgwPage />) },
+        { path: 'eventsrc', element: withSuspense(<EventsrcPage />) },
         { path: 'discover', element: withSuspense(<GlobalSearchPage />) },
         { path: 'notifications', element: withSuspense(<NotificationsPage />) },
         { path: 'messages', element: withSuspense(<NotificationsHubPage />) },
