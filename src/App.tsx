@@ -169,6 +169,7 @@ const AdminDashboard = lazy(() => import('./admin/components').then(m => ({ defa
 const DesignSystemPage = lazy(() => import('./design-system/page').then(m => ({ default: m.DesignSystemPage })))
 const RealtimePage = lazy(() => import('./realtime/page').then(m => ({ default: m.RealtimePage })))
 const MLPipelinePage = lazy(() => import('./ml/page').then(m => ({ default: m.MLPipelinePage })))
+const PluginsPage = lazy(() => import('./plugins/page').then(m => ({ default: m.PluginsPage })))
 
 export const router = createBrowserRouter(
   [
@@ -299,6 +300,7 @@ export const router = createBrowserRouter(
         { path: 'design-system', element: withSuspense(<DesignSystemPage />) },
         { path: 'realtime', element: withSuspense(<RealtimePage />) },
         { path: 'ml', element: withSuspense(<MLPipelinePage />) },
+        { path: 'plugins', element: withSuspense(<PluginsPage />) },
         { path: 'shop/shorts', element: withSuspense(<ShortVideoPage />) },
         { path: 'shop/shorts/:id', element: withSuspense(<ShortVideoDetailPage />) },
         { path: 'shop/shorts/creator/:creatorId', element: withSuspense(<ShortVideoCreatorPage />) },

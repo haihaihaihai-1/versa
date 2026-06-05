@@ -20,6 +20,7 @@
 | v20.0 | DevOps 部署 | ✅ 完成 | 多阶 Docker + nginx + docker-compose + 部署脚本 + CI/CD |
 | v21.0 | 实时协作 | ✅ 完成 | WebSocket/SSE/Mock 适配器 + Channel + Presence + Live Cursor |
 | v22.0 | ML 流水线 | ✅ 完成 | CSV/JSONL 解析 + 模型注册表 + 训练 + 评估 + A/B + Feature Store |
+| v23.0 | 插件系统 | ✅ 完成 | 注册表 + 沙箱 + 事件总线 + 权限 + 市场 + 34 单测 |
 
 ---
 
