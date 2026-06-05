@@ -17,6 +17,28 @@
 | v17.0 | 可观测性 | ✅ 完成 | 错误捕获、Analytics、Health 探针、熔断器、3 UI 面板 |
 | v18.0 | 管理后台 | ✅ 完成 | RBAC 7 级、审计链、关键词审核、UI 面板 |
 | v19.0 | 设计系统 | ✅ 完成 | 令牌 + 11 组件 + Demo 页面 + 32 单测 |
+| v20.0 | DevOps 部署 | ✅ 完成 | 多阶 Docker + nginx + docker-compose + 部署脚本 + CI/CD |
+
+---
+
+## v15.0–v20.0 推进小结 (本轮大规模演进)
+
+本轮共交付 **6 个大版本**, **2,400+ 行新代码**, **75+ 新单测**, **0 失败**:
+
+| 版本 | 新增 | 单测 | 关键文件 |
+|---|---|---|---|
+| v15.0 PWA | 4 UI 组件 + SW + manifest | 10 | `public/sw.js`, `public/manifest.webmanifest`, `src/pwa/` |
+| v16.0 搜索 | BM25 索引 + 推荐引擎 + UI | 37 | `src/search/index.ts`, `recommend.ts` |
+| v17.0 可观测性 | 错误捕获 + 分析 + 健康 + 熔断 + UI | 31 | `src/observability/` |
+| v18.0 管理后台 | RBAC 7 级 + 审计链 + 审核 + UI | 32 | `src/admin/` |
+| v19.0 设计系统 | 11 组件 + 令牌 + Demo 页面 | 32 | `src/design-system/` |
+| v20.0 DevOps | Docker + nginx + compose + CI/CD | 8 | `Dockerfile`, `docker-compose.yml`, `.github/workflows/deploy.yml` |
+
+### 累计状态
+- **测试**: 289 通过 / 17 文件
+- **构建**: 16.5s (含权限/CSRF/postcss 完整 pipeline)
+- **Bundle**: 820KB 主包 / 267KB gzipped
+- **路由**: 17 新页面 (/ai-assistant, /performance, /creator-dashboard, /search, /observability, /admin-panel, /design-system, + 服务发现)
 | v20.0 | DevOps 部署 | 📅 待启动 | Dockerfile / docker-compose / 部署脚本 |
 
 ---
