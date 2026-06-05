@@ -44,6 +44,7 @@
 | v31.0 | Notification 平台 | ✅ 完成 | ChannelRegistry(7 通道) + TemplateEngine(条件/循环/部分 + locale) + Queue(优先级+退避重试) + Preference(DND+类目) + ThrottleLimiter + DigestEngine + 4 mock Provider + Metrics + 54 单测 |
 | v32.0 | Job Queue 任务队列 | ✅ 完成 | JobQueueSystem(优先级/延迟/重试/DLQ/stuck/重复任务) + JobRegistry + Worker(并发) + Scheduler(stuck 检测) + RateLimiter + Metrics + 4 种 backoff + 54 单测 |
 | v33.0 | Secrets / Vault 密钥管理 | ✅ 完成 | SecretStore(CRUD + 9 类型) + 加密(XOR/Identity) + 版本链 + RBAC Policies + 审计链(哈希) + 自动轮换 + 13 种密钥扫描 + 引用解析器 + 58 单测 |
+| v34.0 | API Gateway 网关 | ✅ 完成 | RouteRegistry(路径参数) + Gateway + 6 中间件(Auth/RateLimit/CORS/Cache+ETag/Transform/Validator) + Logging + Mock/Echo Handler + Metrics + 67 单测 |
 
 ### 设计原则（沿用 v10 时代）
 

@@ -180,6 +180,7 @@ const PrivacyPage = lazy(() => import('./privacy/page').then(m => ({ default: m.
 const NotifPage = lazy(() => import('./notif/page'))
 const QueuePage = lazy(() => import('./queue/page'))
 const SecretsPage = lazy(() => import('./secrets/page'))
+const GatewayPage = lazy(() => import('./gateway/page'))
 
 export const router = createBrowserRouter(
   [
@@ -321,6 +322,7 @@ export const router = createBrowserRouter(
         { path: 'notif', element: withSuspense(<NotifPage />) },
         { path: 'queue', element: withSuspense(<QueuePage />) },
         { path: 'secrets', element: withSuspense(<SecretsPage />) },
+        { path: 'gateway', element: withSuspense(<GatewayPage />) },
         { path: 'shop/shorts', element: withSuspense(<ShortVideoPage />) },
         { path: 'shop/shorts/:id', element: withSuspense(<ShortVideoDetailPage />) },
         { path: 'shop/shorts/creator/:creatorId', element: withSuspense(<ShortVideoCreatorPage />) },
