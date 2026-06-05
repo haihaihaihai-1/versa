@@ -49,6 +49,7 @@
 | v36.0 | Distributed Lock 分布式锁 | ✅ 完成 | InMemoryLockStore(模拟 Redis SETNX) + LockManager(Redlock 多数派) + fencing token 单调递增 + 自动续约(后台心跳) + ResourceQueue(按 key 串行+并行不同 key) + runExclusive 闭包 + 健康检查 + 33 单测 |
 | v37.0 | File Storage 文件存储 | ✅ 完成 | ObjectStore(CRUD/etag/分片上传/版本) + BucketPolicy(IAM 通配 principal/action/resource) + Lifecycle(过期/转储) + Presigned URL(HMAC 签名) + FileStorage facade + 42 单测 |
 | v38.0 | Stream Processing 流处理 | ✅ 完成 | StreamEngine(topic/分区键哈希/消费组 rebalance/leader 选举/heartbeat/offset commit/window 聚合/map+filter+reduce/retention) + 34 单测 |
+| v39.0 | Config Service 配置中心 | ✅ 完成 | ConfigService(CRUD/类型推断/版本链/rollback/watchers[exact/prefix/regex]/灰度按 user_id+attributes 一致性哈希/Schema 校验 min/max/enum/pattern/自定义 validator/批量/导出/test override) + 41 单测 |
 
 ### 设计原则（沿用 v10 时代）
 
