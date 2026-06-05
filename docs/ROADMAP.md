@@ -46,6 +46,7 @@
 | v33.0 | Secrets / Vault 密钥管理 | ✅ 完成 | SecretStore(CRUD + 9 类型) + 加密(XOR/Identity) + 版本链 + RBAC Policies + 审计链(哈希) + 自动轮换 + 13 种密钥扫描 + 引用解析器 + 58 单测 |
 | v34.0 | API Gateway 网关 | ✅ 完成 | RouteRegistry(路径参数) + Gateway + 6 中间件(Auth/RateLimit/CORS/Cache+ETag/Transform/Validator) + Logging + Mock/Echo Handler + Metrics + 67 单测 |
 | v35.0 | Feature Flag Service 功能开关 | ✅ 完成 | FlagRegistry(4 类型 + 6 策略) + SegmentRegistry(13 规则操作符) + ExperimentService(权重+粘性+暴露/转化) + FlagEvaluator(7 评估原因) + 一致性哈希 bucket(FNV-1a) + 48 单测 |
+| v36.0 | Distributed Lock 分布式锁 | ✅ 完成 | InMemoryLockStore(模拟 Redis SETNX) + LockManager(Redlock 多数派) + fencing token 单调递增 + 自动续约(后台心跳) + ResourceQueue(按 key 串行+并行不同 key) + runExclusive 闭包 + 健康检查 + 33 单测 |
 
 ### 设计原则（沿用 v10 时代）
 

@@ -182,6 +182,7 @@ const QueuePage = lazy(() => import('./queue/page'))
 const SecretsPage = lazy(() => import('./secrets/page'))
 const GatewayPage = lazy(() => import('./gateway/page'))
 const FeatflagPage = lazy(() => import('./featflag/page'))
+const DistlockPage = lazy(() => import('./distlock/page'))
 
 export const router = createBrowserRouter(
   [
@@ -325,6 +326,7 @@ export const router = createBrowserRouter(
         { path: 'secrets', element: withSuspense(<SecretsPage />) },
         { path: 'gateway', element: withSuspense(<GatewayPage />) },
         { path: 'featflag', element: withSuspense(<FeatflagPage />) },
+        { path: 'distlock', element: withSuspense(<DistlockPage />) },
         { path: 'shop/shorts', element: withSuspense(<ShortVideoPage />) },
         { path: 'shop/shorts/:id', element: withSuspense(<ShortVideoDetailPage />) },
         { path: 'shop/shorts/creator/:creatorId', element: withSuspense(<ShortVideoCreatorPage />) },
