@@ -176,6 +176,7 @@ const EdgePage = lazy(() => import('./edge/page').then(m => ({ default: m.EdgePa
 const FederationPage = lazy(() => import('./federation/page').then(m => ({ default: m.FederationPage })))
 const WorkflowPage = lazy(() => import('./workflow/page').then(m => ({ default: m.WorkflowPage })))
 const TenantPage = lazy(() => import('./tenant/page').then(m => ({ default: m.TenantPage })))
+const PrivacyPage = lazy(() => import('./privacy/page').then(m => ({ default: m.PrivacyPage })))
 
 export const router = createBrowserRouter(
   [
@@ -313,6 +314,7 @@ export const router = createBrowserRouter(
         { path: 'federation', element: withSuspense(<FederationPage />) },
         { path: 'workflow', element: withSuspense(<WorkflowPage />) },
         { path: 'tenant', element: withSuspense(<TenantPage />) },
+        { path: 'privacy', element: withSuspense(<PrivacyPage />) },
         { path: 'shop/shorts', element: withSuspense(<ShortVideoPage />) },
         { path: 'shop/shorts/:id', element: withSuspense(<ShortVideoDetailPage />) },
         { path: 'shop/shorts/creator/:creatorId', element: withSuspense(<ShortVideoCreatorPage />) },
