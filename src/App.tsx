@@ -192,6 +192,7 @@ const ApiMockPage = lazy(() => import('./apimock/page'))
 const RateLimitPage = lazy(() => import('./ratelimit/page'))
 const WebhookPage = lazy(() => import('./webhook/page'))
 const NotificationPage = lazy(() => import('./notification/page'))
+const GraphqlgwPage = lazy(() => import('./graphqlgw/page'))
 
 export const router = createBrowserRouter(
   [
@@ -208,6 +209,7 @@ export const router = createBrowserRouter(
         { path: 'ratelimit', element: withSuspense(<RateLimitPage />) },
         { path: 'webhook', element: withSuspense(<WebhookPage />) },
         { path: 'notification', element: withSuspense(<NotificationPage />) },
+        { path: 'graphqlgw', element: withSuspense(<GraphqlgwPage />) },
         { path: 'discover', element: withSuspense(<GlobalSearchPage />) },
         { path: 'notifications', element: withSuspense(<NotificationsPage />) },
         { path: 'messages', element: withSuspense(<NotificationsHubPage />) },

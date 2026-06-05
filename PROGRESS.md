@@ -23,10 +23,10 @@ gh pr list --repo haihaihaihai-1/versa
 
 ## 当前状态（2026-06-05 抓取）
 
-- **HEAD**：本地 HEAD — v45.0 Notification Center（待推送）
-- **远程 origin/main**：`3300fae`（v44.0 Webhook Delivery，已推送）
-- **本地工作区**：即将推送 v45.0 Notification Center
-- **测试**：1306 通过 / 41 文件
+- **HEAD**：本地 HEAD — v46.0 GraphQL Gateway（待推送）
+- **远程 origin/main**：`44ac6b5`（v45.0 Notification Center，已推送）
+- **本地工作区**：即将推送 v46.0 GraphQL Gateway
+- **测试**：1341 通过 / 42 文件
 
 ## 里程碑（按时间倒序）
 
@@ -45,6 +45,7 @@ gh pr list --repo haihaihaihai-1/versa
 | v43.0 | Rate Limiter（fixed/sliding/token/leaky/GCRA + headers + 自适应 + 分布式同步） | 33 |
 | v44.0 | Webhook Delivery（订阅/HMAC签名/重试/DLQ/重放/metrics） | 35 |
 | v45.0 | Notification Center（多渠道/模板/偏好/静默/分组/调度/限流/i18n） | 46 |
+| v46.0 | GraphQL Gateway（Federation/Upstream/Parser/Planner/DataLoader/Cache/Subscriptions/APQ/Metrics） | 35 |
 | v33.0 | Secrets/Vault（SecretStore/Encryption/Versioning/Policies/Audit/Rotation/Scanner/Resolver） | 58 |
 | v32.0 | Job Queue（JobQueueSystem/Registry/Worker/Scheduler/Retry/DLQ/Events/Metrics） | 54 |
 | v31.0 | Notification（Channel/Template/Queue/Preference/Throttle/Digest/Provider/Metrics） | 54 |
