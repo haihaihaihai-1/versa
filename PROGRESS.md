@@ -23,10 +23,10 @@ gh pr list --repo haihaihaihai-1/versa
 
 ## 当前状态（2026-06-05 抓取）
 
-- **HEAD**：本地 HEAD — v41.0 Search Engine（待推送）
-- **远程 origin/main**：`113fe42`（v40.0 IAM，已推送）
-- **本地工作区**：即将推送 v41.0 Search Engine
-- **测试**：1153 通过 / 37 文件
+- **HEAD**：本地 HEAD — v42.0 API Mock（待推送）
+- **远程 origin/main**：`417b1ee`（v41.0 Search Engine，已推送）
+- **本地工作区**：即将推送 v42.0 API Mock
+- **测试**：1192 通过 / 38 文件
 
 ## 里程碑（按时间倒序）
 
@@ -41,6 +41,7 @@ gh pr list --repo haihaihaihai-1/versa
 | v39.0 | Config Service（集中配置/版本历史/watchers/灰度/校验） | 41 |
 | v40.0 | IAM（用户/组/角色/策略/会话/MFA/条件授权/资源 ACL） | 46 |
 | v41.0 | Search Engine（倒排索引/BM25/字段加权/模糊/布尔查询/高亮/ngram/分词） | 39 |
+| v42.0 | API Mock Service（HTTP stub/序列/模板/动态/代理/故障/场景/录制/日志/Webhook） | 39 |
 | v33.0 | Secrets/Vault（SecretStore/Encryption/Versioning/Policies/Audit/Rotation/Scanner/Resolver） | 58 |
 | v32.0 | Job Queue（JobQueueSystem/Registry/Worker/Scheduler/Retry/DLQ/Events/Metrics） | 54 |
 | v31.0 | Notification（Channel/Template/Queue/Preference/Throttle/Digest/Provider/Metrics） | 54 |
