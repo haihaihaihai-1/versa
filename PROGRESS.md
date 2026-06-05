@@ -23,20 +23,21 @@ gh pr list --repo haihaihaihai-1/versa
 
 ## 当前状态（2026-06-05 抓取）
 
-- **HEAD**：`6116591` — v24.0 GraphQL Gateway（Schema + Parser + Executor + DataLoader + Subscriptions）
+- **HEAD**：`c12366b` — v25.0 向量检索 + RAG（hash embedding + 混合索引 + 重排 + 33 单测）
 - **作者**：ErnestRayleign（ernestrayleign@stu.xhu.edu.cn）
-- **最新推送**：2026-06-05 10:37 CST
+- **最新推送**：2026-06-05 13:10 CST
 - **分支**：仅 `main`（无其他活跃分支）
 - **Issues / PRs / Releases**：均无
 - **本地工作区**：clean（与 origin/main 同步）
-- **总提交数**：约 110+ 条（v10.0 起大幅推进）
-- **代码量**：566 个 TS/TSX 文件
+- **总提交数**：约 113+ 条（v10.0 起大幅推进）
+- **代码量**：566+ 个 TS/TSX 文件
 
 ## 里程碑（按时间倒序）
 
-### 阶段 A：v10–v24 平台能力（2026-06-04 → 06-05）
+### 阶段 A：v10–v25 平台能力（2026-06-04 → 06-05）
 | 版本 | 主题 | 单测 |
 |---|---|---|
+| v25.0 | 向量检索 + RAG（hash embedding + BM25 混合 + 重排） | 33 |
 | v24.0 | GraphQL Gateway（自研 schema/parser/executor/DataLoader/订阅） | 29 |
 | v23.0 | 插件系统（注册表/沙箱/事件总线/权限/市场） | 34 |
 | v22.0 | ML 训练流水线（数据集/注册表/训练/评估/A-B/Feature Store） | 33 |
@@ -73,7 +74,7 @@ gh pr list --repo haihaihaihai-1/versa
 
 ## 待跟进
 
-- [ ] v25.0+ 计划（路线图停留在 v14，需关注 ROADMAP.md 更新）
+- [ ] v26.0+ 计划（路线图停留在 v14，需关注 ROADMAP.md 更新）
 - [ ] Issues / PR 体系（目前 0，可能即将启用）
 - [ ] Releases / Tag 体系（目前未打 tag）
 - [ ] CI/CD 工作流（`.github/workflows/`）— 克隆时已见 deploy.yml
