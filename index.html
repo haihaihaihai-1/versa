@@ -2,36 +2,25 @@
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="./icons/icon-192.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#0b0b14" media="(prefers-color-scheme: dark)" />
-    <meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#8b5cf6" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Versa" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="description" content="Versa · 购物·辩论·资讯 一体化融合平台 — 在 Versa，新闻激发辩论，辩论推荐商品，商品成为新闻" />
-    <meta name="keywords" content="Versa,购物,辩论,资讯,社区,融合平台" />
+    <meta name="keywords" content="Versa,购物,辩论,资讯,社区,融合平台,PWA,离线" />
     <meta property="og:title" content="Versa — Where Shopping, Debate & News Converge" />
     <meta property="og:description" content="Versa is a unified platform where news sparks debate, debate recommends products, and products become news." />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="/icons/icon-512.png" />
-    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta property="og:image" content="./icons/icon-512.png" />
     <title>Versa · 三体融合平台</title>
   </head>
   <body>
     <div id="root"></div>
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js').then(
-            (reg) => console.log('[SW] Registered:', reg.scope),
-            (err) => console.warn('[SW] Registration failed:', err)
-          )
-        })
-      }
-    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

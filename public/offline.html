@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>离线 · Versa</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 100%);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .container { text-align: center; max-width: 480px; }
+    .icon { font-size: 96px; margin-bottom: 24px; animation: pulse 2s ease-in-out infinite; }
+    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+    h1 { font-size: 32px; margin-bottom: 12px; background: linear-gradient(135deg, #8b5cf6, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    p { color: #a0a0b0; line-height: 1.6; margin-bottom: 24px; }
+    .features { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 32px; }
+    .feature { background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.2); border-radius: 12px; padding: 16px; }
+    .feature-icon { font-size: 24px; margin-bottom: 8px; }
+    .feature-label { font-size: 12px; color: #c0c0d0; }
+    button {
+      background: linear-gradient(135deg, #8b5cf6, #ec4899);
+      color: white;
+      border: none;
+      padding: 12px 32px;
+      border-radius: 24px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    button:hover { transform: translateY(-2px); }
+    .queue { margin-top: 24px; padding: 16px; background: rgba(255, 165, 0, 0.1); border-radius: 12px; border: 1px solid rgba(255, 165, 0, 0.2); display: none; }
+    .queue.show { display: block; }
+    .queue-label { font-size: 12px; color: #ffa500; margin-bottom: 4px; }
+    .queue-text { font-size: 14px; color: #fff; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="icon">📡</div>
+    <h1>当前离线</h1>
+    <p>您已离线，但仍可使用 Versa 的本地功能。您的更改会在网络恢复后自动同步。</p>
+
+    <div class="features">
+      <div class="feature">
+        <div class="feature-icon">📝</div>
+        <div class="feature-label">本地草稿</div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">📚</div>
+        <div class="feature-label">已读博客</div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🛍️</div>
+        <div class="feature-label">购物车</div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">⭐</div>
+        <div class="feature-label">收藏</div>
+      </div>
+    </div>
+
+    <button onclick="location.reload()">🔄 重新连接</button>
+
+    <div class="queue" id="queue">
+      <div class="queue-label">⏳ 待同步</div>
+      <div class="queue-text" id="queue-text">检测中…</div>
+    </div>
+  </div>
+
+  <script>
+    if ('serviceWorker' in navigator && 'SyncManager' in window) {
+      navigator.serviceWorker.ready.then((reg) => {
+        reg.sync.register('sync-versa-queue').catch(() => {});
+      });
+    }
+    setTimeout(() => {
+      const el = document.getElementById('queue');
+      if (el) el.classList.add('show');
+    }, 2000);
+  </script>
+</body>
+</html>

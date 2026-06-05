@@ -1,56 +1,40 @@
 {
-  "name": "Versa · 三体融合平台",
+  "name": "Versa · 综合社区",
   "short_name": "Versa",
-  "description": "购物·辩论·资讯 一体化融合平台",
-  "start_url": "/versa/",
-  "scope": "/versa/",
+  "description": "AI 驱动的多元化兴趣社区 · 博客 · 辩论 · 购物 · 群聊",
+  "start_url": "./",
+  "scope": "/",
   "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#0b0b14",
-  "theme_color": "#0b0b14",
+  "orientation": "portrait-primary",
+  "background_color": "#0a0a0f",
+  "theme_color": "#8b5cf6",
   "lang": "zh-CN",
   "dir": "ltr",
-  "categories": ["shopping", "social", "news", "lifestyle"],
+  "categories": ["social", "productivity", "shopping", "lifestyle"],
   "icons": [
-    {
-      "src": "/versa/icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/versa/icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/versa/favicon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    }
+    { "src": "./icons/icon-72.png",   "sizes": "72x72",   "type": "image/png", "purpose": "any maskable" },
+    { "src": "./icons/icon-96.png",   "sizes": "96x96",   "type": "image/png", "purpose": "any maskable" },
+    { "src": "./icons/icon-128.png",  "sizes": "128x128", "type": "image/png", "purpose": "any maskable" },
+    { "src": "./icons/icon-192.png",  "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "./icons/icon-384.png",  "sizes": "384x384", "type": "image/png", "purpose": "any maskable" },
+    { "src": "./icons/icon-512.png",  "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
   ],
   "shortcuts": [
-    {
-      "name": "购物首页",
-      "url": "/versa/shop",
-      "icons": [{ "src": "/versa/icons/icon-192.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "辩论广场",
-      "url": "/versa/debates",
-      "icons": [{ "src": "/versa/icons/icon-192.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "资讯流",
-      "url": "/versa/news",
-      "icons": [{ "src": "/versa/icons/icon-192.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "会员中心",
-      "url": "/versa/help/member",
-      "icons": [{ "src": "/versa/icons/icon-192.png", "sizes": "192x192" }]
-    }
-  ]
+    { "name": "博客",     "url": "./blog",       "icons": [{ "src": "./icons/shortcut-blog.png",   "sizes": "96x96" }] },
+    { "name": "AI 助手",  "url": "./ai-assistant", "icons": [{ "src": "./icons/shortcut-ai.png",     "sizes": "96x96" }] },
+    { "name": "创作者中心", "url": "./creator-dashboard", "icons": [{ "src": "./icons/shortcut-creator.png", "sizes": "96x96" }] },
+    { "name": "辩论广场",  "url": "./debate",     "icons": [{ "src": "./icons/shortcut-debate.png", "sizes": "96x96" }] }
+  ],
+  "share_target": {
+    "action": "./share-target",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": { "title": "title", "text": "text", "url": "url" }
+  },
+  "edge_side_panel": { "preferred_width": 480 },
+  "screenshots": [
+    { "src": "./screenshots/home.png",  "sizes": "1280x720", "type": "image/png", "form_factor": "wide",  "label": "Versa 首页" },
+    { "src": "./screenshots/blog.png",  "sizes": "390x844",  "type": "image/png", "form_factor": "narrow","label": "博客详情" }
+  ],
+  "prefer_related_applications": false
 }
