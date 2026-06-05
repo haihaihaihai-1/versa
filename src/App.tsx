@@ -171,6 +171,7 @@ const RealtimePage = lazy(() => import('./realtime/page').then(m => ({ default: 
 const MLPipelinePage = lazy(() => import('./ml/page').then(m => ({ default: m.MLPipelinePage })))
 const PluginsPage = lazy(() => import('./plugins/page').then(m => ({ default: m.PluginsPage })))
 const GraphQLPage = lazy(() => import('./graphql/page').then(m => ({ default: m.GraphQLPage })))
+const VectorPage = lazy(() => import('./vector/page').then(m => ({ default: m.VectorPage })))
 
 export const router = createBrowserRouter(
   [
@@ -303,6 +304,7 @@ export const router = createBrowserRouter(
         { path: 'ml', element: withSuspense(<MLPipelinePage />) },
         { path: 'plugins', element: withSuspense(<PluginsPage />) },
         { path: 'graphql', element: withSuspense(<GraphQLPage />) },
+        { path: 'vector', element: withSuspense(<VectorPage />) },
         { path: 'shop/shorts', element: withSuspense(<ShortVideoPage />) },
         { path: 'shop/shorts/:id', element: withSuspense(<ShortVideoDetailPage />) },
         { path: 'shop/shorts/creator/:creatorId', element: withSuspense(<ShortVideoCreatorPage />) },
