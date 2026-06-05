@@ -23,10 +23,10 @@ gh pr list --repo haihaihaihai-1/versa
 
 ## 当前状态（2026-06-05 抓取）
 
-- **HEAD**：本地 HEAD — v49.0 Cache Layer（待推送）
-- **远程 origin/main**：`6a70bfd`（v48.0 Realtime Manager，已推送）
-- **本地工作区**：即将推送 v49.0 Cache Layer
-- **测试**：1442 通过 / 44 文件
+- **HEAD**：本地 HEAD — v50.0 CQRS（待推送）
+- **远程 origin/main**：`25ba84d`（v49.0 Cache Layer，已推送）
+- **本地工作区**：即将推送 v50.0 CQRS
+- **测试**：1469 通过 / 45 文件
 
 ## 里程碑（按时间倒序）
 
@@ -49,6 +49,7 @@ gh pr list --repo haihaihaihai-1/versa
 | v47.0 | Event Sourcing（Aggregate/Snapshot/Projection/Saga/Schema/Time-travel/Subscribe） | 36 |
 | v48.0 | Realtime Manager（WebSocket/Rooms/Presence/Routing/Heartbeat/Backpressure/Hooks） | 45 |
 | v49.0 | Cache Layer（LRU/LFU/FIFO/TTL/Namespaces/Tags/Singleflight/SWR/Memoize/Bus） | 36 |
+| v50.0 | CQRS（Command/Query/Middleware/Read-model/Event-Bus/Auth/Metrics） | 27 |
 | v33.0 | Secrets/Vault（SecretStore/Encryption/Versioning/Policies/Audit/Rotation/Scanner/Resolver） | 58 |
 | v32.0 | Job Queue（JobQueueSystem/Registry/Worker/Scheduler/Retry/DLQ/Events/Metrics） | 54 |
 | v31.0 | Notification（Channel/Template/Queue/Preference/Throttle/Digest/Provider/Metrics） | 54 |
