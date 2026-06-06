@@ -196,6 +196,7 @@ const EventsrcPage = lazy(() => import('./eventsrc/page'))
 const RealtimePage = lazy(() => import('./realtime/page'))
 const CachePage = lazy(() => import('./cache/page'))
 const CqrsPage = lazy(() => import('./cqrs/page'))
+const SchedulerPage = lazy(() => import('./scheduler/page'))
 
 export const router = createBrowserRouter(
   [
@@ -338,6 +339,7 @@ export const router = createBrowserRouter(
         { path: 'graphql', element: withSuspense(<GraphQLPage />) },
         { path: 'cache', element: withSuspense(<CachePage />) },
         { path: 'cqrs', element: withSuspense(<CqrsPage />) },
+        { path: 'scheduler', element: withSuspense(<SchedulerPage />) },
         { path: 'vector', element: withSuspense(<VectorPage />) },
         { path: 'edge', element: withSuspense(<EdgePage />) },
         { path: 'federation', element: withSuspense(<FederationPage />) },
