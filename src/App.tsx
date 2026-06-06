@@ -204,6 +204,7 @@ const CrdtPage = lazy(() => import('./crdt/page'))
 const ObservabilityPage = lazy(() => import('./observability/page'))
 const EdgeFnPage = lazy(() => import('./edgefn/page'))
 const VaultPage = lazy(() => import('./vault/page'))
+const SandboxPage = lazy(() => import('./sandbox/page'))
 
 export const router = createBrowserRouter(
   [
@@ -354,6 +355,7 @@ export const router = createBrowserRouter(
         { path: 'observability', element: withSuspense(<ObservabilityPage />) },
         { path: 'edgefn', element: withSuspense(<EdgeFnPage />) },
         { path: 'vault', element: withSuspense(<VaultPage />) },
+        { path: 'sandbox', element: withSuspense(<SandboxPage />) },
         { path: 'vector', element: withSuspense(<VectorPage />) },
         { path: 'edge', element: withSuspense(<EdgePage />) },
         { path: 'federation', element: withSuspense(<FederationPage />) },
