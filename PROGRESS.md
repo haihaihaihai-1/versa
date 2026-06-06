@@ -23,10 +23,10 @@ gh pr list --repo haihaihaihai-1/versa
 
 ## 当前状态（2026-06-05 抓取）
 
-- **HEAD**：本地 HEAD — v72.0 WebSocket Gateway（待推送）
-- **远程 origin/main**：`4b142ce`（v71.0 Audit Trail，已推送）
-- **本地工作区**：即将推送 v72.0 WebSocket Gateway
-- **测试**：2230 通过 / 65 文件
+- **HEAD**：本地 HEAD — v73.0 Service Mesh（待推送）
+- **远程 origin/main**：`9a508e3`（v72.0 WebSocket Gateway，已推送）
+- **本地工作区**：即将推送 v73.0 Service Mesh
+- **测试**：2253 通过 / 66 文件
 
 ## 里程碑（按时间倒序）
 
@@ -72,6 +72,7 @@ gh pr list --repo haihaihaihai-1/versa
 | v70.0 | Quota Manager（Tier/WinRecord/Enforcement/Forecast/Top） | 30 |
 | v71.0 | Audit Trail（ChainHash/Query/History/Integrity/Retention） | 27 |
 | v72.0 | WebSocket Gateway（Conn/Room/Channel/Broadcast/Heartbeat/Rate） | 31 |
+| v73.0 | Service Mesh（Registry/LB/Circuit/Retry/Mirror/Health） | 23 |
 | v33.0 | Secrets/Vault（SecretStore/Encryption/Versioning/Policies/Audit/Rotation/Scanner/Resolver） | 58 |
 | v32.0 | Job Queue（JobQueueSystem/Registry/Worker/Scheduler/Retry/DLQ/Events/Metrics） | 54 |
 | v31.0 | Notification（Channel/Template/Queue/Preference/Throttle/Digest/Provider/Metrics） | 54 |
