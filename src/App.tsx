@@ -209,6 +209,7 @@ const GeoPage = lazy(() => import('./geo/page'))
 const TimeSeriesPage = lazy(() => import('./timeseries/page'))
 const WorkflowPage = lazy(() => import('./workflow/page'))
 const MLPipelinePage2 = lazy(() => import('./mlpipeline/page'))
+const SchemaRegistryPage = lazy(() => import('./schemaregistry/page'))
 
 export const router = createBrowserRouter(
   [
@@ -365,6 +366,7 @@ export const router = createBrowserRouter(
         { path: 'timeseries', element: withSuspense(<TimeSeriesPage />) },
         { path: 'workflow', element: withSuspense(<WorkflowPage />) },
         { path: 'mlpipeline', element: withSuspense(<MLPipelinePage2 />) },
+        { path: 'schemaregistry', element: withSuspense(<SchemaRegistryPage />) },
         { path: 'vector', element: withSuspense(<VectorPage />) },
         { path: 'edge', element: withSuspense(<EdgePage />) },
         { path: 'federation', element: withSuspense(<FederationPage />) },
