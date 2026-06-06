@@ -23,10 +23,10 @@ gh pr list --repo haihaihaihai-1/versa
 
 ## 当前状态（2026-06-05 抓取）
 
-- **HEAD**：本地 HEAD — v61.0 Geo / Location（待推送）
-- **远程 origin/main**：`5e64be0`（v60.0 SQL Query Builder，已推送）
-- **本地工作区**：即将推送 v61.0 Geo / Location
-- **测试**：1900 通过 / 55 文件
+- **HEAD**：本地 HEAD — v62.0 Time Series DB（待推送）
+- **远程 origin/main**：`ea26ce5`（v61.0 Geo / Location，已推送）
+- **本地工作区**：即将推送 v62.0 Time Series DB
+- **测试**：1941 通过 / 56 文件
 
 ## 里程碑（按时间倒序）
 
@@ -61,6 +61,7 @@ gh pr list --repo haihaihaihai-1/versa
 | v59.0 | Code Sandbox（VM/Timeout/ForbiddenGlobals/Modules/Template/Registry/Metrics） | 32 |
 | v60.0 | SQL Query Builder（SELECT/INSERT/UPDATE/DELETE/JOIN/GROUP/UNION/Dialects/Aggregates） | 52 |
 | v61.0 | Geo / Location（Haversine/Vincenty/Geohash/GeoIndex/Geofence/Polygon） | 39 |
+| v62.0 | Time Series DB（Series/Downsample/7Agg/Interpolate/ContinuousQuery/Retention） | 41 |
 | v33.0 | Secrets/Vault（SecretStore/Encryption/Versioning/Policies/Audit/Rotation/Scanner/Resolver） | 58 |
 | v32.0 | Job Queue（JobQueueSystem/Registry/Worker/Scheduler/Retry/DLQ/Events/Metrics） | 54 |
 | v31.0 | Notification（Channel/Template/Queue/Preference/Throttle/Digest/Provider/Metrics） | 54 |

@@ -207,6 +207,7 @@ const VaultPage = lazy(() => import('./vault/page'))
 const SandboxPage = lazy(() => import('./sandbox/page'))
 const QueryBuilderPage = lazy(() => import('./querybuilder/page'))
 const GeoPage = lazy(() => import('./geo/page'))
+const TimeSeriesPage = lazy(() => import('./timeseries/page'))
 
 export const router = createBrowserRouter(
   [
@@ -360,6 +361,7 @@ export const router = createBrowserRouter(
         { path: 'sandbox', element: withSuspense(<SandboxPage />) },
         { path: 'querybuilder', element: withSuspense(<QueryBuilderPage />) },
         { path: 'geo', element: withSuspense(<GeoPage />) },
+        { path: 'timeseries', element: withSuspense(<TimeSeriesPage />) },
         { path: 'vector', element: withSuspense(<VectorPage />) },
         { path: 'edge', element: withSuspense(<EdgePage />) },
         { path: 'federation', element: withSuspense(<FederationPage />) },
