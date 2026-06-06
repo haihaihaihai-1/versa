@@ -23,10 +23,10 @@ gh pr list --repo haihaihaihai-1/versa
 
 ## 当前状态（2026-06-05 抓取）
 
-- **HEAD**：本地 HEAD — v66.0 Feature Flag Targeting（待推送）
-- **远程 origin/main**：`e1ffaeb`（v65.0 Schema Registry，已推送）
-- **本地工作区**：即将推送 v66.0 Feature Flag Targeting
-- **测试**：2054 通过 / 59 文件
+- **HEAD**：本地 HEAD — v67.0 Blue-Green Deployment（待推送）
+- **远程 origin/main**：`6701d0f`（v66.0 Feature Flag Targeting，已推送）
+- **本地工作区**：即将推送 v67.0 Blue-Green Deployment
+- **测试**：2084 通过 / 60 文件
 
 ## 里程碑（按时间倒序）
 
@@ -66,6 +66,7 @@ gh pr list --repo haihaihaihai-1/versa
 | v64.0 | ML Pipeline（5Models/Scaling/CV/GridSearch/FeatureEng） | 36 |
 | v65.0 | Schema Registry（JSON/Avro/Compat4Modes/Migration/Codec/Refs） | 34 |
 | v66.0 | Feature Flag Targeting（Segments/Rules/Variants/Rollout/Dependencies/Kill） | 40 |
+| v67.0 | Blue-Green Deployment（Env/Health/Route/Rollback/AutoRollback/History） | 30 |
 | v33.0 | Secrets/Vault（SecretStore/Encryption/Versioning/Policies/Audit/Rotation/Scanner/Resolver） | 58 |
 | v32.0 | Job Queue（JobQueueSystem/Registry/Worker/Scheduler/Retry/DLQ/Events/Metrics） | 54 |
 | v31.0 | Notification（Channel/Template/Queue/Preference/Throttle/Digest/Provider/Metrics） | 54 |
