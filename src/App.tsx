@@ -200,6 +200,7 @@ const SchedulerPage = lazy(() => import('./scheduler/page'))
 const SdkGeneratorPage = lazy(() => import('./sdkgenerator/page'))
 const ExperimentPage = lazy(() => import('./experiment/page'))
 const ReplicationPage = lazy(() => import('./replication/page'))
+const CrdtPage = lazy(() => import('./crdt/page'))
 
 export const router = createBrowserRouter(
   [
@@ -346,6 +347,7 @@ export const router = createBrowserRouter(
         { path: 'sdkgenerator', element: withSuspense(<SdkGeneratorPage />) },
         { path: 'experiment', element: withSuspense(<ExperimentPage />) },
         { path: 'replication', element: withSuspense(<ReplicationPage />) },
+        { path: 'crdt', element: withSuspense(<CrdtPage />) },
         { path: 'vector', element: withSuspense(<VectorPage />) },
         { path: 'edge', element: withSuspense(<EdgePage />) },
         { path: 'federation', element: withSuspense(<FederationPage />) },
