@@ -202,6 +202,7 @@ const ExperimentPage = lazy(() => import('./experiment/page'))
 const ReplicationPage = lazy(() => import('./replication/page'))
 const CrdtPage = lazy(() => import('./crdt/page'))
 const ObservabilityPage = lazy(() => import('./observability/page'))
+const EdgeFnPage = lazy(() => import('./edgefn/page'))
 
 export const router = createBrowserRouter(
   [
@@ -350,6 +351,7 @@ export const router = createBrowserRouter(
         { path: 'replication', element: withSuspense(<ReplicationPage />) },
         { path: 'crdt', element: withSuspense(<CrdtPage />) },
         { path: 'observability', element: withSuspense(<ObservabilityPage />) },
+        { path: 'edgefn', element: withSuspense(<EdgeFnPage />) },
         { path: 'vector', element: withSuspense(<VectorPage />) },
         { path: 'edge', element: withSuspense(<EdgePage />) },
         { path: 'federation', element: withSuspense(<FederationPage />) },
