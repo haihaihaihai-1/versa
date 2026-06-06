@@ -215,6 +215,7 @@ const BlueGreenPage = lazy(() => import('./bluegreen/page'))
 const CanaryPage2 = lazy(() => import('./canarydep/page'))
 const DLQPage = lazy(() => import('./dlqmgr/page'))
 const QuotaPage = lazy(() => import('./quotamgr/page'))
+const AuditTrailPage = lazy(() => import('./audittrail/page'))
 
 export const router = createBrowserRouter(
   [
@@ -377,6 +378,7 @@ export const router = createBrowserRouter(
         { path: 'canary', element: withSuspense(<CanaryPage2 />) },
         { path: 'dlq', element: withSuspense(<DLQPage />) },
         { path: 'quota', element: withSuspense(<QuotaPage />) },
+        { path: 'audit', element: withSuspense(<AuditTrailPage />) },
         { path: 'vector', element: withSuspense(<VectorPage />) },
         { path: 'edge', element: withSuspense(<EdgePage />) },
         { path: 'federation', element: withSuspense(<FederationPage />) },

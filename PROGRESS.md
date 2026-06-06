@@ -23,10 +23,10 @@ gh pr list --repo haihaihaihai-1/versa
 
 ## 当前状态（2026-06-05 抓取）
 
-- **HEAD**：本地 HEAD — v70.0 Quota Manager（待推送）
-- **远程 origin/main**：`f83a894`（v69.0 DLQ Manager，已推送）
-- **本地工作区**：即将推送 v70.0 Quota Manager
-- **测试**：2172 通过 / 63 文件
+- **HEAD**：本地 HEAD — v71.0 Audit Trail（待推送）
+- **远程 origin/main**：`cd6a133`（v70.0 Quota Manager，已推送）
+- **本地工作区**：即将推送 v71.0 Audit Trail
+- **测试**：2199 通过 / 64 文件
 
 ## 里程碑（按时间倒序）
 
@@ -70,6 +70,7 @@ gh pr list --repo haihaihaihai-1/versa
 | v68.0 | Canary Deployment（Stages/Traffic/Whitelist/EvalMetrics/AutoPromoteRollback） | 33 |
 | v69.0 | DLQ Manager（Retry/Backoff/Park/Replay/Expire/Alerts） | 25 |
 | v70.0 | Quota Manager（Tier/WinRecord/Enforcement/Forecast/Top） | 30 |
+| v71.0 | Audit Trail（ChainHash/Query/History/Integrity/Retention） | 27 |
 | v33.0 | Secrets/Vault（SecretStore/Encryption/Versioning/Policies/Audit/Rotation/Scanner/Resolver） | 58 |
 | v32.0 | Job Queue（JobQueueSystem/Registry/Worker/Scheduler/Retry/DLQ/Events/Metrics） | 54 |
 | v31.0 | Notification（Channel/Template/Queue/Preference/Throttle/Digest/Provider/Metrics） | 54 |
