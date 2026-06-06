@@ -23,10 +23,10 @@ gh pr list --repo haihaihaihai-1/versa
 
 ## 当前状态（2026-06-05 抓取）
 
-- **HEAD**：本地 HEAD — v60.0 SQL Query Builder（待推送）
-- **远程 origin/main**：`33b2644`（v59.0 Code Sandbox，已推送）
-- **本地工作区**：即将推送 v60.0 SQL Query Builder
-- **测试**：1861 通过 / 54 文件
+- **HEAD**：本地 HEAD — v61.0 Geo / Location（待推送）
+- **远程 origin/main**：`5e64be0`（v60.0 SQL Query Builder，已推送）
+- **本地工作区**：即将推送 v61.0 Geo / Location
+- **测试**：1900 通过 / 55 文件
 
 ## 里程碑（按时间倒序）
 
@@ -60,6 +60,7 @@ gh pr list --repo haihaihaihai-1/versa
 | v58.0 | Secret Vault（PBKDF2/AES-256-GCM/Version/Rotation/DynamicLease/Template/RBAC/Audit/Backup） | 43 |
 | v59.0 | Code Sandbox（VM/Timeout/ForbiddenGlobals/Modules/Template/Registry/Metrics） | 32 |
 | v60.0 | SQL Query Builder（SELECT/INSERT/UPDATE/DELETE/JOIN/GROUP/UNION/Dialects/Aggregates） | 52 |
+| v61.0 | Geo / Location（Haversine/Vincenty/Geohash/GeoIndex/Geofence/Polygon） | 39 |
 | v33.0 | Secrets/Vault（SecretStore/Encryption/Versioning/Policies/Audit/Rotation/Scanner/Resolver） | 58 |
 | v32.0 | Job Queue（JobQueueSystem/Registry/Worker/Scheduler/Retry/DLQ/Events/Metrics） | 54 |
 | v31.0 | Notification（Channel/Template/Queue/Preference/Throttle/Digest/Provider/Metrics） | 54 |
