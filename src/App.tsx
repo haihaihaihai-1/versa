@@ -213,6 +213,7 @@ const SchemaRegistryPage = lazy(() => import('./schemaregistry/page'))
 const FlagTargetingPage = lazy(() => import('./flagtargeting/page'))
 const BlueGreenPage = lazy(() => import('./bluegreen/page'))
 const CanaryPage2 = lazy(() => import('./canarydep/page'))
+const DLQPage = lazy(() => import('./dlqmgr/page'))
 
 export const router = createBrowserRouter(
   [
@@ -373,6 +374,7 @@ export const router = createBrowserRouter(
         { path: 'flagtargeting', element: withSuspense(<FlagTargetingPage />) },
         { path: 'bluegreen', element: withSuspense(<BlueGreenPage />) },
         { path: 'canary', element: withSuspense(<CanaryPage2 />) },
+        { path: 'dlq', element: withSuspense(<DLQPage />) },
         { path: 'vector', element: withSuspense(<VectorPage />) },
         { path: 'edge', element: withSuspense(<EdgePage />) },
         { path: 'federation', element: withSuspense(<FederationPage />) },
