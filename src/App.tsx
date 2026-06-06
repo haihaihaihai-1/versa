@@ -216,6 +216,7 @@ const CanaryPage2 = lazy(() => import('./canarydep/page'))
 const DLQPage = lazy(() => import('./dlqmgr/page'))
 const QuotaPage = lazy(() => import('./quotamgr/page'))
 const AuditTrailPage = lazy(() => import('./audittrail/page'))
+const WSGatewayPage = lazy(() => import('./wsgateway/page'))
 
 export const router = createBrowserRouter(
   [
@@ -379,6 +380,7 @@ export const router = createBrowserRouter(
         { path: 'dlq', element: withSuspense(<DLQPage />) },
         { path: 'quota', element: withSuspense(<QuotaPage />) },
         { path: 'audit', element: withSuspense(<AuditTrailPage />) },
+        { path: 'wsgateway', element: withSuspense(<WSGatewayPage />) },
         { path: 'vector', element: withSuspense(<VectorPage />) },
         { path: 'edge', element: withSuspense(<EdgePage />) },
         { path: 'federation', element: withSuspense(<FederationPage />) },
