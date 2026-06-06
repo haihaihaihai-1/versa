@@ -197,6 +197,7 @@ const RealtimePage = lazy(() => import('./realtime/page'))
 const CachePage = lazy(() => import('./cache/page'))
 const CqrsPage = lazy(() => import('./cqrs/page'))
 const SchedulerPage = lazy(() => import('./scheduler/page'))
+const SdkGeneratorPage = lazy(() => import('./sdkgenerator/page'))
 
 export const router = createBrowserRouter(
   [
@@ -340,6 +341,7 @@ export const router = createBrowserRouter(
         { path: 'cache', element: withSuspense(<CachePage />) },
         { path: 'cqrs', element: withSuspense(<CqrsPage />) },
         { path: 'scheduler', element: withSuspense(<SchedulerPage />) },
+        { path: 'sdkgenerator', element: withSuspense(<SdkGeneratorPage />) },
         { path: 'vector', element: withSuspense(<VectorPage />) },
         { path: 'edge', element: withSuspense(<EdgePage />) },
         { path: 'federation', element: withSuspense(<FederationPage />) },

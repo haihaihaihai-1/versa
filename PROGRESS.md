@@ -23,10 +23,10 @@ gh pr list --repo haihaihaihai-1/versa
 
 ## 当前状态（2026-06-05 抓取）
 
-- **HEAD**：本地 HEAD — v51.0 Task Scheduler（待推送）
-- **远程 origin/main**：`7c49b29`（v50.0 CQRS，已推送）
-- **本地工作区**：即将推送 v51.0 Task Scheduler
-- **测试**：1508 通过 / 46 文件
+- **HEAD**：本地 HEAD — v52.0 API Client SDK Generator（待推送）
+- **远程 origin/main**：`544c247`（v51.0 Task Scheduler，已推送）
+- **本地工作区**：即将推送 v52.0 SDK Generator
+- **测试**：1544 通过 / 47 文件
 
 ## 里程碑（按时间倒序）
 
@@ -51,6 +51,7 @@ gh pr list --repo haihaihaihai-1/versa
 | v49.0 | Cache Layer（LRU/LFU/FIFO/TTL/Namespaces/Tags/Singleflight/SWR/Memoize/Bus） | 36 |
 | v50.0 | CQRS（Command/Query/Middleware/Read-model/Event-Bus/Auth/Metrics） | 27 |
 | v51.0 | Task Scheduler（Cron/Delay/Recurring/Misfire/Retry/Concurrency/History） | 39 |
+| v52.0 | API Client SDK Generator（OpenAPI/GraphQL → TS/JS/Python/Go/cURL） | 36 |
 | v33.0 | Secrets/Vault（SecretStore/Encryption/Versioning/Policies/Audit/Rotation/Scanner/Resolver） | 58 |
 | v32.0 | Job Queue（JobQueueSystem/Registry/Worker/Scheduler/Retry/DLQ/Events/Metrics） | 54 |
 | v31.0 | Notification（Channel/Template/Queue/Preference/Throttle/Digest/Provider/Metrics） | 54 |
