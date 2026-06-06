@@ -23,10 +23,10 @@ gh pr list --repo haihaihaihai-1/versa
 
 ## 当前状态（2026-06-05 抓取）
 
-- **HEAD**：本地 HEAD — v57.0 Edge Functions（待推送）
-- **远程 origin/main**：`c90165c`（v56.0 Observability，已推送）
-- **本地工作区**：即将推送 v57.0 Edge Functions
-- **测试**：1734 通过 / 51 文件
+- **HEAD**：本地 HEAD — v58.0 Secret Vault（待推送）
+- **远程 origin/main**：`3c4d9a3`（v57.0 Edge Functions，已推送）
+- **本地工作区**：即将推送 v58.0 Secret Vault
+- **测试**：1777 通过 / 52 文件
 
 ## 里程碑（按时间倒序）
 
@@ -57,6 +57,7 @@ gh pr list --repo haihaihaihai-1/versa
 | v55.0 | CRDT Collaboration（GCounter/PNCtr/Set/2P/OR/LWW/MV/RGA/Map/Peers/Sync） | 47 |
 | v56.0 | Observability / Distributed Tracing（W3C/Span/Event/Link/Counter/Gauge/Histogram） | 47 |
 | v57.0 | Edge Functions / Serverless（Route/Middleware/ColdStart/Timeout/Region/Triggers） | 44 |
+| v58.0 | Secret Vault（PBKDF2/AES-256-GCM/Version/Rotation/DynamicLease/Template/RBAC/Audit/Backup） | 43 |
 | v33.0 | Secrets/Vault（SecretStore/Encryption/Versioning/Policies/Audit/Rotation/Scanner/Resolver） | 58 |
 | v32.0 | Job Queue（JobQueueSystem/Registry/Worker/Scheduler/Retry/DLQ/Events/Metrics） | 54 |
 | v31.0 | Notification（Channel/Template/Queue/Preference/Throttle/Digest/Provider/Metrics） | 54 |
