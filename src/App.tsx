@@ -173,7 +173,6 @@ const GraphQLPage = lazy(() => import('./graphql/page').then(m => ({ default: m.
 const VectorPage = lazy(() => import('./vector/page').then(m => ({ default: m.VectorPage })))
 const EdgePage = lazy(() => import('./edge/page').then(m => ({ default: m.EdgePage })))
 const FederationPage = lazy(() => import('./federation/page').then(m => ({ default: m.FederationPage })))
-const WorkflowPage = lazy(() => import('./workflow/page').then(m => ({ default: m.WorkflowPage })))
 const TenantPage = lazy(() => import('./tenant/page').then(m => ({ default: m.TenantPage })))
 const PrivacyPage = lazy(() => import('./privacy/page').then(m => ({ default: m.PrivacyPage })))
 const NotifPage = lazy(() => import('./notif/page'))
@@ -208,6 +207,7 @@ const SandboxPage = lazy(() => import('./sandbox/page'))
 const QueryBuilderPage = lazy(() => import('./querybuilder/page'))
 const GeoPage = lazy(() => import('./geo/page'))
 const TimeSeriesPage = lazy(() => import('./timeseries/page'))
+const WorkflowPage = lazy(() => import('./workflow/page'))
 
 export const router = createBrowserRouter(
   [
@@ -362,6 +362,7 @@ export const router = createBrowserRouter(
         { path: 'querybuilder', element: withSuspense(<QueryBuilderPage />) },
         { path: 'geo', element: withSuspense(<GeoPage />) },
         { path: 'timeseries', element: withSuspense(<TimeSeriesPage />) },
+        { path: 'workflow', element: withSuspense(<WorkflowPage />) },
         { path: 'vector', element: withSuspense(<VectorPage />) },
         { path: 'edge', element: withSuspense(<EdgePage />) },
         { path: 'federation', element: withSuspense(<FederationPage />) },

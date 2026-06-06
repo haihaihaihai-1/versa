@@ -23,10 +23,10 @@ gh pr list --repo haihaihaihai-1/versa
 
 ## 当前状态（2026-06-05 抓取）
 
-- **HEAD**：本地 HEAD — v62.0 Time Series DB（待推送）
-- **远程 origin/main**：`ea26ce5`（v61.0 Geo / Location，已推送）
-- **本地工作区**：即将推送 v62.0 Time Series DB
-- **测试**：1941 通过 / 56 文件
+- **HEAD**：本地 HEAD — v63.0 Workflow Engine（待推送）
+- **远程 origin/main**：`c60ad93`（v62.0 Time Series DB，已推送）
+- **本地工作区**：即将推送 v63.0 Workflow Engine
+- **测试**：1944 通过 / 56 文件
 
 ## 里程碑（按时间倒序）
 
@@ -62,6 +62,7 @@ gh pr list --repo haihaihaihai-1/versa
 | v60.0 | SQL Query Builder（SELECT/INSERT/UPDATE/DELETE/JOIN/GROUP/UNION/Dialects/Aggregates） | 52 |
 | v61.0 | Geo / Location（Haversine/Vincenty/Geohash/GeoIndex/Geofence/Polygon） | 39 |
 | v62.0 | Time Series DB（Series/Downsample/7Agg/Interpolate/ContinuousQuery/Retention） | 41 |
+| v63.0 | Workflow Engine（Steps/Parallel/Compensate/Retries/Signals/Timers/Snapshot） | 33 |
 | v33.0 | Secrets/Vault（SecretStore/Encryption/Versioning/Policies/Audit/Rotation/Scanner/Resolver） | 58 |
 | v32.0 | Job Queue（JobQueueSystem/Registry/Worker/Scheduler/Retry/DLQ/Events/Metrics） | 54 |
 | v31.0 | Notification（Channel/Template/Queue/Preference/Throttle/Digest/Provider/Metrics） | 54 |

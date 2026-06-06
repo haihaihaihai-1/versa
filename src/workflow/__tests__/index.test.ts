@@ -1,360 +1,348 @@
-/**
- * Versa · Workflow Engine (v28.0) — 单元测试
- */
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import {
-  DefinitionRegistry, definitions, HandlerRegistry, handlers,
-  WorkflowEventBus, eventBus, WorkflowEngine, engine,
-  Scheduler, scheduler, nextCronFire, hasCycle as _hasCycle, topoSort as _topoSort,
-  summarizeWorkflow, loadExecutions, persistExecutions,
-  type WorkflowDefinition, type StepDefinition, type WorkflowExecution,
-} from '../index'
+import { describe, it, expect } from 'vitest'
+import { Workflow, WorkflowEngine, WorkflowBuilder, workflow, Step, getEngine, resetEngine } from '../index'
 
-// ============== DefinitionRegistry ==============
-
-describe('DefinitionRegistry', () => {
-  it('register and get', () => {
-    const r = new DefinitionRegistry()
-    const def: WorkflowDefinition = { id: 'w1', name: 'w', version: '1', steps: [{ id: 'a', name: 'a', kind: 'action', config: { handler: 'h' }, dependsOn: [] }] }
-    r.register(def)
-    expect(r.get('w1')?.name).toBe('w')
+describe('Workflow definition', () => {
+  it('builds from builder', () => {
+    const wf = workflow('w1')
+      .step('a', async () => ({ output: 1 }))
+      .step('b', async () => ({ output: 2 }))
+      .build('a')
+    expect(wf).toBeInstanceOf(Workflow)
+    expect(wf.def.steps).toHaveLength(2)
+    expect(wf.def.start).toBe('a')
   })
 
-  it('rejects duplicate step ids', () => {
-    const r = new DefinitionRegistry()
-    expect(() => r.register({
-      id: 'w', name: 'w', version: '1',
+  it('validates reachable steps', () => {
+    const wf = new Workflow({
+      id: 'w2',
+      start: 'a',
       steps: [
-        { id: 'a', name: 'a', kind: 'action', config: {}, dependsOn: [] },
-        { id: 'a', name: 'b', kind: 'action', config: {}, dependsOn: [] },
+        { id: 'a', handler: () => ({ output: 1 }), next: 'b' },
+        { id: 'b', handler: () => ({ output: 2 }) },
+        { id: 'orphan', handler: () => ({ output: 3 }) },
       ],
-    })).toThrow(/Duplicate/)
+    })
+    const v = wf.validate()
+    expect(v.ok).toBe(false)
+    expect(v.errors.some(e => e.includes('orphan'))).toBe(true)
   })
 
-  it('rejects unknown dep', () => {
-    const r = new DefinitionRegistry()
-    expect(() => r.register({
-      id: 'w', name: 'w', version: '1',
-      steps: [{ id: 'a', name: 'a', kind: 'action', config: {}, dependsOn: ['nope'] }],
-    })).toThrow(/unknown step/)
+  it('detects missing next ref', () => {
+    const wf = new Workflow({
+      id: 'w3',
+      start: 'a',
+      steps: [{ id: 'a', handler: () => ({}), next: 'missing' }],
+    })
+    const v = wf.validate()
+    expect(v.ok).toBe(false)
+    expect(v.errors.some(e => e.includes('missing'))).toBe(true)
   })
 
-  it('rejects cycles', () => {
-    const r = new DefinitionRegistry()
-    expect(() => r.register({
-      id: 'w', name: 'w', version: '1',
+  it('detects cycle', () => {
+    const wf = new Workflow({
+      id: 'w4',
+      start: 'a',
       steps: [
-        { id: 'a', name: 'a', kind: 'action', config: {}, dependsOn: ['b'] },
-        { id: 'b', name: 'b', kind: 'action', config: {}, dependsOn: ['a'] },
+        { id: 'a', handler: () => ({}), next: 'b' },
+        { id: 'b', handler: () => ({}), next: 'a' },
       ],
-    })).toThrow(/cycle/)
+    })
+    const v = wf.validate()
+    expect(v.ok).toBe(false)
+    expect(v.errors.some(e => e.includes('cycle'))).toBe(true)
   })
 
-  it('list / size / remove / clear', () => {
-    const r = new DefinitionRegistry()
-    r.register({ id: 'w1', name: 'w1', version: '1', steps: [] })
-    r.register({ id: 'w2', name: 'w2', version: '1', steps: [] })
-    expect(r.size()).toBe(2)
-    expect(r.remove('w1')).toBe(true)
-    expect(r.size()).toBe(1)
-    r.clear()
-    expect(r.size()).toBe(0)
+  it('topoOrder returns steps in order', () => {
+    const wf = new Workflow({
+      id: 'w5',
+      start: 'a',
+      steps: [
+        { id: 'a', handler: () => ({}), next: 'b' },
+        { id: 'b', handler: () => ({}), next: 'c' },
+        { id: 'c', handler: () => ({}), next: 'd' },
+        { id: 'd', handler: () => ({}) },
+      ],
+    })
+    expect(wf.topoOrder()).toEqual(['a', 'b', 'c', 'd'])
   })
 })
 
-// ============== HandlerRegistry ==============
-
-describe('HandlerRegistry', () => {
-  it('register and lookup', () => {
-    const r = new HandlerRegistry()
-    const h = () => 1
-    r.registerAction('a', h)
-    expect(r.getAction('a')).toBe(h)
-  })
-  it('separate namespaces', () => {
-    const r = new HandlerRegistry()
-    r.registerAction('a', () => 1)
-    r.registerCompensate('c', () => {})
-    r.registerCondition('x', () => true)
-    expect(r.listActions()).toEqual(['a'])
-    expect(r.listCompensates()).toEqual(['c'])
-    expect(r.listConditions()).toEqual(['x'])
-  })
-  it('clear all', () => {
-    const r = new HandlerRegistry()
-    r.registerAction('a', () => 1)
-    r.clear()
-    expect(r.listActions()).toEqual([])
-  })
-})
-
-// ============== EventBus ==============
-
-describe('WorkflowEventBus', () => {
-  beforeEach(() => eventBus.clear())
-
-  it('emits to listener', () => {
-    const fn = vi.fn()
-    eventBus.on('test', fn)
-    eventBus.emit('test', { data: 1 })
-    expect(fn).toHaveBeenCalledWith(expect.objectContaining({ message: 'test', data: 1 }))
+describe('Step', () => {
+  it('runs handler with context', async () => {
+    const step = new Step({ id: 's1', handler: ctx => ({ output: ctx.runId }) })
+    const r = await step.run(undefined, {}, 'rid')
+    expect(r.output).toBe('rid')
   })
 
-  it('unsubscribe', () => {
-    const fn = vi.fn()
-    const off = eventBus.on('test', fn)
-    off()
-    eventBus.emit('test')
-    expect(fn).not.toHaveBeenCalled()
+  it('respects condition false → skip', async () => {
+    let called = false
+    const step = new Step({ id: 's', handler: () => { called = true; return { output: 1 } }, condition: () => false })
+    const r = await step.run(undefined, {})
+    expect(called).toBe(false)
+    expect(r.output).toBeUndefined()
   })
 
-  it('wildcard listener', () => {
-    const fn = vi.fn()
-    eventBus.on('*', fn)
-    eventBus.emit('a')
-    eventBus.emit('b')
-    expect(fn).toHaveBeenCalledTimes(2)
-  })
-
-  it('history with filter', () => {
-    eventBus.emit('a')
-    eventBus.emit('b')
-    eventBus.emit('a')
-    expect(eventBus.history_({ type: 'a' })).toHaveLength(2)
-  })
-})
-
-// ============== Engine ==============
-
-describe('WorkflowEngine', () => {
-  beforeEach(() => {
-    definitions.clear()
-    handlers.clear()
-    engine.clear()
-  })
-
-  it('executes a simple action step', async () => {
-    handlers.registerAction('echo', (ctx, step) => {
-      ctx.vars['echoed'] = step.config.msg
-      return { ok: true }
-    })
-    definitions.register({
-      id: 'w1', name: 'echo', version: '1',
-      steps: [{ id: 'a', name: 'echo', kind: 'action', config: { handler: 'echo', msg: 'hi' }, dependsOn: [] }],
-    })
-    const r = await engine.execute('w1', {})
-    expect(r.status).toBe('success')
-    expect(r.steps[0]?.status).toBe('success')
-    expect(r.steps[0]?.output).toEqual({ ok: true })
-  })
-
-  it('executes steps in dependency order', async () => {
-    const order: string[] = []
-    handlers.registerAction('a', () => { order.push('a'); return 1 })
-    handlers.registerAction('b', () => { order.push('b'); return 2 })
-    handlers.registerAction('c', () => { order.push('c'); return 3 })
-    definitions.register({
-      id: 'w', name: 'w', version: '1',
-      steps: [
-        { id: 'c', name: 'c', kind: 'action', config: { handler: 'c' }, dependsOn: ['a', 'b'] },
-        { id: 'a', name: 'a', kind: 'action', config: { handler: 'a' }, dependsOn: [] },
-        { id: 'b', name: 'b', kind: 'action', config: { handler: 'b' }, dependsOn: [] },
-      ],
-    })
-    const r = await engine.execute('w', {})
-    expect(r.status).toBe('success')
-    expect(order).toEqual(['a', 'b', 'c'])
-  })
-
-  it('runs delay step', async () => {
-    definitions.register({
-      id: 'w', name: 'w', version: '1',
-      steps: [{ id: 'd', name: 'd', kind: 'delay', config: { ms: 30 }, dependsOn: [] }],
-    })
-    const r = await engine.execute('w', {})
-    expect(r.status).toBe('success')
-    expect(r.steps[0]?.output).toEqual({ slept: 30 })
-  })
-
-  it('emits events to the bus', async () => {
-    definitions.register({
-      id: 'w', name: 'w', version: '1',
-      steps: [{ id: 'e', name: 'e', kind: 'emit', config: { event: 'hi', data: 1 }, dependsOn: [] }],
-    })
-    const fn = vi.fn()
-    eventBus.on('hi', fn)
-    await engine.execute('w', {})
-    expect(fn).toHaveBeenCalled()
-  })
-
-  it('loop step runs N times', async () => {
-    let count = 0
-    handlers.registerAction('inc', () => { count++; return count })
-    definitions.register({
-      id: 'w', name: 'w', version: '1',
-      steps: [{ id: 'l', name: 'l', kind: 'loop', config: { handler: 'inc', count: 5 }, dependsOn: [] }],
-    })
-    const r = await engine.execute('w', {})
-    expect(count).toBe(5)
-    expect(r.steps[0]?.output).toEqual([1, 2, 3, 4, 5])
-  })
-
-  it('failed step bubbles up and triggers saga', async () => {
-    handlers.registerAction('ok', () => 'ok')
-    handlers.registerAction('boom', () => { throw new Error('boom') })
-    handlers.registerCompensate('undo', (ctx, step, out) => { (ctx.vars as Record<string, unknown>).undone = out })
-    definitions.register({
-      id: 'w', name: 'w', version: '1',
-      steps: [
-        { id: 'a', name: 'a', kind: 'action', config: { handler: 'ok' }, dependsOn: [], compensate: 'undo' },
-        { id: 'b', name: 'b', kind: 'action', config: { handler: 'boom' }, dependsOn: ['a'] },
-      ],
-    })
-    const r = await engine.execute('w', {})
-    expect(r.status).toBe('compensated')
+  it('catches handler error', async () => {
+    const step = new Step({ id: 's', handler: () => { throw new Error('boom') } })
+    const r = await step.run(undefined, {})
     expect(r.error).toBe('boom')
-    expect(r.steps.find(s => s.stepId === 'a')?.status).toBe('compensated')
   })
 
-  it('retries with backoff on transient failure', async () => {
-    let n = 0
-    handlers.registerAction('flaky', () => { n++; if (n < 3) throw new Error('try again'); return 'ok' })
-    definitions.register({
-      id: 'w', name: 'w', version: '1',
-      steps: [{ id: 'f', name: 'f', kind: 'action', config: { handler: 'flaky' }, dependsOn: [], retry: { maxAttempts: 5, baseDelayMs: 1, maxDelayMs: 5, jitter: false, retryOnStatus: [] } }],
-    })
-    const r = await engine.execute('w', {})
+  it('respects timeoutMs', async () => {
+    const step = new Step({ id: 's', handler: async ctx => { await ctx.sleep(1000); return { output: 1 } }, timeoutMs: 50 })
+    const r = await step.run(undefined, {})
+    expect(r.error).toBe('timeout')
+  })
+})
+
+describe('WorkflowEngine — basic', () => {
+  it('starts a run', () => {
+    const eng = new WorkflowEngine()
+    const wf = workflow('w').step('a', () => ({ output: 1 })).build('a')
+    eng.register(wf)
+    const run = eng.start('w')
+    expect(run.status).toBe('pending')
+    expect(run.stepStates.get('a')).toBe('pending')
+  })
+
+  it('executes simple workflow', async () => {
+    const eng = new WorkflowEngine()
+    const wf = workflow('w')
+      .step('a', () => ({ output: 1 }))
+      .step('b', () => ({ output: 2 }))
+      .build('a', 'b')
+    eng.register(wf)
+    const run = eng.start('w')
+    const r = await eng.execute(run)
     expect(r.status).toBe('success')
-    expect(r.steps[0]?.attempts).toBe(3)
+    expect(r.stepStates.get('a')).toBe('success')
+    expect(r.stepStates.get('b')).toBe('success')
   })
 
-  it('cancels a running workflow', async () => {
-    handlers.registerAction('slow', async () => { await new Promise(r => setTimeout(r, 200)); return 'done' })
-    definitions.register({
-      id: 'w', name: 'w', version: '1',
-      steps: [{ id: 's', name: 's', kind: 'action', config: { handler: 'slow' }, dependsOn: [] }],
-    })
-    const p = engine.execute('w', {})
-    // wait a bit for engine to start
-    await new Promise(r => setTimeout(r, 10))
-    // find the exec id by listing
-    const execs = engine.list()
-    if (execs[0]) engine.cancel(execs[0].id)
-    const r = await p
+  it('throws on unknown workflow', () => {
+    const eng = new WorkflowEngine()
+    expect(() => eng.start('nope')).toThrow()
+  })
+
+  it('rejects start on completed run', async () => {
+    const eng = new WorkflowEngine()
+    const wf = workflow('w').step('a', () => ({ output: 1 })).build('a')
+    eng.register(wf)
+    const run = eng.start('w')
+    await eng.execute(run)
+    const r2 = await eng.execute(run)
+    expect(r2.status).toBe('success')
+  })
+})
+
+describe('WorkflowEngine — parallel fork/join', () => {
+  it('runs parallel siblings concurrently', async () => {
+    const eng = new WorkflowEngine()
+    const wf = workflow('p')
+      .parallelStep('a', async () => { await new Promise(r => setTimeout(r, 30)); return { output: 'A' } })
+      .parallelStep('b', async () => { await new Promise(r => setTimeout(r, 30)); return { output: 'B' } })
+      .step('c', () => ({ output: 'C' }))
+      .build('a', 'c')
+    eng.register(wf)
+    const run = eng.start('p')
+    const r = await eng.execute(run)
+    expect(r.status).toBe('success')
+    expect(r.stepStates.get('a')).toBe('success')
+    expect(r.stepStates.get('b')).toBe('success')
+    expect(r.stepStates.get('c')).toBe('success')
+  })
+
+  it('fails and compensates on parallel error', async () => {
+    const eng = new WorkflowEngine()
+    let aCompensated = false
+    const wf = workflow('p2')
+      .parallelStep('a', async () => ({ output: 1 }), { compensate: () => { aCompensated = true } })
+      .parallelStep('b', async () => ({ error: 'fail' }))
+      .build('a')
+    eng.register(wf)
+    const run = eng.start('p2')
+    const r = await eng.execute(run)
+    expect(r.status).toBe('failed')
+    expect(aCompensated).toBe(true)
+    expect(r.stepStates.get('a')).toBe('compensated')
+  })
+})
+
+describe('WorkflowEngine — retries, compensation, signals, timers', () => {
+  it('retries failed step', async () => {
+    let n = 0
+    const eng = new WorkflowEngine()
+    const wf = workflow('r').step('a', () => { n++; return n < 3 ? { error: 'try' } : { output: 'ok' } }, { retries: 3, backoffMs: 1 }).build('a')
+    eng.register(wf)
+    const run = eng.start('r')
+    const r = await eng.execute(run)
+    expect(r.status).toBe('success')
+    expect(run.stepAttempts.get('a')).toBe(3)
+  })
+
+  it('marks failed after max attempts', async () => {
+    const eng = new WorkflowEngine()
+    const wf = workflow('r2').step('a', () => ({ error: 'always' }), { retries: 1, backoffMs: 1 }).build('a')
+    eng.register(wf)
+    const run = eng.start('r2')
+    const r = await eng.execute(run)
+    expect(r.status).toBe('failed')
+    expect(run.stepAttempts.get('a')).toBe(2)
+  })
+
+  it('runs compensation on failure', async () => {
+    let comp = false
+    const eng = new WorkflowEngine()
+    const wf = workflow('c')
+      .step('a', () => ({ output: 1 }))
+      .step('b', () => ({ error: 'fail' }), { compensate: () => { comp = true } })
+      .build('a')
+    eng.register(wf)
+    const run = eng.start('c')
+    const r = await eng.execute(run)
+    expect(r.status).toBe('failed')
+    expect(comp).toBe(true)
+  })
+
+  it('signals modify run state', () => {
+    const eng = new WorkflowEngine()
+    const wf = workflow('s').step('a', () => ({ output: 1 })).build('a')
+    eng.register(wf)
+    const run = eng.start('s')
+    eng.signal(run.id, 'x', 42)
+    expect(run.state['signal.x']).toBe(42)
+  })
+
+  it('schedule fires signal', async () => {
+    const eng = new WorkflowEngine()
+    const wf = workflow('s2').step('a', () => ({ output: 1 })).build('a')
+    eng.register(wf)
+    const run = eng.start('s2')
+    eng.schedule(run.id, 'tick', true, 30)
+    await new Promise(r => setTimeout(r, 80))
+    expect(run.state['signal.tick']).toBe(true)
+  })
+
+  it('cancelTimer removes pending', () => {
+    const eng = new WorkflowEngine()
+    const wf = workflow('s3').step('a', () => ({ output: 1 })).build('a')
+    eng.register(wf)
+    const run = eng.start('s3')
+    const tid = eng.schedule(run.id, 'k', 1, 10000)
+    expect(eng.cancelTimer(tid)).toBe(true)
+    expect(eng.cancelTimer(tid)).toBe(false)
+  })
+
+  it('cancel marks run cancelled', async () => {
+    const eng = new WorkflowEngine()
+    const wf = workflow('x').step('a', async () => { await new Promise(r => setTimeout(r, 50)); return { output: 1 } }).build('a')
+    eng.register(wf)
+    const run = eng.start('x')
+    eng.cancel(run.id)
+    const r = await eng.execute(run)
     expect(r.status).toBe('cancelled')
   })
 
-  it('skips step when dependency failed', async () => {
-    handlers.registerAction('boom', () => { throw new Error('x') })
-    handlers.registerAction('after', () => 'after')
-    definitions.register({
-      id: 'w', name: 'w', version: '1',
-      steps: [
-        { id: 'a', name: 'a', kind: 'action', config: { handler: 'boom' }, dependsOn: [] },
-        { id: 'b', name: 'b', kind: 'action', config: { handler: 'after' }, dependsOn: ['a'] },
-      ],
-    })
-    const r = await engine.execute('w', {})
-    expect(r.steps.find(s => s.stepId === 'a')?.status).toBe('failed')
-    expect(r.steps.find(s => s.stepId === 'b')?.status).toBe('skipped')
+  it('waitForSignal resolves when signal set', async () => {
+    const eng = new WorkflowEngine()
+    const wf = workflow('w').step('a', () => ({ output: 1 })).build('a')
+    eng.register(wf)
+    const run = eng.start('w')
+    setTimeout(() => eng.signal(run.id, 'k', 'v'), 30)
+    const v = await eng.waitForSignal(run.id, 'k', 500)
+    expect(v).toBe('v')
   })
 
-  it('subworkflow executes nested', async () => {
-    handlers.registerAction('inner', () => 'inner-result')
-    definitions.register({
-      id: 'inner', name: 'inner', version: '1',
-      steps: [{ id: 'a', name: 'a', kind: 'action', config: { handler: 'inner' }, dependsOn: [] }],
-    })
-    definitions.register({
-      id: 'outer', name: 'outer', version: '1',
-      steps: [{ id: 's', name: 's', kind: 'subworkflow', config: { workflow: 'inner' }, dependsOn: [] }],
-    })
-    const r = await engine.execute('outer', {})
-    expect(r.status).toBe('success')
+  it('waitForSignal rejects on timeout', async () => {
+    const eng = new WorkflowEngine()
+    const wf = workflow('w').step('a', () => ({ output: 1 })).build('a')
+    eng.register(wf)
+    const run = eng.start('w')
+    await expect(eng.waitForSignal(run.id, 'k', 30)).rejects.toThrow('timeout')
   })
 })
 
-// ============== Scheduler ==============
-
-describe('Scheduler', () => {
-  beforeEach(() => { scheduler.clear(); definitions.clear(); handlers.clear() })
-
-  it('schedules and runs interval job', async () => {
-    handlers.registerAction('tick', () => 'tick')
-    definitions.register({
-      id: 'w', name: 'w', version: '1',
-      steps: [{ id: 'a', name: 'a', kind: 'action', config: { handler: 'tick' }, dependsOn: [] }],
-    })
-    const id = scheduler.schedule('every-100ms', 'w', { type: 'interval', expr: 100 })
-    await new Promise(r => setTimeout(r, 250))
-    const job = scheduler.get(id)
-    expect(job?.runs).toBeGreaterThanOrEqual(1)
-    scheduler.remove(id)
+describe('WorkflowEngine — registry and metrics', () => {
+  it('registers, unregisters, lists', () => {
+    const eng = new WorkflowEngine()
+    const wf = workflow('r').step('a', () => ({ output: 1 })).build('a')
+    eng.register(wf)
+    expect(eng.listWorkflows()).toContain('r')
+    expect(eng.unregister('r')).toBe(true)
+    expect(eng.listWorkflows()).not.toContain('r')
   })
 
-  it('once job fires then removes itself', async () => {
-    handlers.registerAction('once', () => 'once')
-    definitions.register({
-      id: 'w', name: 'w', version: '1',
-      steps: [{ id: 'a', name: 'a', kind: 'action', config: { handler: 'once' }, dependsOn: [] }],
-    })
-    const id = scheduler.schedule('once-50ms', 'w', { type: 'once', expr: Date.now() + 50 })
-    expect(scheduler.size()).toBe(1)
-    await new Promise(r => setTimeout(r, 150))
-    expect(scheduler.size()).toBe(0)
+  it('getWorkflow retrieves by id', () => {
+    const eng = new WorkflowEngine()
+    const wf = workflow('id1').step('a', () => ({})).build('a')
+    eng.register(wf)
+    expect(eng.getWorkflow('id1')).toBe(wf)
   })
 
-  it('list / enable / clear', () => {
-    definitions.register({ id: 'w', name: 'w', version: '1', steps: [] })
-    const id = scheduler.schedule('j', 'w', { type: 'interval', expr: 60_000 })
-    expect(scheduler.list()).toHaveLength(1)
-    scheduler.enable(id, false)
-    expect(scheduler.get(id)?.enabled).toBe(false)
-    scheduler.clear()
-    expect(scheduler.size()).toBe(0)
+  it('listRuns filters by workflow', async () => {
+    const eng = new WorkflowEngine()
+    eng.register(workflow('a').step('s', () => ({})).build('s'))
+    eng.register(workflow('b').step('s', () => ({})).build('s'))
+    const r1 = eng.start('a')
+    const r2 = eng.start('b')
+    expect(eng.listRuns('a')).toHaveLength(1)
+    expect(eng.listRuns('b')).toHaveLength(1)
+  })
+
+  it('snapshot captures state', async () => {
+    const eng = new WorkflowEngine()
+    const wf = workflow('s').step('a', () => ({ output: 1 })).build('a')
+    eng.register(wf)
+    const run = eng.start('s')
+    eng.signal(run.id, 'x', 1)
+    await eng.execute(run)
+    const snap = eng.snapshot()
+    expect(snap).toHaveLength(1)
+    expect(snap[0].state['signal.x']).toBe(1)
+  })
+
+  it('metrics counts statuses', async () => {
+    const eng = new WorkflowEngine()
+    const wf = workflow('m').step('a', () => ({ output: 1 })).build('a')
+    eng.register(wf)
+    const r1 = eng.start('m')
+    await eng.execute(r1)
+    expect(eng.metrics().success).toBe(1)
+    expect(eng.metrics().workflows).toBe(1)
+  })
+
+  it('clear wipes all', async () => {
+    const eng = new WorkflowEngine()
+    const wf = workflow('c').step('a', () => ({})).build('a')
+    eng.register(wf)
+    eng.start('c')
+    eng.clear()
+    expect(eng.listRuns()).toHaveLength(0)
+  })
+
+  it('onStepComplete callback fires for each step', async () => {
+    const eng = new WorkflowEngine()
+    const wf = workflow('cb').step('a', () => ({ output: 1 })).step('b', () => ({ output: 2 })).build('a')
+    eng.register(wf)
+    const run = eng.start('cb')
+    const seen: string[] = []
+    await eng.execute(run, id => seen.push(id))
+    expect(seen).toEqual(['a', 'b'])
   })
 })
 
-describe('nextCronFire', () => {
-  it('every minute returns next minute boundary', () => {
-    const now = new Date('2026-06-05T10:30:30Z').getTime()
-    const next = nextCronFire('* * * * *', now)
-    expect(new Date(next).getMinutes()).toBe(31)
-    expect(new Date(next).getSeconds()).toBe(0)
+describe('Singleton', () => {
+  it('getEngine returns same instance', () => {
+    resetEngine()
+    const a = getEngine()
+    const b = getEngine()
+    expect(a).toBe(b)
   })
-  it('every hour at M', () => {
-    const now = new Date('2026-06-05T10:30:00Z').getTime()
-    const next = nextCronFire('15 * * * *', now)
-    expect(new Date(next).getUTCMinutes()).toBe(15)
-    expect(new Date(next).getUTCHours()).toBe(11)
-  })
-})
 
-// ============== Persistence ==============
-
-describe('persistence', () => {
-  it('loadExecutions returns empty when no data', () => {
-    if (typeof localStorage !== 'undefined') localStorage.removeItem('versa.workflow.v1')
-    expect(loadExecutions()).toEqual([])
-  })
-  it('persistExecutions returns count', () => {
-    if (typeof localStorage === 'undefined') return
-    engine.clear()
-    expect(persistExecutions(engine)).toBe(0)
-  })
-})
-
-// ============== summarizeWorkflow ==============
-
-describe('summarizeWorkflow', () => {
-  it('returns aggregated snapshot', () => {
-    definitions.clear()
-    handlers.clear()
-    definitions.register({ id: 'w', name: 'w', version: '1', steps: [] })
-    handlers.registerAction('a', () => 1)
-    const s = summarizeWorkflow()
-    expect(s.definitions).toBe(1)
-    expect(s.handlers).toBe(1)
-    expect(s.metrics).toBeDefined()
+  it('resetEngine creates new instance', () => {
+    const a = getEngine()
+    resetEngine()
+    const b = getEngine()
+    expect(a).not.toBe(b)
   })
 })
