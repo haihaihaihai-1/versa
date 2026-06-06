@@ -214,6 +214,7 @@ const FlagTargetingPage = lazy(() => import('./flagtargeting/page'))
 const BlueGreenPage = lazy(() => import('./bluegreen/page'))
 const CanaryPage2 = lazy(() => import('./canarydep/page'))
 const DLQPage = lazy(() => import('./dlqmgr/page'))
+const QuotaPage = lazy(() => import('./quotamgr/page'))
 
 export const router = createBrowserRouter(
   [
@@ -375,6 +376,7 @@ export const router = createBrowserRouter(
         { path: 'bluegreen', element: withSuspense(<BlueGreenPage />) },
         { path: 'canary', element: withSuspense(<CanaryPage2 />) },
         { path: 'dlq', element: withSuspense(<DLQPage />) },
+        { path: 'quota', element: withSuspense(<QuotaPage />) },
         { path: 'vector', element: withSuspense(<VectorPage />) },
         { path: 'edge', element: withSuspense(<EdgePage />) },
         { path: 'federation', element: withSuspense(<FederationPage />) },
