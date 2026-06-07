@@ -1,300 +1,217 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { ExperimentService, getExperimentService, resetExperimentService, type Experiment } from '../index'
+import { ExperimentTracker, resetExperimentTracker } from '../index'
 
-function makeExp(overrides: Partial<Experiment> = {}): Experiment {
-  return {
-    key: 'btn_color',
-    name: 'Button Color',
-    variants: [
-      { name: 'control', weight: 50, config: { color: 'blue' } },
-      { name: 'variant_a', weight: 50, config: { color: 'green' } }
-    ],
-    status: 'running',
-    createdAt: Date.now(),
-    updatedAt: Date.now(),
-    ...overrides
-  }
-}
+let t: ExperimentTracker
 
-describe('ExperimentService - CRUD', () => {
-  let svc: ExperimentService
-  beforeEach(() => { svc = new ExperimentService() })
-
-  it('creates experiment', () => {
-    const e = svc.createExperiment(makeExp())
-    expect(e.key).toBe('btn_color')
-    expect(e.status).toBe('running')
-    expect(svc.getExperiment('btn_color')).toBeDefined()
-  })
-  it('throws on duplicate', () => {
-    svc.createExperiment(makeExp())
-    expect(() => svc.createExperiment(makeExp())).toThrow()
-  })
-  it('updates experiment', () => {
-    svc.createExperiment(makeExp())
-    const u = svc.updateExperiment('btn_color', { description: 'updated' })
-    expect(u.description).toBe('updated')
-  })
-  it('throws on update missing', () => {
-    expect(() => svc.updateExperiment('foo', {})).toThrow()
-  })
-  it('deletes experiment', () => {
-    svc.createExperiment(makeExp())
-    expect(svc.deleteExperiment('btn_color')).toBe(true)
-    expect(svc.getExperiment('btn_color')).toBeUndefined()
-  })
-  it('delete returns false for missing', () => {
-    expect(svc.deleteExperiment('foo')).toBe(false)
-  })
-  it('lifecycle: start/pause/resume/complete/archive', () => {
-    svc.createExperiment({ ...makeExp(), status: 'draft' })
-    svc.startExperiment('btn_color')
-    expect(svc.getExperiment('btn_color')?.status).toBe('running')
-    svc.pauseExperiment('btn_color')
-    expect(svc.getExperiment('btn_color')?.status).toBe('paused')
-    svc.resumeExperiment('btn_color')
-    expect(svc.getExperiment('btn_color')?.status).toBe('running')
-    svc.completeExperiment('btn_color')
-    expect(svc.getExperiment('btn_color')?.status).toBe('completed')
-    svc.archiveExperiment('btn_color')
-    expect(svc.getExperiment('btn_color')?.status).toBe('archived')
-  })
+beforeEach(() => {
+  resetExperimentTracker()
+  t = new ExperimentTracker()
 })
 
-describe('ExperimentService - list & filter', () => {
-  let svc: ExperimentService
-  beforeEach(() => { svc = new ExperimentService() })
-  it('lists by status', () => {
-    svc.createExperiment({ ...makeExp({ key: 'a' }), status: 'running' })
-    svc.createExperiment({ ...makeExp({ key: 'b' }), status: 'paused' })
-    expect(svc.listExperiments({ status: 'running' })).toHaveLength(1)
+describe('ExperimentTracker', () => {
+  it('starts a run with auto id', () => {
+    const r = t.startRun({ name: 'exp-1' })
+    expect(r.id).toMatch(/run-/)
+    expect(r.status).toBe('running')
   })
-  it('lists by tag', () => {
-    svc.createExperiment({ ...makeExp({ key: 'a' }), tags: ['homepage'] })
-    expect(svc.listExperiments({ tag: 'homepage' })).toHaveLength(1)
-  })
-  it('lists by owner', () => {
-    svc.createExperiment({ ...makeExp({ key: 'a' }), ownerId: 'alice' })
-    expect(svc.listExperiments({ ownerId: 'alice' })).toHaveLength(1)
-  })
-})
 
-describe('ExperimentService - targeting', () => {
-  let svc: ExperimentService
-  beforeEach(() => { svc = new ExperimentService() })
+  it('starts run with explicit id', () => {
+    const r = t.startRun({ id: 'r-42', name: 'x' })
+    expect(r.id).toBe('r-42')
+  })
 
-  it('match-all returns true', () => {
-    expect(svc.evaluateTargeting({ type: 'match-all' }, { userId: 'u1' })).toBe(true)
+  it('rejects duplicate id', () => {
+    t.startRun({ id: 'r', name: 'x' })
+    expect(() => t.startRun({ id: 'r', name: 'y' })).toThrow()
   })
-  it('match-attrs eq', () => {
-    expect(svc.evaluateTargeting({ type: 'match-attrs', predicates: [{ attr: 'country', op: 'eq', value: 'US' }] }, { userId: 'u1', attributes: { country: 'US' } })).toBe(true)
-    expect(svc.evaluateTargeting({ type: 'match-attrs', predicates: [{ attr: 'country', op: 'eq', value: 'US' }] }, { userId: 'u1', attributes: { country: 'CA' } })).toBe(false)
-  })
-  it('match-attrs in/gt/lt/contains', () => {
-    const r = (op: string, v: unknown, val: unknown, expect_: boolean) => {
-      const result = svc.evaluateTargeting({ type: 'match-attrs', predicates: [{ attr: 'x', op: op as 'eq', value: v }] }, { userId: 'u', attributes: { x: val } })
-      expect(result).toBe(expect_)
-    }
-    r('gt', 3, 5, true)
-    r('gt', 5, 5, false)
-    r('lt', 10, 5, true)
-    r('in', [1, 5, 7], 5, true)
-    r('contains', 'hello', 'hello world', true)
-  })
-  it('and/or', () => {
-    const a = svc.evaluateTargeting({ type: 'and', rules: [{ type: 'match-attrs', predicates: [{ attr: 'a', op: 'eq', value: 1 }] }, { type: 'match-attrs', predicates: [{ attr: 'b', op: 'eq', value: 2 }] }] }, { userId: 'u', attributes: { a: 1, b: 2 } })
-    expect(a).toBe(true)
-    const o = svc.evaluateTargeting({ type: 'or', rules: [{ type: 'match-attrs', predicates: [{ attr: 'a', op: 'eq', value: 9 }] }, { type: 'match-attrs', predicates: [{ attr: 'b', op: 'eq', value: 2 }] }] }, { userId: 'u', attributes: { a: 1, b: 2 } })
-    expect(o).toBe(true)
-  })
-  it('not', () => {
-    expect(svc.evaluateTargeting({ type: 'not' }, { userId: 'u' })).toBe(false)
-  })
-})
 
-describe('ExperimentService - assignment', () => {
-  let svc: ExperimentService
-  beforeEach(() => { svc = new ExperimentService() })
+  it('getRun retrieves', () => {
+    t.startRun({ id: 'a', name: 'x' })
+    expect(t.getRun('a')).toBeDefined()
+  })
 
-  it('returns null for missing experiment', () => {
-    expect(svc.assign('missing', { userId: 'u1' })).toBeNull()
+  it('setParams merges', () => {
+    t.startRun({ id: 'a', name: 'x', params: { lr: 0.01 } })
+    t.setParams('a', { batch: 32 })
+    expect(t.getRun('a')?.params.batch).toBe(32)
   })
-  it('returns null for non-running experiment', () => {
-    svc.createExperiment({ ...makeExp(), status: 'paused' })
-    expect(svc.assign('btn_color', { userId: 'u1' })).toBeNull()
-  })
-  it('returns null when targeting fails', () => {
-    svc.createExperiment({ ...makeExp(), targeting: { type: 'match-attrs', predicates: [{ attr: 'country', op: 'eq', value: 'US' }] } })
-    expect(svc.assign('btn_color', { userId: 'u1', attributes: { country: 'CA' } })).toBeNull()
-  })
-  it('assigns a variant', () => {
-    svc.createExperiment(makeExp())
-    const r = svc.assign('btn_color', { userId: 'u1' })
-    expect(r).not.toBeNull()
-    expect(['control', 'variant_a']).toContain(r!.variant)
-    expect(r!.source).toBe('bucket')
-  })
-  it('sticks to same variant on second call', () => {
-    svc.createExperiment(makeExp())
-    const a = svc.assign('btn_color', { userId: 'u1' })!
-    const b = svc.assign('btn_color', { userId: 'u1' })!
-    expect(a.variant).toBe(b.variant)
-    expect(b.sticky).toBe(true)
-  })
-  it('forced user always gets first variant', () => {
-    svc.createExperiment({ ...makeExp(), forcedUserIds: ['u1'] })
-    const r = svc.assign('btn_color', { userId: 'u1' })!
-    expect(r.variant).toBe('control')
-    expect(r.source).toBe('forced')
-  })
-  it('holdout assignment', () => {
-    svc.createExperiment({ ...makeExp({ key: 'h' }), holdoutPercent: 100 })
-    const r = svc.assign('h', { userId: 'u1' })!
-    expect(r.variant).toBe('__holdout__')
-    expect(r.source).toBe('holdout')
-  })
-  it('rampout when bucket exceeds ramp', () => {
-    svc.createExperiment({ ...makeExp({ key: 'r' }), rampPercent: 0 })
-    const r = svc.assign('r', { userId: 'u1' })!
-    expect(r.variant).toBe('__rampout__')
-    expect(r.source).toBe('rampout')
-  })
-  it('distributes across variants roughly evenly', () => {
-    svc.createExperiment(makeExp())
-    const counts: Record<string, number> = { control: 0, variant_a: 0 }
-    for (let i = 0; i < 200; i++) {
-      const r = svc.assign('btn_color', { userId: 'u' + i })!
-      counts[r.variant]++
-    }
-    expect(counts.control).toBeGreaterThan(50)
-    expect(counts.variant_a).toBeGreaterThan(50)
-  })
-  it('weighted 90/10 distribution', () => {
-    svc.createExperiment({ ...makeExp({ key: 'w' }), variants: [{ name: 'control', weight: 90, config: {} }, { name: 'treatment', weight: 10, config: {} }] })
-    let control = 0, treat = 0
-    for (let i = 0; i < 500; i++) {
-      const r = svc.assign('w', { userId: 'uw' + i })!
-      if (r.variant === 'control') control++; else treat++
-    }
-    expect(control).toBeGreaterThan(treat * 5)
-  })
-})
 
-describe('ExperimentService - conversions', () => {
-  let svc: ExperimentService
-  beforeEach(() => { svc = new ExperimentService() })
-  it('tracks and lists conversions', () => {
-    svc.createExperiment(makeExp())
-    svc.assign('btn_color', { userId: 'u1' })
-    svc.trackConversion({ experimentKey: 'btn_color', variant: 'control', userId: 'u1', metric: 'goal' })
-    expect(svc.listConversions({ experimentKey: 'btn_color' })).toHaveLength(1)
+  it('logMetric stores metric', () => {
+    t.startRun({ id: 'a', name: 'x' })
+    t.logMetric('a', 'loss', 0.5)
+    expect(t.getRun('a')?.metrics.loss).toBe(0.5)
   })
-  it('filters by metric', () => {
-    svc.createExperiment(makeExp())
-    svc.trackConversion({ experimentKey: 'btn_color', variant: 'control', userId: 'u1', metric: 'click' })
-    svc.trackConversion({ experimentKey: 'btn_color', variant: 'control', userId: 'u1', metric: 'goal' })
-    expect(svc.listConversions({ metric: 'click' })).toHaveLength(1)
-  })
-  it('filters by user', () => {
-    svc.createExperiment(makeExp())
-    svc.trackConversion({ experimentKey: 'btn_color', variant: 'control', userId: 'u1', metric: 'goal' })
-    expect(svc.listConversions({ userId: 'u2' })).toHaveLength(0)
-  })
-})
 
-describe('ExperimentService - results', () => {
-  let svc: ExperimentService
-  beforeEach(() => { svc = new ExperimentService() })
+  it('logMetric with step uses suffix key', () => {
+    t.startRun({ id: 'a', name: 'x' })
+    t.logMetric('a', 'loss', 0.5, 1)
+    expect(t.getRun('a')?.metrics['loss@1']).toBe(0.5)
+  })
 
-  it('computes variant stats', () => {
-    svc.createExperiment(makeExp())
-    for (let i = 0; i < 20; i++) {
-      const r = svc.assign('btn_color', { userId: 'u' + i })!
-      if (i < 5) svc.trackConversion({ experimentKey: 'btn_color', variant: r.variant, userId: 'u' + i, metric: 'goal' })
-    }
-    const res = svc.computeResults('btn_color')
-    expect(res).not.toBeNull()
-    expect(res!.totalExposures).toBeGreaterThan(0)
-    expect(res!.variantStats).toHaveLength(2)
+  it('setMetrics merges', () => {
+    t.startRun({ id: 'a', name: 'x' })
+    t.setMetrics('a', { acc: 0.9, loss: 0.1 })
+    expect(t.getRun('a')?.metrics.acc).toBe(0.9)
   })
-  it('returns null for missing', () => {
-    expect(svc.computeResults('foo')).toBeNull()
-  })
-  it('computes significance', () => {
-    svc.createExperiment(makeExp())
-    for (let i = 0; i < 100; i++) {
-      const r = svc.assign('btn_color', { userId: 'u' + i })!
-      if (r.variant === 'variant_a') svc.trackConversion({ experimentKey: 'btn_color', variant: r.variant, userId: 'u' + i, metric: 'goal' })
-    }
-    const res = svc.computeResults('btn_color')!
-    expect(res.significance).toBeDefined()
-    expect(res.significance![0]!.pValue).toBeLessThanOrEqual(1)
-  })
-  it('high significance with extreme lift', () => {
-    svc.createExperiment(makeExp())
-    for (let i = 0; i < 100; i++) {
-      svc.assign('btn_color', { userId: 'u' + i })
-      if (i < 50) {
-        const r2 = svc.assign('btn_color', { userId: 'u' + i })
-        svc.trackConversion({ experimentKey: 'btn_color', variant: r2!.variant, userId: 'u' + i, metric: 'goal' })
-      }
-    }
-    const res = svc.computeResults('btn_color')!
-    expect(res).toBeDefined()
-  })
-})
 
-describe('ExperimentService - query', () => {
-  let svc: ExperimentService
-  beforeEach(() => { svc = new ExperimentService() })
-  it('returns sticky assignment', () => {
-    svc.createExperiment(makeExp())
-    svc.assign('btn_color', { userId: 'u1' })
-    expect(svc.getAssignment('u1', 'btn_color')).toBeDefined()
+  it('addTag is idempotent', () => {
+    t.startRun({ id: 'a', name: 'x' })
+    t.addTag('a', 'prod')
+    t.addTag('a', 'prod')
+    expect(t.getRun('a')?.tags).toEqual(['prod'])
   })
-  it('lists all user assignments', () => {
-    svc.createExperiment(makeExp({ key: 'a' }))
-    svc.createExperiment(makeExp({ key: 'b' }))
-    svc.assign('a', { userId: 'u1' })
-    svc.assign('b', { userId: 'u1' })
-    expect(svc.listAssignmentsForUser('u1')).toHaveLength(2)
-  })
-})
 
-describe('ExperimentService - metrics', () => {
-  let svc: ExperimentService
-  beforeEach(() => { svc = new ExperimentService() })
-  it('tracks totalExperiments', () => {
-    svc.createExperiment(makeExp())
-    svc.createExperiment({ ...makeExp({ key: 'b' }) })
-    expect(svc.getMetrics().totalExperiments).toBe(2)
+  it('removeTag', () => {
+    t.startRun({ id: 'a', name: 'x', tags: ['a', 'b'] })
+    t.removeTag('a', 'a')
+    expect(t.getRun('a')?.tags).toEqual(['b'])
   })
-  it('tracks byStatus', () => {
-    svc.createExperiment({ ...makeExp({ key: 'a' }), status: 'running' })
-    svc.createExperiment({ ...makeExp({ key: 'b' }), status: 'paused' })
-    const m = svc.getMetrics()
-    expect(m.byStatus.running).toBe(1)
-    expect(m.byStatus.paused).toBe(1)
-  })
-  it('tracks byVariant', () => {
-    svc.createExperiment(makeExp())
-    for (let i = 0; i < 5; i++) svc.assign('btn_color', { userId: 'u' + i })
-    const m = svc.getMetrics()
-    expect(m.byVariant.control + m.byVariant.variant_a).toBe(5)
-  })
-  it('resetMetrics keeps experiments', () => {
-    svc.createExperiment(makeExp())
-    svc.assign('btn_color', { userId: 'u1' })
-    svc.resetMetrics()
-    const m = svc.getMetrics()
-    expect(m.totalAssignments).toBe(0)
-    expect(m.totalExperiments).toBe(1)
-  })
-})
 
-describe('ExperimentService - singleton', () => {
-  it('singleton returns same instance', () => {
-    resetExperimentService()
-    expect(getExperimentService()).toBe(getExperimentService())
+  it('addArtifact stores path', () => {
+    t.startRun({ id: 'a', name: 'x' })
+    t.addArtifact('a', 'model.pkl')
+    expect(t.getRun('a')?.artifacts).toEqual(['model.pkl'])
+  })
+
+  it('setNotes', () => {
+    t.startRun({ id: 'a', name: 'x' })
+    t.setNotes('a', 'best result')
+    expect(t.getRun('a')?.notes).toBe('best result')
+  })
+
+  it('finishRun sets status and finishedAt', () => {
+    t.startRun({ id: 'a', name: 'x' })
+    t.finishRun('a', 'completed')
+    expect(t.getRun('a')?.status).toBe('completed')
+    expect(t.getRun('a')?.finishedAt).toBeDefined()
+  })
+
+  it('finishRun default is completed', () => {
+    t.startRun({ id: 'a', name: 'x' })
+    t.finishRun('a')
+    expect(t.getRun('a')?.status).toBe('completed')
+  })
+
+  it('deleteRun returns true on success', () => {
+    t.startRun({ id: 'a', name: 'x' })
+    expect(t.deleteRun('a')).toBe(true)
+    expect(t.hasRun('a')).toBe(false)
+  })
+
+  it('deleteRun returns false for missing', () => {
+    expect(t.deleteRun('nope')).toBe(false)
+  })
+
+  it('listRuns filters by status', () => {
+    t.startRun({ id: 'a', name: 'x' })
+    t.startRun({ id: 'b', name: 'y' })
+    t.finishRun('a', 'completed')
+    const completed = t.listRuns({ status: 'completed' })
+    expect(completed).toHaveLength(1)
+  })
+
+  it('listRuns filters by tag', () => {
+    t.startRun({ id: 'a', name: 'x', tags: ['prod'] })
+    t.startRun({ id: 'b', name: 'y' })
+    const prod = t.listRuns({ tag: 'prod' })
+    expect(prod).toHaveLength(1)
+  })
+
+  it('listRuns filters by name pattern', () => {
+    t.startRun({ id: 'a', name: 'exp-mlp' })
+    t.startRun({ id: 'b', name: 'exp-rf' })
+    const r = t.listRuns({ namePattern: 'mlp' })
+    expect(r).toHaveLength(1)
+  })
+
+  it('listRuns filters by minMetric', () => {
+    t.startRun({ id: 'a', name: 'x' })
+    t.logMetric('a', 'acc', 0.8)
+    t.finishRun('a', 'completed')
+    t.startRun({ id: 'b', name: 'y' })
+    t.logMetric('b', 'acc', 0.9)
+    t.finishRun('b', 'completed')
+    const r = t.listRuns({ minMetric: { key: 'acc', value: 0.85 } })
+    expect(r).toHaveLength(1)
+    expect(r[0]!.id).toBe('b')
+  })
+
+  it('listRuns filters by time range', () => {
+    const before = Date.now()
+    t.startRun({ id: 'a', name: 'x' })
+    t.finishRun('a', 'completed')
+    const r = t.listRuns({ startedAfter: before })
+    expect(r).toHaveLength(1)
+  })
+
+  it('listRuns returns sorted by startedAt desc', () => {
+    t.startRun({ id: 'a', name: 'x' })
+    t.startRun({ id: 'b', name: 'y' })
+    const r = t.listRuns()
+    expect(r[0]!.id).toBe('b')
+  })
+
+  it('bestRun picks max', () => {
+    t.startRun({ id: 'a', name: 'x' }); t.logMetric('a', 'acc', 0.7); t.finishRun('a')
+    t.startRun({ id: 'b', name: 'y' }); t.logMetric('b', 'acc', 0.9); t.finishRun('b')
+    const r = t.bestRun('acc', 'max')
+    expect(r!.id).toBe('b')
+  })
+
+  it('bestRun picks min', () => {
+    t.startRun({ id: 'a', name: 'x' }); t.logMetric('a', 'loss', 0.7); t.finishRun('a')
+    t.startRun({ id: 'b', name: 'y' }); t.logMetric('b', 'loss', 0.1); t.finishRun('b')
+    const r = t.bestRun('loss', 'min')
+    expect(r!.id).toBe('b')
+  })
+
+  it('bestRun returns null when no completed', () => {
+    t.startRun({ id: 'a', name: 'x' })
+    expect(t.bestRun('acc')).toBeNull()
+  })
+
+  it('compare builds table', () => {
+    t.startRun({ id: 'a', name: 'x' }); t.logMetric('a', 'acc', 0.8); t.logMetric('a', 'loss', 0.2); t.finishRun('a')
+    t.startRun({ id: 'b', name: 'y' }); t.logMetric('b', 'acc', 0.9); t.finishRun('b')
+    const c = t.compare(['a', 'b'], ['acc', 'loss'])
+    expect(c.table).toHaveLength(2)
+    expect(c.table[0]!.values.a).toBe(0.8)
+    expect(c.table[1]!.values.b).toBeNull()
+  })
+
+  it('countByStatus', () => {
+    t.startRun({ id: 'a', name: 'x' }); t.finishRun('a', 'completed')
+    t.startRun({ id: 'b', name: 'y' }); t.finishRun('b', 'failed')
+    t.startRun({ id: 'c', name: 'z' })
+    const c = t.countByStatus()
+    expect(c.completed).toBe(1)
+    expect(c.failed).toBe(1)
+    expect(c.running).toBe(1)
+  })
+
+  it('totalRuns and uptime', () => {
+    t.startRun({ id: 'a', name: 'x' })
+    expect(t.totalRuns()).toBe(1)
+    expect(t.uptimeMs()).toBeGreaterThanOrEqual(0)
+  })
+
+  it('rejects run when maxRuns reached', () => {
+    const tt = new ExperimentTracker({ maxRuns: 1 })
+    tt.startRun({ id: 'a', name: 'x' })
+    expect(() => tt.startRun({ id: 'b', name: 'y' })).toThrow()
+  })
+
+  it('parent and gitCommit are stored', () => {
+    t.startRun({ id: 'a', name: 'x' })
+    t.startRun({ id: 'b', name: 'y', parent: 'a', gitCommit: 'abc123' })
+    expect(t.getRun('b')?.parent).toBe('a')
+    expect(t.getRun('b')?.gitCommit).toBe('abc123')
+  })
+
+  it('getExperimentTracker singleton', async () => {
+    const { getExperimentTracker } = await import('../index')
+    const a = getExperimentTracker()
+    const b = getExperimentTracker()
+    expect(a).toBe(b)
   })
 })
