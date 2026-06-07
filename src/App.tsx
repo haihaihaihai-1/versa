@@ -223,6 +223,7 @@ const FeatureStorePage = lazy(() => import('./featurestore/page'))
 const FeaturePipelinePage = lazy(() => import('./featurepipe/page'))
 const ModelRegistryPage = lazy(() => import('./modelreg/page'))
 const DriftPage = lazy(() => import('./drift/page'))
+const InferencePage = lazy(() => import('./inference/page'))
 
 export const router = createBrowserRouter(
   [
@@ -393,6 +394,7 @@ export const router = createBrowserRouter(
         { path: 'featurepipe', element: withSuspense(<FeaturePipelinePage />) },
         { path: 'modelreg', element: withSuspense(<ModelRegistryPage />) },
         { path: 'drift', element: withSuspense(<DriftPage />) },
+        { path: 'inference', element: withSuspense(<InferencePage />) },
         { path: 'vector', element: withSuspense(<VectorPage />) },
         { path: 'edge', element: withSuspense(<EdgePage />) },
         { path: 'federation', element: withSuspense(<FederationPage />) },
