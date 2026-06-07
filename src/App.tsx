@@ -232,6 +232,7 @@ const RagPage = lazy(() => import('./rag/page').then(m => ({ default: m.RagPage 
 const TunePage = lazy(() => import('./tune/page').then(m => ({ default: m.TunePage })))
 const ExperimentPage = lazy(() => import('./experiment/page').then(m => ({ default: m.ExperimentPage })))
 const ValidatePage = lazy(() => import('./validate/page').then(m => ({ default: m.ValidatePage })))
+const FeatimpPage = lazy(() => import('./featimp/page').then(m => ({ default: m.FeatimpPage })))
 
 export const router = createBrowserRouter(
   [
@@ -377,6 +378,7 @@ export const router = createBrowserRouter(
         { path: 'scheduler', element: withSuspense(<SchedulerPage />) },
         { path: 'sdkgenerator', element: withSuspense(<SdkGeneratorPage />) },
         { path: 'validate', element: withSuspense(<ValidatePage />) },
+        { path: 'featimp', element: withSuspense(<FeatimpPage />) },
         { path: 'replication', element: withSuspense(<ReplicationPage />) },
         { path: 'crdt', element: withSuspense(<CrdtPage />) },
         { path: 'observability', element: withSuspense(<ObservabilityPage />) },
