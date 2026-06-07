@@ -23,10 +23,10 @@ gh pr list --repo haihaihaihai-1/versa
 
 ## 当前状态（2026-06-07 抓取）
 
-- **HEAD**：本地 HEAD — v79.0 Online Inference（待推送）
-- **远程 origin/main**：`0167551`（v78.0 Drift Detection，已推送）
-- **本地工作区**：即将推送 v79.0 Online Inference
-- **测试**：2398 通过 / 72 文件（v79.0 净增 28 条）
+- **HEAD**：本地 HEAD — v80.0 Recommendation Engine（待推送）
+- **远程 origin/main**：`256cd9a`（v79.0 Online Inference，已推送）
+- **本地工作区**：即将推送 v80.0 Recommendation Engine
+- **测试**：2431 通过 / 73 文件（v80.0 净增 33 条）
 
 ## 里程碑（按时间倒序）
 
@@ -79,6 +79,7 @@ gh pr list --repo haihaihaihai-1/versa
 | v77.0 | Model Registry（Versioning/StageTransition/Artifacts/Lineage/Checksum/Stats） | 24 |
 | v78.0 | Drift Detection（PSI/KS/ChiSquare/JSD · Severity · Snapshot · Alert · Stats） | 20 |
 | v79.0 | Online Inference（Version Routing · LRU Cache · A/B · Feature Enrichment · Metrics） | 28 |
+| v80.0 | Recommendation Engine（CandidateGen · Vector/Popularity/Category/CoOccurrence/History · A/B · Diversity） | 33 |
 | v33.0 | Secrets/Vault（SecretStore/Encryption/Versioning/Policies/Audit/Rotation/Scanner/Resolver） | 58 |
 | v32.0 | Job Queue（JobQueueSystem/Registry/Worker/Scheduler/Retry/DLQ/Events/Metrics） | 54 |
 | v31.0 | Notification（Channel/Template/Queue/Preference/Throttle/Digest/Provider/Metrics） | 54 |
