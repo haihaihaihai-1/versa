@@ -230,6 +230,7 @@ const AnomalyPage = lazy(() => import('./anomaly/page'))
 const ForecastPage = lazy(() => import('./forecast/page'))
 const KgPage = lazy(() => import('./kg/page').then(m => ({ default: m.KgPage })))
 const RagPage = lazy(() => import('./rag/page').then(m => ({ default: m.RagPage })))
+const TunePage = lazy(() => import('./tune/page').then(m => ({ default: m.TunePage })))
 
 export const router = createBrowserRouter(
   [
@@ -407,6 +408,7 @@ export const router = createBrowserRouter(
         { path: 'forecast', element: withSuspense(<ForecastPage />) },
         { path: 'kg', element: withSuspense(<KgPage />) },
         { path: 'rag', element: withSuspense(<RagPage />) },
+        { path: 'tune', element: withSuspense(<TunePage />) },
         { path: 'vector', element: withSuspense(<VectorPage />) },
         { path: 'edge', element: withSuspense(<EdgePage />) },
         { path: 'federation', element: withSuspense(<FederationPage />) },
