@@ -221,6 +221,7 @@ const ServiceMeshPage = lazy(() => import('./svcmgr/page'))
 const VectorSearchPage = lazy(() => import('./vecsearch/page'))
 const FeatureStorePage = lazy(() => import('./featurestore/page'))
 const FeaturePipelinePage = lazy(() => import('./featurepipe/page'))
+const ModelRegistryPage = lazy(() => import('./modelreg/page'))
 
 export const router = createBrowserRouter(
   [
@@ -389,6 +390,7 @@ export const router = createBrowserRouter(
         { path: 'vec', element: withSuspense(<VectorSearchPage />) },
         { path: 'featurestore', element: withSuspense(<FeatureStorePage />) },
         { path: 'featurepipe', element: withSuspense(<FeaturePipelinePage />) },
+        { path: 'modelreg', element: withSuspense(<ModelRegistryPage />) },
         { path: 'vector', element: withSuspense(<VectorPage />) },
         { path: 'edge', element: withSuspense(<EdgePage />) },
         { path: 'federation', element: withSuspense(<FederationPage />) },

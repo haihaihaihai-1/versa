@@ -23,10 +23,10 @@ gh pr list --repo haihaihaihai-1/versa
 
 ## 当前状态（2026-06-07 抓取）
 
-- **HEAD**：本地 HEAD — v76.0 Feature Pipeline（待推送）
-- **远程 origin/main**：`7f8f578`（v75.0 Feature Store，已推送）
-- **本地工作区**：即将推送 v76.0 Feature Pipeline
-- **测试**：2292 通过 / 68 文件（v76.0 净增 19 条）
+- **HEAD**：本地 HEAD — v77.0 Model Registry（待推送）
+- **远程 origin/main**：`caccf70`（v76.0 Feature Pipeline，已推送）
+- **本地工作区**：即将推送 v77.0 Model Registry
+- **测试**：2350 通过 / 70 文件（v77.0 净增 24 条）
 
 ## 里程碑（按时间倒序）
 
@@ -76,6 +76,7 @@ gh pr list --repo haihaihaihai-1/versa
 | v74.0 | Vector Search（Index/Search/Chunk/Embed/Metric/Filter） | 28 |
 | v75.0 | Feature Store（Definition/Entity/VersionedSet/Online/Offline PIT/Group/TTL/Stats） | 26 |
 | v76.0 | Feature Pipeline（DAG/TopoOrder/Cycle/Validation/Retries/RunHistory/Stats/Handler Registry） | 19 |
+| v77.0 | Model Registry（Versioning/StageTransition/Artifacts/Lineage/Checksum/Stats） | 24 |
 | v33.0 | Secrets/Vault（SecretStore/Encryption/Versioning/Policies/Audit/Rotation/Scanner/Resolver） | 58 |
 | v32.0 | Job Queue（JobQueueSystem/Registry/Worker/Scheduler/Retry/DLQ/Events/Metrics） | 54 |
 | v31.0 | Notification（Channel/Template/Queue/Preference/Throttle/Digest/Provider/Metrics） | 54 |
