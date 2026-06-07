@@ -219,6 +219,7 @@ const AuditTrailPage = lazy(() => import('./audittrail/page'))
 const WSGatewayPage = lazy(() => import('./wsgateway/page'))
 const ServiceMeshPage = lazy(() => import('./svcmgr/page'))
 const VectorSearchPage = lazy(() => import('./vecsearch/page'))
+const FeatureStorePage = lazy(() => import('./featurestore/page'))
 
 export const router = createBrowserRouter(
   [
@@ -385,6 +386,7 @@ export const router = createBrowserRouter(
         { path: 'wsgateway', element: withSuspense(<WSGatewayPage />) },
         { path: 'mesh', element: withSuspense(<ServiceMeshPage />) },
         { path: 'vec', element: withSuspense(<VectorSearchPage />) },
+        { path: 'featurestore', element: withSuspense(<FeatureStorePage />) },
         { path: 'vector', element: withSuspense(<VectorPage />) },
         { path: 'edge', element: withSuspense(<EdgePage />) },
         { path: 'federation', element: withSuspense(<FederationPage />) },
