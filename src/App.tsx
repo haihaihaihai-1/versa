@@ -227,6 +227,7 @@ const InferencePage = lazy(() => import('./inference/page'))
 const RecommendPage = lazy(() => import('./recommend/page'))
 const AbTestPage = lazy(() => import('./abtest/page'))
 const AnomalyPage = lazy(() => import('./anomaly/page'))
+const ForecastPage = lazy(() => import('./forecast/page'))
 
 export const router = createBrowserRouter(
   [
@@ -401,6 +402,7 @@ export const router = createBrowserRouter(
         { path: 'recommend', element: withSuspense(<RecommendPage />) },
         { path: 'abtest', element: withSuspense(<AbTestPage />) },
         { path: 'anomaly', element: withSuspense(<AnomalyPage />) },
+        { path: 'forecast', element: withSuspense(<ForecastPage />) },
         { path: 'vector', element: withSuspense(<VectorPage />) },
         { path: 'edge', element: withSuspense(<EdgePage />) },
         { path: 'federation', element: withSuspense(<FederationPage />) },
