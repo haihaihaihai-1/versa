@@ -23,10 +23,10 @@ gh pr list --repo haihaihaihai-1/versa
 
 ## 当前状态（2026-06-07 抓取）
 
-- **HEAD**：本地 HEAD — v88.0 Experiment Tracking（待推送）
-- **远程 origin/main**：`8651e3a`（v87.0 Hyperparameter Tuning，已推送）
-- **本地工作区**：即将推送 v88.0 Experiment Tracking
-- **测试**：2577 通过 / 80 文件（v88.0 净增 31 条）
+- **HEAD**：本地 HEAD — v89.0 Data Validation（待推送）
+- **远程 origin/main**：`a2533fa`（v88.0 Experiment Tracking，已推送）
+- **本地工作区**：即将推送 v89.0 Data Validation
+- **测试**：2605 通过 / 81 文件（v89.0 净增 28 条）
 
 ## 里程碑（按时间倒序）
 
@@ -88,6 +88,7 @@ gh pr list --repo haihaihaihai-1/versa
 | v86.0 | RAG Pipeline（Chunking · Retrieval · Generation simulation · Citation · Eval） | 30 |
 | v87.0 | Hyperparameter Tuning（Grid/Random/Bayesian-lite · Search Space · Early Stopping） | 22 |
 | v88.0 | Experiment Tracking（Run/Params/Metrics/Tags/Artifacts · Filter · Compare · Best Run） | 31 |
+| v89.0 | Data Validation（Schema · Type/Range/Pattern/Enum · Coercion · Custom Rule · Batch） | 28 |
 | v33.0 | Secrets/Vault（SecretStore/Encryption/Versioning/Policies/Audit/Rotation/Scanner/Resolver） | 58 |
 | v32.0 | Job Queue（JobQueueSystem/Registry/Worker/Scheduler/Retry/DLQ/Events/Metrics） | 54 |
 | v31.0 | Notification（Channel/Template/Queue/Preference/Throttle/Digest/Provider/Metrics） | 54 |

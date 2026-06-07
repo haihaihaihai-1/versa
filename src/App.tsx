@@ -231,6 +231,7 @@ const KgPage = lazy(() => import('./kg/page').then(m => ({ default: m.KgPage }))
 const RagPage = lazy(() => import('./rag/page').then(m => ({ default: m.RagPage })))
 const TunePage = lazy(() => import('./tune/page').then(m => ({ default: m.TunePage })))
 const ExperimentPage = lazy(() => import('./experiment/page').then(m => ({ default: m.ExperimentPage })))
+const ValidatePage = lazy(() => import('./validate/page').then(m => ({ default: m.ValidatePage })))
 
 export const router = createBrowserRouter(
   [
@@ -375,7 +376,7 @@ export const router = createBrowserRouter(
         { path: 'cqrs', element: withSuspense(<CqrsPage />) },
         { path: 'scheduler', element: withSuspense(<SchedulerPage />) },
         { path: 'sdkgenerator', element: withSuspense(<SdkGeneratorPage />) },
-        { path: 'experiment', element: withSuspense(<ExperimentPage />) },
+        { path: 'validate', element: withSuspense(<ValidatePage />) },
         { path: 'replication', element: withSuspense(<ReplicationPage />) },
         { path: 'crdt', element: withSuspense(<CrdtPage />) },
         { path: 'observability', element: withSuspense(<ObservabilityPage />) },
@@ -409,7 +410,6 @@ export const router = createBrowserRouter(
         { path: 'kg', element: withSuspense(<KgPage />) },
         { path: 'rag', element: withSuspense(<RagPage />) },
         { path: 'tune', element: withSuspense(<TunePage />) },
-        { path: 'experiment', element: withSuspense(<ExperimentPage />) },
         { path: 'vector', element: withSuspense(<VectorPage />) },
         { path: 'edge', element: withSuspense(<EdgePage />) },
         { path: 'federation', element: withSuspense(<FederationPage />) },
