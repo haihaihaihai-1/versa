@@ -220,6 +220,7 @@ const WSGatewayPage = lazy(() => import('./wsgateway/page'))
 const ServiceMeshPage = lazy(() => import('./svcmgr/page'))
 const VectorSearchPage = lazy(() => import('./vecsearch/page'))
 const FeatureStorePage = lazy(() => import('./featurestore/page'))
+const FeaturePipelinePage = lazy(() => import('./featurepipe/page'))
 
 export const router = createBrowserRouter(
   [
@@ -387,6 +388,7 @@ export const router = createBrowserRouter(
         { path: 'mesh', element: withSuspense(<ServiceMeshPage />) },
         { path: 'vec', element: withSuspense(<VectorSearchPage />) },
         { path: 'featurestore', element: withSuspense(<FeatureStorePage />) },
+        { path: 'featurepipe', element: withSuspense(<FeaturePipelinePage />) },
         { path: 'vector', element: withSuspense(<VectorPage />) },
         { path: 'edge', element: withSuspense(<EdgePage />) },
         { path: 'federation', element: withSuspense(<FederationPage />) },
