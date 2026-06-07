@@ -228,7 +228,7 @@ const RecommendPage = lazy(() => import('./recommend/page'))
 const AbTestPage = lazy(() => import('./abtest/page'))
 const AnomalyPage = lazy(() => import('./anomaly/page'))
 const ForecastPage = lazy(() => import('./forecast/page'))
-const KgPage = lazy(() => import('./kg/page'))
+const KgPage = lazy(() => import('./kg/page').then(m => ({ default: m.KgPage })))
 
 export const router = createBrowserRouter(
   [

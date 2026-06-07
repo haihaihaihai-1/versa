@@ -1,379 +1,283 @@
-// v41.0 Search Engine (inverted index, BM25, fuzzy match, boolean query, highlight)
+// Search & Ranking: tokenization, BM25, query understanding, hybrid scoring, rerank, filters.
 
-export interface Document {
-  id: string
-  fields: Record<string, string | number | boolean>
-  tags?: string[]
+export type DocId = string
+export type Field = 'title' | 'body' | 'tags' | 'category'
+
+export interface SearchDoc {
+  id: DocId
+  fields: Partial<Record<Field, string>>
+  boost?: number
+  freshness?: number
+  tag?: string
+  category?: string
 }
 
-export interface IndexConfig {
-  fields: string[]
-  fieldBoosts?: Record<string, number>
-  tokenizer?: 'default' | 'unicode' | 'ngram'
-  ngramSize?: number
-  k1?: number  // BM25 parameter
-  b?: number   // BM25 parameter
-  enableFuzzy?: boolean
-  fuzzyDistance?: number
+export interface Token {
+  text: string
+  position: number
 }
 
-export interface SearchHit {
-  id: string
+export interface ScoredDoc {
+  id: DocId
   score: number
-  highlights: Record<string, string[]>  // field -> highlighted snippets
-  matchedTerms: string[]
+  bm25: number
+  vector: number
+  boost: number
+  freshness: number
+  highlights: string[]
 }
 
-export interface SearchOptions {
-  query: string
-  fields?: string[]                 // override fields
-  filter?: { field: string; value: string | number | boolean }[]
+export interface SearchQuery {
+  text: string
+  filters?: { field: 'tag' | 'category'; op: 'eq' | 'in'; value: string | string[] }[]
   limit?: number
-  offset?: number
-  highlight?: { pre?: string; post?: string; fragmentSize?: number }
-  fuzzy?: boolean
-  operator?: 'and' | 'or'           // implicit operator between terms
+  fields?: Field[]
+  minScore?: number
+  doRerank?: boolean
 }
 
-export interface InvertedPosting {
-  docId: string
-  field: string
-  tf: number          // term frequency in field
-  positions: number[] // term positions (for phrase)
+export interface SearchConfig {
+  bm25K1: number
+  bm25B: number
+  vectorWeight: number
+  bm25Weight: number
+  boostWeight: number
+  freshnessWeight: number
+  rerankDepth: number
+  stopWords: Set<string>
+  enableRerank: boolean
+  defaultFields: Field[]
 }
 
-export interface IndexStats {
-  totalDocs: number
-  totalTerms: number
-  avgDocLength: number
-  indexSize: number
+const DEFAULT_STOP = new Set(['the', 'a', 'an', 'is', 'are', 'was', 'were', 'be', 'been', 'of', 'in', 'on', 'at', 'to', 'and', 'or', 'but'])
+
+const DEFAULT_CONFIG: SearchConfig = {
+  bm25K1: 1.2,
+  bm25B: 0.75,
+  vectorWeight: 0.3,
+  bm25Weight: 0.6,
+  boostWeight: 0.05,
+  freshnessWeight: 0.05,
+  rerankDepth: 20,
+  stopWords: DEFAULT_STOP,
+  enableRerank: true,
+  defaultFields: ['title', 'body', 'tags'],
 }
 
-// ============== Tokenizer ==============
-
-function defaultTokenize(text: string): string[] {
-  return text.toLowerCase().split(/[^a-z0-9_\u4e00-\u9fff]+/i).filter(Boolean)
-}
-
-function unicodeTokenize(text: string): string[] {
-  return text.toLowerCase().split(/\s+/).filter(Boolean)
-}
-
-function ngramTokenize(text: string, n = 3): string[] {
-  const s = text.toLowerCase().replace(/\s+/g, ' ')
-  const out: string[] = []
-  if (s.length < n) return [s]
-  for (let i = 0; i <= s.length - n; i++) out.push(s.slice(i, i + n))
+export const tokenize = (text: string, stopWords: Set<string> = DEFAULT_STOP): Token[] => {
+  const out: Token[] = []
+  const re = /[A-Za-z0-9\u4e00-\u9fff]+/g
+  let m: RegExpExecArray | null
+  let pos = 0
+  while ((m = re.exec(text)) !== null) {
+    const t = m[0]
+    if (/^[A-Za-z0-9]+$/.test(t)) {
+      const lower = t.toLowerCase()
+      if (stopWords.has(lower)) { pos += 1; continue }
+      out.push({ text: lower, position: pos++ })
+    } else {
+      for (const ch of t) {
+        if (stopWords.has(ch)) { pos += 1; continue }
+        out.push({ text: ch, position: pos++ })
+      }
+    }
+  }
   return out
 }
 
-// ============== Edit distance (Levenshtein) ==============
-
-function levenshtein(a: string, b: string, maxDist = Infinity): number {
-  if (a === b) return 0
-  const la = a.length, lb = b.length
-  if (Math.abs(la - lb) > maxDist) return maxDist + 1
-  if (la === 0) return lb
-  if (lb === 0) return la
-  const prev = new Array(lb + 1)
-  const curr = new Array(lb + 1)
-  for (let j = 0; j <= lb; j++) prev[j] = j
-  for (let i = 1; i <= la; i++) {
-    curr[0] = i
-    let rowMin = curr[0]
-    for (let j = 1; j <= lb; j++) {
-      const cost = a[i - 1] === b[j - 1] ? 0 : 1
-      curr[j] = Math.min(curr[j - 1] + 1, prev[j] + 1, prev[j - 1] + cost)
-      if (curr[j] < rowMin) rowMin = curr[j]
-    }
-    if (rowMin > maxDist) return maxDist + 1
-    for (let j = 0; j <= lb; j++) prev[j] = curr[j]
-  }
-  return prev[lb]
+// Simple character n-gram (3-grams) for Chinese-friendly embeddings
+export const ngrams = (s: string, n = 3): string[] => {
+  const padded = '  ' + s.toLowerCase() + '  '
+  const out: string[] = []
+  for (let i = 0; i + n <= padded.length; i++) out.push(padded.slice(i, i + n))
+  return out
 }
 
-// ============== Search Engine ==============
+export const jaccard = (a: string[], b: string[]): number => {
+  const sa = new Set(a)
+  const sb = new Set(b)
+  let inter = 0
+  for (const x of sa) if (sb.has(x)) inter += 1
+  const union = sa.size + sb.size - inter
+  return union === 0 ? 0 : inter / union
+}
+
+export const tf = (tokens: Token[]): Map<string, number> => {
+  const m = new Map<string, number>()
+  for (const t of tokens) m.set(t.text, (m.get(t.text) ?? 0) + 1)
+  return m
+}
 
 export class SearchEngine {
-  private docs = new Map<string, Document>()
-  private inverted = new Map<string, InvertedPosting[]>() // term -> postings
-  private docLengths = new Map<string, number>() // docId -> total terms
-  private fieldLengths = new Map<string, Map<string, number>>() // docId -> field -> length
-  private avgDocLength = 0
-  private config: Required<IndexConfig>
-  private stopwords = new Set(['the', 'a', 'an', 'of', 'in', 'on', 'and', 'or', 'is', 'are', 'to'])
-  private metrics = { searches: 0, indexed: 0, removed: 0 }
+  readonly config: SearchConfig
+  private docs: Map<DocId, SearchDoc> = new Map()
+  private docLen: Map<DocId, number> = new Map()
+  private avgDl = 0
+  private docFreq: Map<string, number> = new Map()
+  private docTokens: Map<DocId, Token[]> = new Map()
+  private docNgrams: Map<DocId, string[]> = new Map()
+  private idfCache: Map<string, number> = new Map()
 
-  constructor(config: IndexConfig) {
-    this.config = {
-      fields: config.fields,
-      fieldBoosts: config.fieldBoosts ?? {},
-      tokenizer: config.tokenizer ?? 'default',
-      ngramSize: config.ngramSize ?? 3,
-      k1: config.k1 ?? 1.2,
-      b: config.b ?? 0.75,
-      enableFuzzy: config.enableFuzzy ?? false,
-      fuzzyDistance: config.fuzzyDistance ?? 1,
-    }
+  constructor(config: Partial<SearchConfig> = {}) {
+    this.config = { ...DEFAULT_CONFIG, ...config, stopWords: config.stopWords ?? DEFAULT_CONFIG.stopWords }
   }
 
-  // ---- Indexing ----
-  index(doc: Document): void {
-    if (this.docs.has(doc.id)) this.remove(doc.id)
-    this.docs.set(doc.id, { ...doc, fields: { ...doc.fields }, tags: [...(doc.tags ?? [])] })
-    let totalLen = 0
-    const fieldLens = new Map<string, number>()
-    for (const field of this.config.fields) {
-      const v = doc.fields[field]
-      if (v === undefined) continue
-      const text = String(v)
-      const tokens = this.tokenize(text)
-      fieldLens.set(field, tokens.length)
-      totalLen += tokens.length
-      for (let pos = 0; pos < tokens.length; pos++) {
-        const term = tokens[pos]!
-        if (this.stopwords.has(term) && this.config.tokenizer !== 'ngram') continue
-        if (!this.inverted.has(term)) this.inverted.set(term, [])
-        this.inverted.get(term)!.push({ docId: doc.id, field, tf: 1, positions: [pos] })
-      }
+  addDoc(doc: SearchDoc): void {
+    if (this.docs.has(doc.id)) this.removeDoc(doc.id)
+    this.docs.set(doc.id, doc)
+    const fields = this.config.defaultFields
+    const text = fields.map(f => doc.fields[f] ?? '').join(' ')
+    const tokens = tokenize(text, this.config.stopWords)
+    this.docTokens.set(doc.id, tokens)
+    this.docLen.set(doc.id, tokens.length)
+    this.docNgrams.set(doc.id, ngrams(text))
+    const seen = new Set<string>()
+    for (const t of tokens) {
+      if (seen.has(t.text)) continue
+      seen.add(t.text)
+      this.docFreq.set(t.text, (this.docFreq.get(t.text) ?? 0) + 1)
     }
-    this.docLengths.set(doc.id, totalLen)
-    this.fieldLengths.set(doc.id, fieldLens)
-    this.recomputeAvgDocLength()
-    this.metrics.indexed++
+    this.recomputeAvgDl()
   }
 
-  indexBatch(docs: Document[]): void {
-    for (const d of docs) this.index(d)
-  }
-
-  remove(docId: string): boolean {
-    if (!this.docs.has(docId)) return false
-    this.docs.delete(docId)
-    this.docLengths.delete(docId)
-    this.fieldLengths.delete(docId)
-    for (const [term, postings] of this.inverted) {
-      const filtered = postings.filter(p => p.docId !== docId)
-      if (filtered.length === 0) this.inverted.delete(term)
-      else if (filtered.length !== postings.length) this.inverted.set(term, filtered)
+  removeDoc(id: DocId): boolean {
+    const tokens = this.docTokens.get(id)
+    if (!tokens) return false
+    const seen = new Set<string>()
+    for (const t of tokens) {
+      if (seen.has(t.text)) continue
+      seen.add(t.text)
+      const c = this.docFreq.get(t.text) ?? 0
+      if (c <= 1) this.docFreq.delete(t.text)
+      else this.docFreq.set(t.text, c - 1)
     }
-    this.recomputeAvgDocLength()
-    this.metrics.removed++
+    this.docs.delete(id)
+    this.docTokens.delete(id)
+    this.docLen.delete(id)
+    this.docNgrams.delete(id)
+    this.idfCache.clear()
+    this.recomputeAvgDl()
     return true
   }
 
-  clear(): void {
-    this.docs.clear()
-    this.inverted.clear()
-    this.docLengths.clear()
-    this.fieldLengths.clear()
-    this.avgDocLength = 0
+  private recomputeAvgDl(): void {
+    let sum = 0
+    for (const l of this.docLen.values()) sum += l
+    this.avgDl = this.docLen.size === 0 ? 0 : sum / this.docLen.size
   }
 
-  // ---- Search ----
-  search(opts: SearchOptions): SearchHit[] {
-    this.metrics.searches++
-    const { query, fields, filter, limit = 10, offset = 0, highlight, fuzzy, operator = 'or' } = opts
-    const useFields = fields ?? this.config.fields
-    const terms = this.tokenize(query).filter(t => !this.stopwords.has(t) || this.config.tokenizer === 'ngram')
-    if (terms.length === 0) return []
-    const useFuzzy = fuzzy ?? this.config.enableFuzzy
-    // For each term, find matching documents with BM25 score
-    const scores = new Map<string, { score: number; matchedTerms: Set<string> }>()
-    for (const term of terms) {
-      const matchedTerms = useFuzzy ? this.fuzzyMatchTerms(term) : [term]
-      for (const matchedTerm of matchedTerms) {
-        const postings = this.inverted.get(matchedTerm)
-        if (!postings) continue
-        const idf = this.idf(matchedTerm)
-        for (const p of postings) {
-          if (!useFields.includes(p.field)) continue
-          if (filter && !this.matchesFilter(p.docId, filter)) continue
-          const docLen = this.docLengths.get(p.docId) ?? 1
-          const fieldBoost = this.config.fieldBoosts[p.field] ?? 1
-          const bm25 = this.bm25Score(p.tf, docLen, idf) * fieldBoost
-          const cur = scores.get(p.docId) ?? { score: 0, matchedTerms: new Set() }
-          cur.score += bm25
-          cur.matchedTerms.add(matchedTerm)
-          scores.set(p.docId, cur)
-        }
-      }
-    }
-    // AND operator: only keep docs containing all terms
-    if (operator === 'and') {
-      for (const [docId, info] of scores) {
-        if (info.matchedTerms.size < terms.length) scores.delete(docId)
-      }
-    }
-    // Sort and return
-    const sorted = [...scores.entries()]
-      .sort((a, b) => b[1].score - a[1].score)
-      .slice(offset, offset + limit)
-    return sorted.map(([docId, info]) => ({
-      id: docId,
-      score: info.score,
-      highlights: highlight ? this.buildHighlights(docId, info.matchedTerms, highlight) : {},
-      matchedTerms: [...info.matchedTerms],
-    }))
-  }
-
-  // ---- Query parsers ----
-  parseQuery(q: string): { must: string[]; mustNot: string[]; should: string[]; phrases: string[] } {
-    const must: string[] = []
-    const mustNot: string[] = []
-    const should: string[] = []
-    const phrases: string[] = []
-    // Strip field prefix
-    const tokens = q.match(/(?:[^\s"]+|"[^"]*")+/g) ?? []
-    for (const t of tokens) {
-      if (t.startsWith('-')) { mustNot.push(t.slice(1).replace(/"/g, '')); continue }
-      if (t.startsWith('+')) { must.push(t.slice(1).replace(/"/g, '')); continue }
-      if (t.startsWith('"') && t.endsWith('"')) { phrases.push(t.slice(1, -1)); continue }
-      should.push(t.replace(/"/g, ''))
-    }
-    return { must, mustNot, should, phrases }
-  }
-
-  searchWithParsed(opts: SearchOptions & { parsed?: ReturnType<SearchEngine['parseQuery']> }): SearchHit[] {
-    if (!opts.parsed) return this.search(opts)
-    const { must, mustNot, should, phrases } = opts.parsed
-    // Start with docs matching must + phrases
-    const { parsed: _ignored, ...restOpts } = opts
-    void _ignored
-    const mustHits = this.search({ ...restOpts, query: [...must, ...phrases].join(' '), operator: 'and' })
-    const mustNotIds = new Set<string>()
-    if (mustNot.length > 0) {
-      const hits = this.search({ ...restOpts, query: mustNot.join(' ') })
-      hits.forEach(h => mustNotIds.add(h.id))
-    }
-    const shouldHits = should.length > 0 ? this.search({ ...restOpts, query: should.join(' ') }) : []
-    const mustIds = new Set(mustHits.map(h => h.id))
-    const shouldIds = new Set(shouldHits.map(h => h.id))
-    const finalIds = [...mustIds].filter(id => !mustNotIds.has(id))
-    // Add should hits not already included
-    for (const h of shouldHits) {
-      if (!mustIds.has(h.id) && !mustNotIds.has(h.id)) finalIds.push(h.id)
-    }
-    // Build results with score
-    const scoreMap = new Map<string, number>()
-    for (const h of mustHits) scoreMap.set(h.id, h.score)
-    for (const h of shouldHits) scoreMap.set(h.id, (scoreMap.get(h.id) ?? 0) + h.score * 0.5)
-    return finalIds.slice(opts.offset ?? 0, (opts.offset ?? 0) + (opts.limit ?? 10))
-      .map(id => ({
-        id,
-        score: scoreMap.get(id) ?? 0,
-        highlights: opts.highlight ? this.buildHighlights(id, new Set([...must, ...should]), opts.highlight) : {},
-        matchedTerms: [...new Set([...must, ...should])].slice(0, 5),
-      }))
-      .sort((a, b) => b.score - a.score)
-  }
-
-  // ---- Stats ----
-  stats(): IndexStats {
-    return {
-      totalDocs: this.docs.size,
-      totalTerms: this.inverted.size,
-      avgDocLength: this.avgDocLength,
-      indexSize: this.totalPostings(),
-    }
-  }
-
-  getMetrics() { return { ...this.metrics } }
-  getDoc(id: string): Document | null {
-    const d = this.docs.get(id); return d ? { ...d, fields: { ...d.fields }, tags: [...(d.tags ?? [])] } : null
-  }
-  listDocs(): Document[] { return [...this.docs.values()].map(d => ({ ...d, fields: { ...d.fields } })) }
-  size(): number { return this.docs.size }
-  hasTerm(term: string): boolean { return this.inverted.has(term.toLowerCase()) }
-  getPostings(term: string): InvertedPosting[] {
-    return (this.inverted.get(term.toLowerCase()) ?? []).map(p => ({ ...p, positions: [...p.positions] }))
-  }
-
-  // ---- Internals ----
-  private tokenize(text: string): string[] {
-    if (this.config.tokenizer === 'ngram') return ngramTokenize(text, this.config.ngramSize)
-    if (this.config.tokenizer === 'unicode') return unicodeTokenize(text)
-    return defaultTokenize(text)
-  }
-
-  private fuzzyMatchTerms(term: string): string[] {
-    const results: string[] = []
-    for (const known of this.inverted.keys()) {
-      if (known === term) { results.push(known); continue }
-      if (Math.abs(known.length - term.length) > this.config.fuzzyDistance) continue
-      if (levenshtein(known, term, this.config.fuzzyDistance) <= this.config.fuzzyDistance) {
-        results.push(known)
-      }
-    }
-    return results.length > 0 ? results : [term]
+  size(): number {
+    return this.docs.size
   }
 
   private idf(term: string): number {
+    if (this.idfCache.has(term)) return this.idfCache.get(term)!
+    const df = this.docFreq.get(term) ?? 0
     const N = this.docs.size
-    const df = new Set((this.inverted.get(term) ?? []).map(p => p.docId)).size
-    return Math.log(1 + (N - df + 0.5) / (df + 0.5))
+    const v = Math.log(1 + (N - df + 0.5) / (df + 0.5))
+    this.idfCache.set(term, v)
+    return v
   }
 
-  private bm25Score(tf: number, docLen: number, idf: number): number {
-    const { k1, b } = this.config
-    const norm = 1 - b + b * (docLen / Math.max(1, this.avgDocLength))
-    return idf * (tf * (k1 + 1)) / (tf + k1 * norm)
-  }
-
-  private matchesFilter(docId: string, filter: NonNullable<SearchOptions['filter']>): boolean {
-    const doc = this.docs.get(docId)
-    if (!doc) return false
-    return filter.every(f => {
-      if (f.field === 'tags') return doc.tags?.includes(String(f.value)) ?? false
-      return doc.fields[f.field] === f.value
-    })
-  }
-
-  private buildHighlights(docId: string, terms: Set<string>, opts: NonNullable<SearchOptions['highlight']>): Record<string, string[]> {
-    const doc = this.docs.get(docId)
-    if (!doc) return {}
-    const pre = opts.pre ?? '<mark>'
-    const post = opts.post ?? '</mark>'
-    const fragSize = opts.fragmentSize ?? 80
-    const result: Record<string, string[]> = {}
-    for (const field of this.config.fields) {
-      const v = doc.fields[field]
-      if (v === undefined) continue
-      const text = String(v)
-      const lower = text.toLowerCase()
-      const frags: string[] = []
-      for (const term of terms) {
-        const idx = lower.indexOf(term)
-        if (idx === -1) continue
-        const start = Math.max(0, idx - Math.floor(fragSize / 3))
-        const end = Math.min(text.length, idx + term.length + Math.floor(fragSize * 2 / 3))
-        let frag = text.slice(start, end)
-        // Replace ALL occurrences of any term in fragment
-        for (const t of terms) {
-          const re = new RegExp(`(${this.escapeRegex(t)})`, 'gi')
-          frag = frag.replace(re, `${pre}$1${post}`)
-        }
-        frags.push((start > 0 ? '…' : '') + frag + (end < text.length ? '…' : ''))
-      }
-      if (frags.length > 0) result[field] = [...new Set(frags)]
+  bm25Score(queryTokens: Token[], docId: DocId): number {
+    const docTokens = this.docTokens.get(docId) ?? []
+    const dl = this.docLen.get(docId) ?? 0
+    if (dl === 0) return 0
+    const tfMap = tf(docTokens)
+    let s = 0
+    for (const qt of queryTokens) {
+      const f = tfMap.get(qt.text) ?? 0
+      if (f === 0) continue
+      const idf = this.idf(qt.text)
+      const denom = f + this.config.bm25K1 * (1 - this.config.bm25B + this.config.bm25B * (dl / (this.avgDl || 1)))
+      s += idf * (f * (this.config.bm25K1 + 1)) / denom
     }
-    return result
+    return s
   }
 
-  private escapeRegex(s: string): string { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') }
-
-  private recomputeAvgDocLength() {
-    if (this.docLengths.size === 0) { this.avgDocLength = 0; return }
-    let sum = 0
-    for (const l of this.docLengths.values()) sum += l
-    this.avgDocLength = sum / this.docLengths.size
+  vectorScore(queryTokens: Token[], docId: DocId): number {
+    const qText = queryTokens.map(t => t.text).join(' ')
+    const qGrams = ngrams(qText)
+    const dGrams = this.docNgrams.get(docId) ?? []
+    return jaccard(qGrams, dGrams)
   }
 
-  private totalPostings(): number {
-    let total = 0
-    for (const p of this.inverted.values()) total += p.length
-    return total
+  private matchesFilter(doc: SearchDoc, filter: NonNullable<SearchQuery['filters']>[number]): boolean {
+    if (filter.field === 'tag') {
+      if (filter.op === 'eq') return doc.tag === filter.value
+      if (filter.op === 'in' && Array.isArray(filter.value)) return filter.value.includes(doc.tag ?? '')
+    }
+    if (filter.field === 'category') {
+      if (filter.op === 'eq') return doc.category === filter.value
+      if (filter.op === 'in' && Array.isArray(filter.value)) return filter.value.includes(doc.category ?? '')
+    }
+    return true
+  }
+
+  search(query: SearchQuery): ScoredDoc[] {
+    const limit = query.limit ?? 10
+    const minScore = query.minScore ?? 0
+    const doRerank = query.doRerank ?? this.config.enableRerank
+    if (query.text.trim() === '') return []
+    const queryTokens = tokenize(query.text, this.config.stopWords)
+    if (queryTokens.length === 0) return []
+    const out: ScoredDoc[] = []
+    for (const doc of this.docs.values()) {
+      if (query.filters) {
+        let ok = true
+        for (const f of query.filters) if (!this.matchesFilter(doc, f)) { ok = false; break }
+        if (!ok) continue
+      }
+      const bm = this.bm25Score(queryTokens, doc.id)
+      if (bm === 0) continue
+      const vc = this.vectorScore(queryTokens, doc.id)
+      const boost = doc.boost ?? 1
+      const fresh = doc.freshness ?? 0
+      const score = this.config.bm25Weight * bm + this.config.vectorWeight * vc + this.config.boostWeight * (boost - 1) + this.config.freshnessWeight * fresh
+      if (score < minScore) continue
+      out.push({ id: doc.id, score, bm25: bm, vector: vc, boost, freshness: fresh, highlights: this.highlight(query.text, doc) })
+    }
+    out.sort((a, b) => b.score - a.score)
+    const top = out.slice(0, doRerank ? Math.max(limit, this.config.rerankDepth) : limit)
+    if (doRerank) {
+      top.sort((a, b) => {
+        const adj = (x: ScoredDoc) => x.score + (x.freshness * 0.01) + (x.boost * 0.01)
+        return adj(b) - adj(a)
+      })
+    }
+    return top.slice(0, limit)
+  }
+
+  highlight(q: string, doc: SearchDoc): string[] {
+    const qTokens = tokenize(q, this.config.stopWords).map(t => t.text)
+    const out: string[] = []
+    for (const f of this.config.defaultFields) {
+      const txt = doc.fields[f]
+      if (!txt) continue
+      const lower = txt.toLowerCase()
+      for (const t of qTokens) {
+        if (lower.includes(t)) out.push('<<' + t + '>>')
+      }
+    }
+    return [...new Set(out)]
+  }
+
+  explain(query: SearchQuery, docId: DocId): { bm25: number; vector: number; boost: number; freshness: number; total: number } | null {
+    if (!this.docs.has(docId)) return null
+    const doc = this.docs.get(docId)!
+    const queryTokens = tokenize(query.text, this.config.stopWords)
+    const bm = this.bm25Score(queryTokens, docId)
+    const vc = this.vectorScore(queryTokens, docId)
+    const boost = doc.boost ?? 1
+    const fresh = doc.freshness ?? 0
+    const total = this.config.bm25Weight * bm + this.config.vectorWeight * vc + this.config.boostWeight * (boost - 1) + this.config.freshnessWeight * fresh
+    return { bm25: bm, vector: vc, boost, freshness: fresh, total }
   }
 }
 
-export const search = { SearchEngine }
+let _engine: SearchEngine | null = null
+export const getSearchEngine = (config?: Partial<SearchConfig>): SearchEngine => {
+  if (!_engine) _engine = new SearchEngine(config)
+  return _engine
+}
+export const resetSearchEngine = (): void => { _engine = null }

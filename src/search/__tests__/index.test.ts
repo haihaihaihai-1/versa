@@ -1,294 +1,176 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { SearchEngine } from '../index'
+import { SearchEngine, tokenize, ngrams, jaccard, tf, resetSearchEngine } from '../index'
 
-const docs = [
-  { id: '1', fields: { title: 'Hello World', body: 'The quick brown fox jumps over the lazy dog' }, tags: ['animals'] },
-  { id: '2', fields: { title: 'Vue vs React', body: 'Comparing JavaScript frameworks for modern web development' }, tags: ['web'] },
-  { id: '3', fields: { title: 'Python tutorial', body: 'Learn Python programming language basics for beginners' }, tags: ['python'] },
-  { id: '4', fields: { title: 'TypeScript guide', body: 'Advanced TypeScript types and generics for production code' }, tags: ['typescript'] },
-  { id: '5', fields: { title: 'BM25 algorithm', body: 'The BM25 ranking function is used in information retrieval' }, tags: ['search'] },
-  { id: '6', fields: { title: 'Elasticsearch', body: 'Distributed search engine built on Lucene with full text search' }, tags: ['search'] },
+const corpus = () => [
+  { id: 'd1', fields: { title: 'Machine Learning Basics', body: 'Introduction to algorithms and models', tags: 'ml,ai,intro' }, tag: 'tech', category: 'ml' },
+  { id: 'd2', fields: { title: 'Deep Learning Guide', body: 'Neural networks and backpropagation', tags: 'dl,ai,deep' }, tag: 'tech', category: 'ml' },
+  { id: 'd3', fields: { title: 'Cooking Recipes', body: 'Pasta carbonara with eggs and cheese', tags: 'food,recipe' }, tag: 'life', category: 'food' },
+  { id: 'd4', fields: { title: 'Advanced ML', body: 'Ensemble methods and gradient boosting', tags: 'ml,advanced' }, tag: 'tech', category: 'ml', boost: 1.5, freshness: 0.9 },
+  { id: 'd5', fields: { title: 'Search Engines', body: 'BM25 ranking and vector retrieval', tags: 'search,ir' }, tag: 'tech', category: 'ir' },
 ]
 
-describe('SearchEngine - indexing', () => {
-  let s: SearchEngine
-  beforeEach(() => { s = new SearchEngine({ fields: ['title', 'body'] }) })
+let engine: SearchEngine
 
-  it('index and search', () => {
-    s.index(docs[0]!)
-    const hits = s.search({ query: 'hello' })
-    expect(hits).toHaveLength(1)
-    expect(hits[0].id).toBe('1')
-  })
-
-  it('index replaces existing', () => {
-    s.index(docs[0]!)
-    s.index({ id: '1', fields: { title: 'Goodbye', body: 'farewell' } })
-    const hits = s.search({ query: 'hello' })
-    expect(hits).toHaveLength(0)
-    const hits2 = s.search({ query: 'goodbye' })
-    expect(hits2).toHaveLength(1)
-  })
-
-  it('indexBatch indexes multiple', () => {
-    s.indexBatch(docs)
-    expect(s.size()).toBe(6)
-  })
-
-  it('remove deletes document', () => {
-    s.index(docs[0]!)
-    expect(s.remove('1')).toBe(true)
-    expect(s.search({ query: 'hello' })).toHaveLength(0)
-  })
-
-  it('remove non-existent returns false', () => {
-    expect(s.remove('missing')).toBe(false)
-  })
-
-  it('clear empties index', () => {
-    s.indexBatch(docs)
-    s.clear()
-    expect(s.size()).toBe(0)
-  })
-
-  it('hasTerm', () => {
-    s.index(docs[0]!)
-    expect(s.hasTerm('hello')).toBe(true)
-    expect(s.hasTerm('missing')).toBe(false)
-  })
-
-  it('getPostings returns postings', () => {
-    s.index(docs[0]!)
-    const p = s.getPostings('hello')
-    expect(p).toHaveLength(1)
-    expect(p[0].docId).toBe('1')
-  })
-
-  it('getDoc returns indexed doc', () => {
-    s.index(docs[0]!)
-    expect(s.getDoc('1')?.fields.title).toBe('Hello World')
-  })
-
-  it('listDocs', () => {
-    s.indexBatch(docs)
-    expect(s.listDocs()).toHaveLength(6)
-  })
+beforeEach(() => {
+  resetSearchEngine()
+  engine = new SearchEngine()
+  for (const d of corpus()) engine.addDoc(d)
 })
 
-describe('SearchEngine - basic search', () => {
-  let s: SearchEngine
-  beforeEach(() => { s = new SearchEngine({ fields: ['title', 'body'] }); s.indexBatch(docs) })
-
-  it('finds single term', () => {
-    const hits = s.search({ query: 'python' })
-    expect(hits.length).toBeGreaterThan(0)
-    expect(hits.some(h => h.id === '3')).toBe(true)
+describe('SearchEngine', () => {
+  it('tokenizes text and lowercases', () => {
+    const t = tokenize('Hello World')
+    expect(t.map(x => x.text)).toEqual(['hello', 'world'])
   })
 
-  it('case-insensitive', () => {
-    const lower = s.search({ query: 'python' })
-    const upper = s.search({ query: 'PYTHON' })
-    expect(lower.length).toBe(upper.length)
+  it('tokenizes strips stop words', () => {
+    const t = tokenize('The cat is on the mat')
+    expect(t.map(x => x.text)).toContain('cat')
+    expect(t.map(x => x.text)).not.toContain('the')
   })
 
-  it('multi-term OR', () => {
-    const hits = s.search({ query: 'python typescript', operator: 'or' })
-    expect(hits.length).toBeGreaterThanOrEqual(2)
+  it('tokenizes position is increasing', () => {
+    const t = tokenize('foo bar baz')
+    expect(t[1]!.position).toBe(1)
   })
 
-  it('multi-term AND', () => {
-    const hits = s.search({ query: 'python tutorial', operator: 'and' })
-    expect(hits).toHaveLength(1)
-    expect(hits[0].id).toBe('3')
+  it('ngrams produces overlapping n-grams', () => {
+    const g = ngrams('abc')
+    expect(g).toContain('  a')
+    expect(g).toContain('bc ')
   })
 
-  it('limit and offset', () => {
-    const hits = s.search({ query: 'search', limit: 1 })
-    expect(hits).toHaveLength(1)
+  it('jaccard returns 1 for identical sets', () => {
+    expect(jaccard(['a', 'b'], ['a', 'b'])).toBe(1)
   })
 
-  it('empty query returns nothing', () => {
-    expect(s.search({ query: '' })).toEqual([])
+  it('jaccard returns 0 for disjoint sets', () => {
+    expect(jaccard(['a', 'b'], ['c', 'd'])).toBe(0)
   })
 
-  it('no match returns empty', () => {
-    expect(s.search({ query: 'zzznotawordzzz' })).toEqual([])
+  it('jaccard returns 0 for empty inputs', () => {
+    expect(jaccard([], [])).toBe(0)
   })
 
-  it('stopword filter', () => {
-    const hits = s.search({ query: 'the' })
-    // 'the' is a stopword
-    expect(hits).toHaveLength(0)
+  it('jaccard handles partial overlap', () => {
+    const v = jaccard(['a', 'b', 'c'], ['b', 'c', 'd'])
+    expect(v).toBeCloseTo(2 / 4, 5)
   })
 
-  it('matchedTerms returned', () => {
-    s.index(docs[0]!)
-    const hits = s.search({ query: 'hello world' })
-    expect(hits[0].matchedTerms).toContain('hello')
-    expect(hits[0].matchedTerms).toContain('world')
-  })
-})
-
-describe('SearchEngine - field boosts', () => {
-  it('title match ranks higher than body match', () => {
-    const s = new SearchEngine({ fields: ['title', 'body'], fieldBoosts: { title: 5, body: 1 } })
-    s.indexBatch(docs)
-    // Add a doc with python in body but not title to differentiate
-    s.index({ id: '7', fields: { title: 'Other', body: 'python is great' } })
-    const hits = s.search({ query: 'python' })
-    // Doc 3 has 'Python' in title, doc 7 has 'python' in body — doc 3 should win
-    expect(hits[0].id).toBe('3')
-  })
-})
-
-describe('SearchEngine - filter', () => {
-  let s: SearchEngine
-  beforeEach(() => { s = new SearchEngine({ fields: ['title', 'body'] }); s.indexBatch(docs) })
-
-  it('filter by field value', () => {
-    const hits = s.search({ query: 'search', filter: [{ field: 'tags', value: 'search' }] })
-    expect(hits.every(h => ['5', '6'].includes(h.id))).toBe(true)
+  it('tf counts term frequencies', () => {
+    const m = tf(tokenize('foo bar foo baz foo'))
+    expect(m.get('foo')).toBe(3)
   })
 
-  it('filter excludes non-matching', () => {
-    const hits = s.search({ query: 'python', filter: [{ field: 'tags', value: 'web' }] })
-    expect(hits).toHaveLength(0)
+  it('addDoc and size', () => {
+    const e = new SearchEngine()
+    e.addDoc({ id: 'a', fields: { body: 'hello' } })
+    expect(e.size()).toBe(1)
   })
 
-  it('filter by regular field', () => {
-    const hits = s.search({ query: 'BM25', filter: [{ field: 'title', value: 'BM25 algorithm' }] })
-    expect(hits).toHaveLength(1)
-  })
-})
-
-describe('SearchEngine - highlights', () => {
-  let s: SearchEngine
-  beforeEach(() => { s = new SearchEngine({ fields: ['title', 'body'] }); s.indexBatch(docs) })
-
-  it('highlights matched terms', () => {
-    const hits = s.search({ query: 'python', highlight: { pre: '<b>', post: '</b>' } })
-    const h = hits.find(h => h.id === '3')
-    expect(h).toBeDefined()
-    const allFrags = Object.values(h!.highlights).flat()
-    expect(allFrags.some(f => f.includes('<b>python</b>') || f.includes('<b>Python</b>'))).toBe(true)
+  it('removeDoc returns false for missing', () => {
+    expect(engine.removeDoc('nope')).toBe(false)
   })
 
-  it('highlight with no match returns empty', () => {
-    const hits = s.search({ query: 'zzznotawordzzz', highlight: { pre: '<b>', post: '</b>' } })
-    expect(hits).toHaveLength(0)
+  it('removeDoc removes from index', () => {
+    engine.removeDoc('d1')
+    expect(engine.size()).toBe(4)
+    const r = engine.search({ text: 'machine' })
+    expect(r.find(s => s.id === 'd1')).toBeUndefined()
   })
 
-  it('fragment size limits', () => {
-    const s2 = new SearchEngine({ fields: ['body'] })
-    s2.index({ id: 'big', fields: { body: 'a'.repeat(1000) + ' python ' + 'b'.repeat(1000) } })
-    const hits = s2.search({ query: 'python', highlight: { pre: '<b>', post: '</b>', fragmentSize: 30 } })
-    expect(hits[0].highlights.body[0].length).toBeLessThan(50)
-  })
-})
-
-describe('SearchEngine - fuzzy', () => {
-  it('fuzzy match finds typos', () => {
-    const s = new SearchEngine({ fields: ['title', 'body'], enableFuzzy: true, fuzzyDistance: 1 })
-    s.index(docs[2]!) // "Python tutorial"
-    const hits = s.search({ query: 'Pythn' }) // missing 'o'
-    expect(hits.length).toBeGreaterThan(0)
+  it('search returns sorted by score', () => {
+    const r = engine.search({ text: 'machine learning', limit: 5 })
+    expect(r.length).toBeGreaterThan(0)
+    for (let i = 1; i < r.length; i++) expect(r[i - 1]!.score).toBeGreaterThanOrEqual(r[i]!.score)
   })
 
-  it('exact match still works in fuzzy mode', () => {
-    const s = new SearchEngine({ fields: ['title', 'body'], enableFuzzy: true, fuzzyDistance: 1 })
-    s.index(docs[2]!)
-    const hits = s.search({ query: 'Python' })
-    expect(hits.length).toBeGreaterThan(0)
+  it('search ranks matching docs over non-matching', () => {
+    const r = engine.search({ text: 'machine learning' })
+    expect(r.find(s => s.id === 'd1')).toBeDefined()
+    expect(r.find(s => s.id === 'd3')).toBeUndefined()
   })
 
-  it('distance 2 allows more typos', () => {
-    const s = new SearchEngine({ fields: ['title', 'body'], enableFuzzy: true, fuzzyDistance: 2 })
-    s.index(docs[2]!)
-    const hits = s.search({ query: 'Pyton' }) // 2 chars different
-    expect(hits.length).toBeGreaterThan(0)
-  })
-})
-
-describe('SearchEngine - parser', () => {
-  let s: SearchEngine
-  beforeEach(() => { s = new SearchEngine({ fields: ['title', 'body'] }); s.indexBatch(docs) })
-
-  it('parseQuery must', () => {
-    const p = s.parseQuery('+python +tutorial')
-    expect(p.must).toEqual(['python', 'tutorial'])
+  it('search applies boost and freshness', () => {
+    const r = engine.search({ text: 'ml advanced' })
+    const d4 = r.find(s => s.id === 'd4')
+    expect(d4).toBeDefined()
   })
 
-  it('parseQuery mustNot', () => {
-    const p = s.parseQuery('python -bad')
-    expect(p.mustNot).toEqual(['bad'])
+  it('search filters by tag eq', () => {
+    const r = engine.search({ text: 'learning', filters: [{ field: 'tag', op: 'eq', value: 'tech' }] })
+    expect(r.every(s => s.id !== 'd3')).toBe(true)
   })
 
-  it('parseQuery phrases', () => {
-    const p = s.parseQuery('"machine learning" python')
-    expect(p.phrases).toEqual(['machine learning'])
+  it('search filters by tag in', () => {
+    const r = engine.search({ text: 'learning', filters: [{ field: 'tag', op: 'in', value: ['life'] }] })
+    expect(r.length).toBe(0)
   })
 
-  it('searchWithParsed must', () => {
-    const p = s.parseQuery('+python')
-    const hits = s.searchWithParsed({ query: 'python', parsed: p })
-    expect(hits.length).toBeGreaterThan(0)
+  it('search filters by category eq', () => {
+    const r = engine.search({ text: 'BM25', filters: [{ field: 'category', op: 'eq', value: 'ir' }] })
+    expect(r.length).toBe(1)
+    expect(r[0]!.id).toBe('d5')
   })
 
-  it('searchWithParsed mustNot', () => {
-    const p = s.parseQuery('python -tutorial')
-    const hits = s.searchWithParsed({ query: 'python tutorial', parsed: p })
-    // 'python tutorial' doc 3 has tutorial in body, so excluded
-    expect(hits.find(h => h.id === '3')).toBeUndefined()
-  })
-})
-
-describe('SearchEngine - BM25 scoring', () => {
-  it('higher TF ranks higher', () => {
-    const s = new SearchEngine({ fields: ['body'] })
-    s.index({ id: 'a', fields: { body: 'python python python' } })
-    s.index({ id: 'b', fields: { body: 'python is great' } })
-    const hits = s.search({ query: 'python' })
-    expect(hits[0].id).toBe('a')
+  it('search filters by category in', () => {
+    const r = engine.search({ text: 'pasta', filters: [{ field: 'category', op: 'in', value: ['food'] }] })
+    expect(r.length).toBe(1)
   })
 
-  it('shorter doc ranks higher for same TF', () => {
-    const s = new SearchEngine({ fields: ['body'] })
-    s.index({ id: 'short', fields: { body: 'python' } })
-    s.index({ id: 'long', fields: { body: 'a b c d e f g h i j python' } })
-    const hits = s.search({ query: 'python' })
-    // BM25 prefers shorter docs with same TF
-    expect(hits[0].id).toBe('short')
-  })
-})
-
-describe('SearchEngine - stats', () => {
-  it('reports totalDocs and totalTerms', () => {
-    const s = new SearchEngine({ fields: ['title', 'body'] })
-    s.indexBatch(docs)
-    const st = s.stats()
-    expect(st.totalDocs).toBe(6)
-    expect(st.totalTerms).toBeGreaterThan(10)
-    expect(st.avgDocLength).toBeGreaterThan(0)
-    expect(st.indexSize).toBeGreaterThan(0)
+  it('search returns empty for no match', () => {
+    const r = engine.search({ text: 'xyzzy' })
+    expect(r).toHaveLength(0)
   })
 
-  it('getMetrics tracks searches/indexed/removed', () => {
-    const s = new SearchEngine({ fields: ['title', 'body'] })
-    s.indexBatch(docs)
-    s.search({ query: 'python' })
-    s.remove('1')
-    const m = s.getMetrics()
-    expect(m.indexed).toBe(6)
-    expect(m.searches).toBe(1)
-    expect(m.removed).toBe(1)
+  it('search minScore filters low', () => {
+    const r = engine.search({ text: 'machine', minScore: 1000 })
+    expect(r).toHaveLength(0)
   })
-})
 
-describe('SearchEngine - ngram tokenizer', () => {
-  it('ngram tokenizer enables partial matching', () => {
-    const s = new SearchEngine({ fields: ['body'], tokenizer: 'ngram', ngramSize: 3 })
-    s.index(docs[0]!) // "The quick brown fox..."
-    const hits = s.search({ query: 'qui' })
-    expect(hits.length).toBeGreaterThan(0)
+  it('search doRerank flag works', () => {
+    const r = engine.search({ text: 'learning', doRerank: true, limit: 3 })
+    expect(r.length).toBeGreaterThan(0)
+  })
+
+  it('search highlight includes matched tokens', () => {
+    const r = engine.search({ text: 'machine', limit: 1 })
+    expect(r[0]!.highlights).toContain('<<machine>>')
+  })
+
+  it('explain returns component scores', () => {
+    const e = engine.explain({ text: 'machine' }, 'd1')
+    expect(e).not.toBeNull()
+    expect(e!.bm25).toBeGreaterThan(0)
+  })
+
+  it('explain returns null for missing doc', () => {
+    expect(engine.explain({ text: 'x' }, 'nope')).toBeNull()
+  })
+
+  it('search empty query', () => {
+    const r = engine.search({ text: '' })
+    expect(r.length).toBe(0)
+  })
+
+  it('search supports Chinese tokenization', () => {
+    const e = new SearchEngine()
+    e.addDoc({ id: 'c1', fields: { title: '机器学习入门', body: '深度学习与神经网络' } })
+    const r = e.search({ text: '学习' })
+    expect(r.length).toBe(1)
+  })
+
+  it('search supports custom stopwords', () => {
+    const e = new SearchEngine({ stopWords: new Set(['the']) })
+    e.addDoc({ id: 'x', fields: { body: 'the cat sat' } })
+    const r = e.search({ text: 'the cat' })
+    expect(r[0]!.id).toBe('x')
+  })
+
+  it('getSearchEngine returns singleton', async () => {
+    const { getSearchEngine } = await import('../index')
+    const a = getSearchEngine()
+    const b = getSearchEngine()
+    expect(a).toBe(b)
   })
 })
