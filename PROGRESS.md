@@ -23,10 +23,10 @@ gh pr list --repo haihaihaihai-1/versa
 
 ## 当前状态（2026-06-07 抓取）
 
-- **HEAD**：本地 HEAD — v83.0 Time Series Forecasting（待推送）
-- **远程 origin/main**：`7348087`（v82.0 Anomaly Detection，已推送）
-- **本地工作区**：即将推送 v83.0 Time Series Forecasting
-- **测试**：2507 通过 / 76 文件（v83.0 净增 24 条）
+- **HEAD**：本地 HEAD — v84.0 Knowledge Graph（待推送）
+- **远程 origin/main**：`67b4b23`（v83.0 Time Series Forecasting，已推送）
+- **本地工作区**：即将推送 v84.0 Knowledge Graph
+- **测试**：2543 通过 / 77 文件（v84.0 净增 36 条）
 
 ## 里程碑（按时间倒序）
 
@@ -83,6 +83,7 @@ gh pr list --repo haihaihaihai-1/versa
 | v81.0 | A/B Testing Framework（Experiment/Variant/Assignment/Exposure/Z-Test/Significance） | 27 |
 | v82.0 | Anomaly Detection（ZScore/MAD/IQR/MovingAvg/IsolationForest · Severity · Alert） | 25 |
 | v83.0 | Time Series Forecasting（MovingAvg/ExpSmoothing/LinearTrend/AR/Naive/Seasonal · Decompose · MAE/RMSE/MAPE） | 24 |
+| v84.0 | Knowledge Graph（Entity/Relation/Query/Path/Subgraph/Stats · Dijkstra） | 36 |
 | v33.0 | Secrets/Vault（SecretStore/Encryption/Versioning/Policies/Audit/Rotation/Scanner/Resolver） | 58 |
 | v32.0 | Job Queue（JobQueueSystem/Registry/Worker/Scheduler/Retry/DLQ/Events/Metrics） | 54 |
 | v31.0 | Notification（Channel/Template/Queue/Preference/Throttle/Digest/Provider/Metrics） | 54 |
