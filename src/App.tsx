@@ -225,6 +225,7 @@ const ModelRegistryPage = lazy(() => import('./modelreg/page'))
 const DriftPage = lazy(() => import('./drift/page'))
 const InferencePage = lazy(() => import('./inference/page'))
 const RecommendPage = lazy(() => import('./recommend/page'))
+const AbTestPage = lazy(() => import('./abtest/page'))
 
 export const router = createBrowserRouter(
   [
@@ -397,6 +398,7 @@ export const router = createBrowserRouter(
         { path: 'drift', element: withSuspense(<DriftPage />) },
         { path: 'inference', element: withSuspense(<InferencePage />) },
         { path: 'recommend', element: withSuspense(<RecommendPage />) },
+        { path: 'abtest', element: withSuspense(<AbTestPage />) },
         { path: 'vector', element: withSuspense(<VectorPage />) },
         { path: 'edge', element: withSuspense(<EdgePage />) },
         { path: 'federation', element: withSuspense(<FederationPage />) },
